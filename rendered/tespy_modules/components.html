@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Components &mdash; tespy 0.6.0 - Colored Chemicals documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> tespy
+            <img src="../_static/logo_tespy_mid.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.6.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Thermal Engineering Systems in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../first_steps.html">First steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials_examples.html">Examples and Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tespy_modules.html">TESPy modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tespy_analyses.html">Thermodynamic analyses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developing_tespy.html">Developing TESPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zliterature.html">Literature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">tespy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Components</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tespy_modules/components.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="components">
+<h1>Components<a class="headerlink" href="#components" title="Permalink to this headline">¶</a></h1>
+<p>In this section we will introduce you into the details of component
+parametrisation and component characteristics. At the end of the section we
+show you, how to create custom components.</p>
+<section id="list-of-components">
+<h2>List of components<a class="headerlink" href="#list-of-components" title="Permalink to this headline">¶</a></h2>
+<p>More information on the components can be gathered from the code documentation.
+We have linked the base class containing a figure and basic information as
+well as the equations.</p>
+<ul>
+<li><p>Basics</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="../api/tespy.components.html#tespy.components.basics.cycle_closer.CycleCloser" title="tespy.components.basics.cycle_closer.CycleCloser"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cycle</span> <span class="pre">closer</span></code></a></p></li>
+<li><p><a class="reference internal" href="../api/tespy.components.html#tespy.components.basics.sink.Sink" title="tespy.components.basics.sink.Sink"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sink</span></code></a></p></li>
+<li><p><a class="reference internal" href="../api/tespy.components.html#tespy.components.basics.source.Source" title="tespy.components.basics.source.Source"><code class="xref py py-class docutils literal notranslate"><span class="pre">Source</span></code></a></p></li>
+<li><p><a class="reference internal" href="../api/tespy.components.html#tespy.components.basics.subsystem_interface.SubsystemInterface" title="tespy.components.basics.subsystem_interface.SubsystemInterface"><code class="xref py py-class docutils literal notranslate"><span class="pre">Subsystem</span> <span class="pre">interface</span></code></a></p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Combustion</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber" title="tespy.components.combustion.base.CombustionChamber"><code class="xref py py-class docutils literal notranslate"><span class="pre">Combustion</span> <span class="pre">chamber</span></code></a></p></li>
+<li><p><a class="reference internal" href="../api/tespy.components.html#tespy.components.combustion.diabatic.DiabaticCombustionChamber" title="tespy.components.combustion.diabatic.DiabaticCombustionChamber"><code class="xref py py-class docutils literal notranslate"><span class="pre">Diabatic</span> <span class="pre">combustion</span> <span class="pre">chamber</span></code></a>
+(Advanced version of combustion chamber, featuring heat losses and
+pressure drop)</p></li>
+<li><p><a class="reference internal" href="../api/tespy.components.html#tespy.components.combustion.engine.CombustionEngine" title="tespy.components.combustion.engine.CombustionEngine"><code class="xref py py-class docutils literal notranslate"><span class="pre">Combustion</span> <span class="pre">engine</span></code></a></p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Heat exchangers</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="../api/tespy.components.html#tespy.components.heat_exchangers.simple.HeatExchangerSimple" title="tespy.components.heat_exchangers.simple.HeatExchangerSimple"><code class="xref py py-class docutils literal notranslate"><span class="pre">Simplified</span> <span class="pre">heat</span> <span class="pre">exchanger</span></code></a></p></li>
+<li><p><a class="reference internal" href="../api/tespy.components.html#tespy.components.heat_exchangers.solar_collector.SolarCollector" title="tespy.components.heat_exchangers.solar_collector.SolarCollector"><code class="xref py py-class docutils literal notranslate"><span class="pre">Solar</span> <span class="pre">collector</span></code></a></p></li>
+<li><p><a class="reference internal" href="../api/tespy.components.html#tespy.components.heat_exchangers.parabolic_trough.ParabolicTrough" title="tespy.components.heat_exchangers.parabolic_trough.ParabolicTrough"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parabolic</span> <span class="pre">trough</span></code></a></p></li>
+<li><p><a class="reference internal" href="../api/tespy.components.html#tespy.components.heat_exchangers.base.HeatExchanger" title="tespy.components.heat_exchangers.base.HeatExchanger"><code class="xref py py-class docutils literal notranslate"><span class="pre">Heat</span> <span class="pre">exchanger</span></code></a></p></li>
+<li><p><a class="reference internal" href="../api/tespy.components.html#tespy.components.heat_exchangers.condenser.Condenser" title="tespy.components.heat_exchangers.condenser.Condenser"><code class="xref py py-class docutils literal notranslate"><span class="pre">Condenser</span></code></a></p></li>
+<li><p><a class="reference internal" href="../api/tespy.components.html#tespy.components.heat_exchangers.desuperheater.Desuperheater" title="tespy.components.heat_exchangers.desuperheater.Desuperheater"><code class="xref py py-class docutils literal notranslate"><span class="pre">Desuperheater</span></code></a></p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Nodes</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="../api/tespy.components.html#tespy.components.nodes.droplet_separator.DropletSeparator" title="tespy.components.nodes.droplet_separator.DropletSeparator"><code class="xref py py-class docutils literal notranslate"><span class="pre">Droplet</span> <span class="pre">separator</span></code></a></p></li>
+<li><p><a class="reference internal" href="../api/tespy.components.html#tespy.components.nodes.drum.Drum" title="tespy.components.nodes.drum.Drum"><code class="xref py py-class docutils literal notranslate"><span class="pre">Drum</span></code></a></p></li>
+<li><p><a class="reference internal" href="../api/tespy.components.html#tespy.components.nodes.merge.Merge" title="tespy.components.nodes.merge.Merge"><code class="xref py py-class docutils literal notranslate"><span class="pre">Merge</span></code></a></p></li>
+<li><p><a class="reference internal" href="../api/tespy.components.html#tespy.components.nodes.separator.Separator" title="tespy.components.nodes.separator.Separator"><code class="xref py py-class docutils literal notranslate"><span class="pre">Separator</span></code></a></p></li>
+<li><p><a class="reference internal" href="../api/tespy.components.html#tespy.components.nodes.splitter.Splitter" title="tespy.components.nodes.splitter.Splitter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Splitter</span></code></a></p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Piping</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="../api/tespy.components.html#tespy.components.piping.pipe.Pipe" title="tespy.components.piping.pipe.Pipe"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipe</span></code></a></p></li>
+<li><p><a class="reference internal" href="../api/tespy.components.html#tespy.components.piping.valve.Valve" title="tespy.components.piping.valve.Valve"><code class="xref py py-class docutils literal notranslate"><span class="pre">Valve</span></code></a></p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Reactors</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer" title="tespy.components.reactors.water_electrolyzer.WaterElectrolyzer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Water</span> <span class="pre">electrolyzer</span></code></a></p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Turbomachinery</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="../api/tespy.components.html#tespy.components.turbomachinery.compressor.Compressor" title="tespy.components.turbomachinery.compressor.Compressor"><code class="xref py py-class docutils literal notranslate"><span class="pre">Compressor</span></code></a></p></li>
+<li><p><a class="reference internal" href="../api/tespy.components.html#tespy.components.turbomachinery.pump.Pump" title="tespy.components.turbomachinery.pump.Pump"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pump</span></code></a></p></li>
+<li><p><a class="reference internal" href="../api/tespy.components.html#tespy.components.turbomachinery.turbine.Turbine" title="tespy.components.turbomachinery.turbine.Turbine"><code class="xref py py-class docutils literal notranslate"><span class="pre">Turbine</span></code></a></p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</section>
+<section id="list-of-custom-components">
+<h2>List of custom components<a class="headerlink" href="#list-of-custom-components" title="Permalink to this headline">¶</a></h2>
+<p>Here we list the components integrated in the customs module.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../api/tespy.components.html#tespy.components.customs.orc_evaporator.ORCEvaporator" title="tespy.components.customs.orc_evaporator.ORCEvaporator"><code class="xref py py-class docutils literal notranslate"><span class="pre">Evaporator</span> <span class="pre">for</span> <span class="pre">two-phase</span> <span class="pre">geothermal</span> <span class="pre">organic</span> <span class="pre">rankine</span> <span class="pre">cycle</span></code></a></p></li>
+</ul>
+</section>
+<section id="component-parametrisation">
+<span id="using-tespy-components-parametrisation-label"></span><h2>Component parametrisation<a class="headerlink" href="#component-parametrisation" title="Permalink to this headline">¶</a></h2>
+<p>All parameters of components are objects of a <code class="code docutils literal notranslate"><span class="pre">DataContainer</span></code> class. The
+data container for component parameters it is called
+<code class="code docutils literal notranslate"><span class="pre">ComponentProperties</span></code>, <code class="code docutils literal notranslate"><span class="pre">ComponentCharacteristics</span></code> for component
+characteristics and <code class="code docutils literal notranslate"><span class="pre">ComponentCharacteristicMaps</span></code> for characteristic
+maps. The main purpose of having a data container for the parameters (instead
+of pure numbers), is added flexibility for the user. There are different ways
+for you to specify and access component parameters.</p>
+<section id="component-parameters">
+<h3>Component parameters<a class="headerlink" href="#component-parameters" title="Permalink to this headline">¶</a></h3>
+<p>The example shows different ways to specify the heat transfer coefficient of an
+evaporator and how to unset the parameter again.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="n">HeatExchanger</span>
+<span class="kn">from</span> <span class="nn">tespy.tools</span> <span class="kn">import</span> <span class="n">ComponentProperties</span> <span class="k">as</span> <span class="n">dc_cp</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="n">he</span> <span class="o">=</span> <span class="n">HeatExchanger</span><span class="p">(</span><span class="s1">&#39;evaporator&#39;</span><span class="p">)</span>
+
+<span class="c1"># specify the value</span>
+<span class="n">he</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">kA</span><span class="o">=</span><span class="mf">1e5</span><span class="p">)</span>
+<span class="c1"># specify via dictionary</span>
+<span class="n">he</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">kA</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;val&#39;</span><span class="p">:</span> <span class="mf">1e5</span><span class="p">,</span> <span class="s1">&#39;is_set&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
+<span class="c1"># set data container parameters</span>
+<span class="n">he</span><span class="o">.</span><span class="n">kA</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">val</span><span class="o">=</span><span class="mf">1e5</span><span class="p">,</span> <span class="n">is_set</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># possibilities to unset a value</span>
+<span class="n">he</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">kA</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+<span class="n">he</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">kA</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">he</span><span class="o">.</span><span class="n">kA</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">is_set</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="grouped-parameters">
+<h3>Grouped parameters<a class="headerlink" href="#grouped-parameters" title="Permalink to this headline">¶</a></h3>
+<p>Grouped parameters are used whenever a component property depends on multiple
+parameters. For instance, the pressure loss calculation via Darcy-Weissbach
+requires information about the length, diameter and roughness of the pipe.
+The solver will prompt a warning, if you do not specify all parameters required
+by a parameter group. If parameters of the group are missing, the equation will
+not be implemented by the solver.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="n">Pipe</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="n">my_pipe</span> <span class="o">=</span> <span class="n">Pipe</span><span class="p">(</span><span class="s1">&#39;pipe&#39;</span><span class="p">)</span>
+
+<span class="c1"># specify grouped parameters</span>
+<span class="n">my_pipe</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">D</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">ks</span><span class="o">=</span><span class="mf">0.00005</span><span class="p">)</span>
+
+<span class="c1"># the solver will not apply an equation, since the information of the</span>
+<span class="c1"># pipe&#39;s length is missing.</span>
+<span class="n">my_pipe</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">D</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">ks</span><span class="o">=</span><span class="mf">0.00005</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>There are several components using parameter groups:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>heat_exchanger_simple and pipe</dt><dd><ul>
+<li><p><code class="code docutils literal notranslate"><span class="pre">hydro_group</span></code> (<code class="code docutils literal notranslate"><span class="pre">D</span></code>, <code class="code docutils literal notranslate"><span class="pre">L</span></code>, <code class="code docutils literal notranslate"><span class="pre">ks</span></code>)</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">kA_group</span></code> (<code class="code docutils literal notranslate"><span class="pre">kA</span></code>, <code class="code docutils literal notranslate"><span class="pre">Tamb</span></code>)</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">kA_char_group</span></code> (<code class="code docutils literal notranslate"><span class="pre">kA_char</span></code>, <code class="code docutils literal notranslate"><span class="pre">Tamb</span></code>)</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>solar_collector</dt><dd><ul>
+<li><p><code class="code docutils literal notranslate"><span class="pre">hydro_group</span></code> (<code class="code docutils literal notranslate"><span class="pre">D</span></code>, <code class="code docutils literal notranslate"><span class="pre">L</span></code>, <code class="code docutils literal notranslate"><span class="pre">ks</span></code>)</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">energy_group</span></code> (<code class="code docutils literal notranslate"><span class="pre">E</span></code>, <code class="code docutils literal notranslate"><span class="pre">eta_opt</span></code>, <code class="code docutils literal notranslate"><span class="pre">lkf_lin</span></code>,
+<code class="code docutils literal notranslate"><span class="pre">lkf_quad</span></code>, <code class="code docutils literal notranslate"><span class="pre">A</span></code>, <code class="code docutils literal notranslate"><span class="pre">Tamb</span></code>)</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>parabolic_trough</dt><dd><ul>
+<li><p><code class="code docutils literal notranslate"><span class="pre">hydro_group</span></code> (<code class="code docutils literal notranslate"><span class="pre">D</span></code>, <code class="code docutils literal notranslate"><span class="pre">L</span></code>, <code class="code docutils literal notranslate"><span class="pre">ks</span></code>)</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">energy_group</span></code> (<code class="code docutils literal notranslate"><span class="pre">E</span></code>, <code class="code docutils literal notranslate"><span class="pre">eta_opt</span></code>, <code class="code docutils literal notranslate"><span class="pre">aoi</span></code>,
+<code class="code docutils literal notranslate"><span class="pre">doc</span></code>, <code class="code docutils literal notranslate"><span class="pre">c_1</span></code>, <code class="code docutils literal notranslate"><span class="pre">c_2</span></code>, <code class="code docutils literal notranslate"><span class="pre">iam_1</span></code>, <code class="code docutils literal notranslate"><span class="pre">iam_2</span></code>,
+<code class="code docutils literal notranslate"><span class="pre">A</span></code>, <code class="code docutils literal notranslate"><span class="pre">Tamb</span></code>)</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>compressor</dt><dd><ul>
+<li><p><code class="code docutils literal notranslate"><span class="pre">char_map_eta_s_group</span></code> (<code class="code docutils literal notranslate"><span class="pre">char_map_eta_s</span></code>, <code class="code docutils literal notranslate"><span class="pre">igva</span></code>)</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">char_map_pr_group</span></code> (<code class="code docutils literal notranslate"><span class="pre">char_map_pr</span></code>, <code class="code docutils literal notranslate"><span class="pre">igva</span></code>)</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</section>
+<section id="custom-variables">
+<h3>Custom variables<a class="headerlink" href="#custom-variables" title="Permalink to this headline">¶</a></h3>
+<p>It is possible to use component parameters as variables of your system of
+equations. In the component parameter list, if a parameter can be a string, it
+is possible to specify this parameter as custom variable. For example, given
+the pressure ratio <code class="code docutils literal notranslate"><span class="pre">pr</span></code>, length <code class="code docutils literal notranslate"><span class="pre">L</span></code> and roughness <code class="code docutils literal notranslate"><span class="pre">ks</span></code> of a
+pipe you may want to calculate the pipe’s diameter <code class="code docutils literal notranslate"><span class="pre">D</span></code> required to
+achieve the specified pressure ratio. In this case you need to specify the
+diameter the following way.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="n">Pipe</span>
+<span class="kn">from</span> <span class="nn">tespy.tools</span> <span class="kn">import</span> <span class="n">ComponentProperties</span> <span class="k">as</span> <span class="n">dc_cp</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1"># custom variables</span>
+<span class="n">my_pipe</span> <span class="o">=</span> <span class="n">Pipe</span><span class="p">(</span><span class="s1">&#39;my pipe&#39;</span><span class="p">)</span>
+
+<span class="c1"># make diameter variable of system</span>
+<span class="n">my_pipe</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">pr</span><span class="o">=</span><span class="mf">0.98</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">ks</span><span class="o">=</span><span class="mf">0.00002</span><span class="p">,</span> <span class="n">D</span><span class="o">=</span><span class="s1">&#39;var&#39;</span><span class="p">)</span>
+
+<span class="c1"># a second way of specifying this is similar to the</span>
+<span class="c1"># way used in the component parameters section</span>
+<span class="c1"># val will be used as starting value</span>
+<span class="n">my_pipe</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">pr</span><span class="o">=</span><span class="mf">0.98</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">ks</span><span class="o">=</span><span class="mf">0.00002</span><span class="p">)</span>
+<span class="n">my_pipe</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">D</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;val&#39;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="s1">&#39;is_set&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;is_var&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>It is also possible to set value boundaries for you custom variable. You can do
+this, if you expect the result to be within a specific range. But beware: This
+might result in a non converging simulation, if the actual value is out of your
+specified range.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># data container specification with identical result,</span>
+<span class="c1"># benefit: specification of bounds will increase stability</span>
+<span class="n">my_pipe</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">D</span><span class="o">=</span><span class="p">{</span>
+    <span class="s1">&#39;val&#39;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="s1">&#39;is_set&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;is_var&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s1">&#39;min_val&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span> <span class="s1">&#39;max_val&#39;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">})</span>
+</pre></div>
+</div>
+</section>
+<section id="component-characteristics">
+<span id="component-characteristic-specification-label"></span><h3>Component characteristics<a class="headerlink" href="#component-characteristics" title="Permalink to this headline">¶</a></h3>
+<p>Several components integrate parameters using a characteristic function. These
+parameters come with default characteristics. The default characteristics
+available can be found in the <code class="xref py py-mod docutils literal notranslate"><span class="pre">&lt;tespy.data&gt;</span></code> module. Of course, it is
+possible to specify your own characteristic functions.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>There are two different characteristics specifications</strong></p>
+<p>The characteristic function can be an auxiliary parameter of a different
+component property. This is the case for <code class="code docutils literal notranslate"><span class="pre">kA_char1</span></code>
+and <code class="code docutils literal notranslate"><span class="pre">kA_char2</span></code> of heat exchangers as well as the characteristics of a
+combustion engine: <code class="code docutils literal notranslate"><span class="pre">tiP_char</span></code>, <code class="code docutils literal notranslate"><span class="pre">Q1_char</span></code>, <code class="code docutils literal notranslate"><span class="pre">Q2_char</span></code>
+and <code class="code docutils literal notranslate"><span class="pre">Qloss_char</span></code>.</p>
+<p>For all other components, the characteristic function is an individual
+parameter of the component.</p>
+<p><strong>What does this mean?</strong></p>
+<p>For the auxiliary functionality the main parameter, e.g. <code class="code docutils literal notranslate"><span class="pre">kA_char</span></code>
+of a heat exchanger must be set <code class="code docutils literal notranslate"><span class="pre">.kA_char.is_set=True</span></code>.</p>
+<p>For the other functionality the characteristics parameter must be
+set e.g. <code class="code docutils literal notranslate"><span class="pre">.eta_s_char.is_set=True</span></code>.</p>
+</div>
+<p>For example, <code class="code docutils literal notranslate"><span class="pre">kA_char</span></code> specification for heat exchangers:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="n">HeatExchanger</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.characteristics</span> <span class="kn">import</span> <span class="n">load_default_char</span> <span class="k">as</span> <span class="n">ldc</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.characteristics</span> <span class="kn">import</span> <span class="n">CharLine</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="n">he</span> <span class="o">=</span> <span class="n">HeatExchanger</span><span class="p">(</span><span class="s1">&#39;evaporator&#39;</span><span class="p">)</span>
+
+<span class="c1"># the characteristic function requires the design value of the property,</span>
+<span class="c1"># therefore the design value of kA must be set and additonally we set</span>
+<span class="c1"># the kA_char method. This is performed automatically, if you specify the</span>
+<span class="c1"># kA_char as offdesign parameter (usual case).</span>
+<span class="n">he</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">kA</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;design&#39;</span><span class="p">:</span> <span class="mf">1e5</span><span class="p">},</span> <span class="n">kA_char</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;is_set&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
+
+<span class="c1"># use a characteristic line from the defaults: specify the component, the</span>
+<span class="c1"># parameter and the name of the characteristic function. Also, specify, what</span>
+<span class="c1"># type of characteristic function you want to use.</span>
+<span class="n">kA_char1</span> <span class="o">=</span> <span class="n">ldc</span><span class="p">(</span><span class="s1">&#39;heat exchanger&#39;</span><span class="p">,</span> <span class="s1">&#39;kA_char1&#39;</span><span class="p">,</span> <span class="s1">&#39;DEFAULT&#39;</span><span class="p">,</span> <span class="n">CharLine</span><span class="p">)</span>
+<span class="n">kA_char2</span> <span class="o">=</span> <span class="n">ldc</span><span class="p">(</span><span class="s1">&#39;heat exchanger&#39;</span><span class="p">,</span> <span class="s1">&#39;kA_char2&#39;</span><span class="p">,</span> <span class="s1">&#39;EVAPORATING FLUID&#39;</span><span class="p">,</span> <span class="n">CharLine</span><span class="p">)</span>
+<span class="n">he</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">kA_char2</span><span class="o">=</span><span class="n">kA_char2</span><span class="p">)</span>
+
+<span class="c1"># specification of a data container yields the same result. It is</span>
+<span class="c1"># aditionally possible to specify the characteristics parameter, e.g. mass flow</span>
+<span class="c1"># for kA_char1 and volumetric flow for kA_char2</span>
+<span class="n">he</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span>
+    <span class="n">kA_char1</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;char_func&#39;</span><span class="p">:</span> <span class="n">kA_char1</span><span class="p">,</span> <span class="s1">&#39;param&#39;</span><span class="p">:</span> <span class="s1">&#39;m&#39;</span><span class="p">},</span>
+    <span class="n">kA_char2</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;char_func&#39;</span><span class="p">:</span> <span class="n">kA_char2</span><span class="p">,</span> <span class="s1">&#39;param&#39;</span><span class="p">:</span> <span class="s1">&#39;v&#39;</span><span class="p">})</span>
+
+<span class="c1"># or use custom values for the characteristic line e.g. kA vs volumetric flow</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">])</span>
+<span class="n">kA_char1</span> <span class="o">=</span> <span class="n">CharLine</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">he</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">kA_char1</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;char_func&#39;</span><span class="p">:</span> <span class="n">kA_char1</span><span class="p">,</span> <span class="s1">&#39;param&#39;</span><span class="p">:</span> <span class="s1">&#39;v&#39;</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>Full working example for <code class="code docutils literal notranslate"><span class="pre">eta_s_char</span></code> specification of a turbine.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="n">Sink</span><span class="p">,</span> <span class="n">Source</span><span class="p">,</span> <span class="n">Turbine</span>
+<span class="kn">from</span> <span class="nn">tespy.connections</span> <span class="kn">import</span> <span class="n">Connection</span>
+<span class="kn">from</span> <span class="nn">tespy.networks</span> <span class="kn">import</span> <span class="n">Network</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.characteristics</span> <span class="kn">import</span> <span class="n">CharLine</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="n">fluid_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;water&#39;</span><span class="p">]</span>
+<span class="n">nw</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span><span class="n">fluids</span><span class="o">=</span><span class="n">fluid_list</span><span class="p">,</span> <span class="n">p_unit</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="n">T_unit</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="n">h_unit</span><span class="o">=</span><span class="s1">&#39;kJ / kg&#39;</span><span class="p">)</span>
+<span class="n">si</span> <span class="o">=</span> <span class="n">Sink</span><span class="p">(</span><span class="s1">&#39;sink&#39;</span><span class="p">)</span>
+<span class="n">so</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span><span class="s1">&#39;source&#39;</span><span class="p">)</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">Turbine</span><span class="p">(</span><span class="s1">&#39;turbine&#39;</span><span class="p">)</span>
+<span class="n">inc</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+<span class="n">outg</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">si</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+<span class="n">nw</span><span class="o">.</span><span class="n">add_conns</span><span class="p">(</span><span class="n">inc</span><span class="p">,</span> <span class="n">outg</span><span class="p">)</span>
+
+<span class="c1"># design value specification, cone law and eta_s characteristic as</span>
+<span class="c1"># offdesign parameters</span>
+<span class="n">eta_s_design</span> <span class="o">=</span> <span class="mf">0.855</span>
+<span class="n">t</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">eta_s</span><span class="o">=</span><span class="n">eta_s_design</span><span class="p">,</span> <span class="n">design</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;eta_s&#39;</span><span class="p">],</span> <span class="n">offdesign</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;eta_s_char&#39;</span><span class="p">,</span><span class="s1">&#39;cone&#39;</span><span class="p">])</span>
+
+<span class="c1"># Characteristics x as m/m_design and y as eta_s(m)/eta_s_design</span>
+<span class="c1"># make sure to cross the 1/1 point (design point) to yield the same</span>
+<span class="c1"># output in the design state of the system</span>
+<span class="n">line</span> <span class="o">=</span> <span class="n">CharLine</span><span class="p">(</span>
+    <span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">],</span>
+    <span class="n">y</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.65</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">,</span> <span class="mf">0.82</span><span class="p">,</span> <span class="mf">0.85</span><span class="p">,</span> <span class="mf">0.855</span><span class="p">,</span> <span class="mf">0.79</span><span class="p">])</span> <span class="o">/</span> <span class="n">eta_s_design</span><span class="p">)</span>
+
+<span class="c1"># default parameter for x is m / m_design</span>
+<span class="n">t</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">eta_s_char</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;char_func&#39;</span><span class="p">:</span> <span class="n">line</span><span class="p">})</span>
+<span class="n">inc</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">fluid</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;water&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span> <span class="n">m</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mi">550</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">110</span><span class="p">,</span> <span class="n">design</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;p&#39;</span><span class="p">])</span>
+<span class="n">outg</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">nw</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="s1">&#39;design&#39;</span><span class="p">)</span>
+<span class="n">nw</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;tmp&#39;</span><span class="p">)</span>
+<span class="c1"># change mass flow value, e.g. 3 kg/s and run offdesign calculation</span>
+<span class="n">inc</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">m</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">nw</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="s1">&#39;offdesign&#39;</span><span class="p">,</span> <span class="n">design_path</span><span class="o">=</span><span class="s1">&#39;tmp&#39;</span><span class="p">)</span>
+<span class="c1"># isentropic efficiency should be at 0.65</span>
+<span class="n">nw</span><span class="o">.</span><span class="n">print_results</span><span class="p">()</span>
+
+<span class="c1"># alternatively, we can specify the volumetric flow v / v_design for</span>
+<span class="c1"># the x lookup</span>
+<span class="n">t</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">eta_s_char</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;param&#39;</span><span class="p">:</span> <span class="s1">&#39;v&#39;</span><span class="p">})</span>
+<span class="n">nw</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="s1">&#39;offdesign&#39;</span><span class="p">,</span> <span class="n">design_path</span><span class="o">=</span><span class="s1">&#39;tmp&#39;</span><span class="p">)</span>
+<span class="n">nw</span><span class="o">.</span><span class="n">print_results</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Instead of writing your custom characteristic line information directly into
+your Python script, TESPy provides a second method of implementation: It is
+possible to store your data in the <code class="code docutils literal notranslate"><span class="pre">HOME/.tespy/data</span></code> folder and import
+from there. For additional information on formatting and usage, look into
+<a class="reference internal" href="../tespy_modules.html#using-tespy-characteristics-label"><span class="std std-ref">this part</span></a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tespy.tools.characteristics</span> <span class="kn">import</span> <span class="n">load_custom_char</span> <span class="k">as</span> <span class="n">lcc</span>
+
+<span class="n">eta_s_char</span> <span class="o">=</span> <span class="n">dc_cc</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">lcc</span><span class="p">(</span><span class="s1">&#39;my_custom_char&#39;</span><span class="p">,</span> <span class="n">CharLine</span><span class="p">),</span> <span class="n">is_set</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">t</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">eta_s_char</span><span class="o">=</span><span class="n">eta_s_char</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>It is possible to allow value extrapolation at the lower and upper limit of the
+value range at the creation of characteristic lines. Set the extrapolation
+parameter to <code class="code docutils literal notranslate"><span class="pre">True</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># use custom specification parameters</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">])</span>
+<span class="n">kA_char1</span> <span class="o">=</span> <span class="n">CharLine</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">extrapolate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">he</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">kA_char1</span><span class="o">=</span><span class="n">kA_char1</span><span class="p">)</span>
+
+<span class="c1"># set extrapolation to True for existing lines, e.g.</span>
+<span class="n">he</span><span class="o">.</span><span class="n">kA_char1</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">extrapolate</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">pu</span><span class="o">.</span><span class="n">eta_s_char</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">extrapolate</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+<p>Characteristics are available for the following components and parameters:</p>
+<ul>
+<li><p>combustion engine</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="../api/tespy.components.html#tespy.components.combustion.engine.CombustionEngine.tiP_char_func" title="tespy.components.combustion.engine.CombustionEngine.tiP_char_func"><code class="xref py py-meth docutils literal notranslate"><span class="pre">tiP_char</span></code></a>: thermal input vs. power ratio.</p></li>
+<li><p><a class="reference internal" href="../api/tespy.components.html#tespy.components.combustion.engine.CombustionEngine.Q1_char_func" title="tespy.components.combustion.engine.CombustionEngine.Q1_char_func"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Q1_char</span></code></a>: heat output 1 vs. power ratio.</p></li>
+<li><p><a class="reference internal" href="../api/tespy.components.html#tespy.components.combustion.engine.CombustionEngine.Q2_char_func" title="tespy.components.combustion.engine.CombustionEngine.Q2_char_func"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Q2_char</span></code></a>: heat output 2 vs. power ratio.</p></li>
+<li><p><a class="reference internal" href="../api/tespy.components.html#tespy.components.combustion.engine.CombustionEngine.Qloss_char_func" title="tespy.components.combustion.engine.CombustionEngine.Qloss_char_func"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Qloss_char</span></code></a>: heat loss vs. power ratio.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>compressor</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">char_map</span></code>: pressure ratio vs. non-dimensional mass flow.</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">char_map</span></code>: isentropic efficiency vs. non-dimensional mass flow.</p></li>
+<li><p><a class="reference internal" href="../api/tespy.components.html#tespy.components.turbomachinery.compressor.Compressor.eta_s_char_func" title="tespy.components.turbomachinery.compressor.Compressor.eta_s_char_func"><code class="xref py py-meth docutils literal notranslate"><span class="pre">eta_s_char</span></code></a>: isentropic efficiency.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>heat exchangers:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="../api/tespy.components.html#tespy.components.heat_exchangers.base.HeatExchanger.kA_char_func" title="tespy.components.heat_exchangers.base.HeatExchanger.kA_char_func"><code class="xref py py-meth docutils literal notranslate"><span class="pre">kA1_char,</span> <span class="pre">kA2_char</span></code></a>: heat transfer coefficient.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>pump</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="../api/tespy.components.html#tespy.components.turbomachinery.pump.Pump.eta_s_char_func" title="tespy.components.turbomachinery.pump.Pump.eta_s_char_func"><code class="xref py py-meth docutils literal notranslate"><span class="pre">eta_s_char</span></code></a>: isentropic efficiency.</p></li>
+<li><p><a class="reference internal" href="../api/tespy.components.html#tespy.components.turbomachinery.pump.Pump.flow_char_func" title="tespy.components.turbomachinery.pump.Pump.flow_char_func"><code class="xref py py-meth docutils literal notranslate"><span class="pre">flow_char</span></code></a>: absolute pressure change.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>simple heat exchangers</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="../api/tespy.components.html#tespy.components.heat_exchangers.simple.HeatExchangerSimple.kA_char_group_func" title="tespy.components.heat_exchangers.simple.HeatExchangerSimple.kA_char_group_func"><code class="xref py py-meth docutils literal notranslate"><span class="pre">kA_char</span></code></a>: heat transfer coefficient.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>turbine</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="../api/tespy.components.html#tespy.components.turbomachinery.turbine.Turbine.eta_s_char_func" title="tespy.components.turbomachinery.turbine.Turbine.eta_s_char_func"><code class="xref py py-meth docutils literal notranslate"><span class="pre">eta_s_char</span></code></a>: isentropic efficiency.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>valve</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="../api/tespy.components.html#tespy.components.piping.valve.Valve.dp_char_func" title="tespy.components.piping.valve.Valve.dp_char_func"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dp_char</span></code></a>: absolute pressure change.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>water electrolyzer</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.eta_char_func" title="tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.eta_char_func"><code class="xref py py-meth docutils literal notranslate"><span class="pre">eta_char</span></code></a>: efficiency vs. load ratio.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+<p>For more information on how the characteristic functions work
+<a class="reference internal" href="../tespy_modules.html#using-tespy-characteristics-label"><span class="std std-ref">click here</span></a>.</p>
+</section>
+</section>
+<section id="extend-components-with-new-equations">
+<h2>Extend components with new equations<a class="headerlink" href="#extend-components-with-new-equations" title="Permalink to this headline">¶</a></h2>
+<p>You can easily add custom equations to the existing components. In order to do
+this, you need to implement four changes to the desired component class:</p>
+<ul class="simple">
+<li><p>modify the <code class="code docutils literal notranslate"><span class="pre">get_variables(self)</span></code> method.</p></li>
+<li><p>add a method, that returns the result of your equation.</p></li>
+<li><p>add a method, that places the partial derivatives in the jacobian matrix of
+your component.</p></li>
+<li><p>add a method, that returns the LaTeX code of your equation for the automatic
+documentation feature.</p></li>
+</ul>
+<p>In the <code class="code docutils literal notranslate"><span class="pre">get_variables(self)</span></code> method, add an entry for your new equation.
+If the equation uses a single parameter, use the <code class="code docutils literal notranslate"><span class="pre">ComponentProperties</span></code>
+type DataContainer (or the <code class="code docutils literal notranslate"><span class="pre">ComponentCharacteristics</span></code> type in case you
+only apply a characteristic curve). If your equations requires multiple
+parameters, add these parameters as <code class="code docutils literal notranslate"><span class="pre">ComponentProperties</span></code> or
+<code class="code docutils literal notranslate"><span class="pre">ComponentCharacteristics</span></code> respectively and add a
+<code class="code docutils literal notranslate"><span class="pre">GroupedComponentProperties</span></code> type DataContainer holding the information,
+e.g. like the <code class="code docutils literal notranslate"><span class="pre">hydro_group</span></code> parameter of the
+<a class="reference internal" href="../api/tespy.components.html#tespy.components.heat_exchangers.simple.HeatExchangerSimple" title="tespy.components.heat_exchangers.simple.HeatExchangerSimple"><code class="xref py py-class docutils literal notranslate"><span class="pre">tespy.components.heat_exchangers.simple.HeatExchangerSimple</span></code></a>
+class shown below.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># [...]</span>
+<span class="s1">&#39;D&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(</span><span class="n">min_val</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span> <span class="n">max_val</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">),</span>
+<span class="s1">&#39;L&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(</span><span class="n">min_val</span><span class="o">=</span><span class="mf">1e-1</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">),</span>
+<span class="s1">&#39;ks&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(</span><span class="n">val</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">min_val</span><span class="o">=</span><span class="mf">1e-7</span><span class="p">,</span> <span class="n">max_val</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">),</span>
+<span class="s1">&#39;hydro_group&#39;</span><span class="p">:</span> <span class="n">dc_gcp</span><span class="p">(</span>
+    <span class="n">elements</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;L&#39;</span><span class="p">,</span> <span class="s1">&#39;ks&#39;</span><span class="p">,</span> <span class="s1">&#39;D&#39;</span><span class="p">],</span> <span class="n">num_eq</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">latex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hydro_group_func_doc</span><span class="p">,</span>
+    <span class="n">func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hydro_group_func</span><span class="p">,</span> <span class="n">deriv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hydro_group_deriv</span><span class="p">),</span>
+<span class="c1"># [...]</span>
+</pre></div>
+</div>
+<p><code class="code docutils literal notranslate"><span class="pre">latex</span></code>, <code class="code docutils literal notranslate"><span class="pre">func</span></code> and <code class="code docutils literal notranslate"><span class="pre">deriv</span></code> are pointing to the method that
+should be applied for the corresponding purpose. For more information on
+defining the equations, derivatives and the LaTeX equation you will find the
+information in the next section on custom components.</p>
+</section>
+<section id="custom-components">
+<h2>Custom components<a class="headerlink" href="#custom-components" title="Permalink to this headline">¶</a></h2>
+<p>You can add own components. The class should inherit from the
+<a class="reference internal" href="../api/tespy.components.html#tespy.components.component.Component" title="tespy.components.component.Component"><code class="xref py py-class docutils literal notranslate"><span class="pre">component</span></code></a> class or its
+children. In order to do that, you can use the customs module or create a
+python file in your working directory and import the base class for your
+custom component. Now create a class for your component and at least add the
+following methods.</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">component(self)</span></code>,</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">get_variables(self)</span></code>,</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">get_mandatory_constraints(self)</span></code>,</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">inlets(self)</span></code>,</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">outlets(self)</span></code> and</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">calc_parameters(self)</span></code>.</p></li>
+</ul>
+<p>The starting lines of your file should look like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tespy.components.component</span> <span class="kn">import</span> <span class="n">Component</span>
+<span class="kn">from</span> <span class="nn">tespy.tools</span> <span class="kn">import</span> <span class="n">ComponentCharacteristics</span> <span class="k">as</span> <span class="n">dc_cc</span>
+<span class="kn">from</span> <span class="nn">tespy.tools</span> <span class="kn">import</span> <span class="n">ComponentProperties</span> <span class="k">as</span> <span class="n">dc_cp</span>
+
+<span class="k">class</span> <span class="nc">my_custom_component</span><span class="p">(</span><span class="n">Component</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is a custom component.</span>
+
+<span class="sd">    You can add your documentation here. From this part, it should be clear</span>
+<span class="sd">    for the user, which parameters are available, which mandatory equations</span>
+<span class="sd">    are applied and which optional equations can be applied using the</span>
+<span class="sd">    component parameters.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">component</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;name of your component&#39;</span>
+</pre></div>
+</div>
+<section id="mandatory-constraints">
+<h3>Mandatory Constraints<a class="headerlink" href="#mandatory-constraints" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="code docutils literal notranslate"><span class="pre">get_mandatory_constraints()</span></code> method must return a dictionary
+containing the information for the mandatory constraints of your component.
+The corresponding equations are applied independently of the user
+specification. Every key of the mandatory constraints represents one set of
+equations. It holds another dictionary with information on</p>
+<ul class="simple">
+<li><p>the equations,</p></li>
+<li><p>the number of equations for this constraint,</p></li>
+<li><p>the derivatives,</p></li>
+<li><p>whether the derivatives are constant values or not (<code class="code docutils literal notranslate"><span class="pre">True/False</span></code>) and</p></li>
+<li><p>the LaTeX code for the model documentation.</p></li>
+</ul>
+<p>For example, the mandatory equations of a valve look are the following:</p>
+<div class="math">
+<p><img src="../_images/math/67d60fed778025411bd2c1e759c843cc6c7044b2.png" alt="0=\dot{m}_{\mathrm{in,1}}-\dot{m}_{\mathrm{out,1}}
+
+0=x_{fl\mathrm{,in,1}}-x_{fl\mathrm{,out,1}}\;\forall fl
+\in\text{network fluids}
+
+0=h_{\mathrm{in,1}}-h_{\mathrm{out,1}}"/></p>
+</div><p>The corresponding method looks like this. The equations, derivatives and
+LaTeX string generation are individual methods you need to define
+(see next sections).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_mandatory_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s1">&#39;mass_flow_constraints&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;func&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass_flow_func</span><span class="p">,</span> <span class="s1">&#39;deriv&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass_flow_deriv</span><span class="p">,</span>
+            <span class="s1">&#39;constant_deriv&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;latex&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass_flow_func_doc</span><span class="p">,</span>
+            <span class="s1">&#39;num_eq&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+        <span class="s1">&#39;fluid_constraints&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;func&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">fluid_func</span><span class="p">,</span> <span class="s1">&#39;deriv&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">fluid_deriv</span><span class="p">,</span>
+            <span class="s1">&#39;constant_deriv&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;latex&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">fluid_func_doc</span><span class="p">,</span>
+            <span class="s1">&#39;num_eq&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_nw_fluids</span><span class="p">},</span>
+        <span class="s1">&#39;enthalpy_equality_constraints&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;func&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">enthalpy_equality_func</span><span class="p">,</span>
+            <span class="s1">&#39;deriv&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">enthalpy_equality_deriv</span><span class="p">,</span>
+            <span class="s1">&#39;constant_deriv&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s1">&#39;latex&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">enthalpy_equality_func_doc</span><span class="p">,</span>
+            <span class="s1">&#39;num_eq&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+    <span class="p">}</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">func</span></code>: Method to be applied (returns residual value of equation).</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">deriv</span></code>: Partial derivatives of equation to primary variables.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">latex</span></code>: Method returning the LaTeX string of the equation.</p></li>
+</ul>
+</section>
+<section id="attributes">
+<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="code docutils literal notranslate"><span class="pre">get_variables()</span></code> method must return a dictionary with the attributes
+you want to use for your component. The keys represent the attributes and the
+respective values the type of data container used for this attribute. By using
+the data container attributes, it is possible to add defaults. Defaults for
+characteristic lines or characteristic maps are loaded automatically by the
+component initialisation method of class
+<a class="reference internal" href="../api/tespy.components.html#tespy.components.component.Component" title="tespy.components.component.Component"><code class="xref py py-class docutils literal notranslate"><span class="pre">tespy.components.component.Component</span></code></a>. For more information on the
+default characteristics consider this
+<a class="reference internal" href="../tespy_modules.html#using-tespy-characteristics-label"><span class="std std-ref">chapter</span></a>.</p>
+<p>The structure is very similar to the mandatory constraints, using
+DataContainers instead of dictionaries, e.g. for the Valve:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s1">&#39;pr&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(</span>
+            <span class="n">min_val</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">max_val</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_eq</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">deriv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pr_deriv</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pr_func</span><span class="p">,</span>
+            <span class="n">func_params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;pr&#39;</span><span class="p">:</span> <span class="s1">&#39;pr&#39;</span><span class="p">},</span> <span class="n">latex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pr_func_doc</span><span class="p">),</span>
+        <span class="s1">&#39;zeta&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(</span>
+            <span class="n">min_val</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_val</span><span class="o">=</span><span class="mf">1e15</span><span class="p">,</span> <span class="n">num_eq</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">deriv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">zeta_deriv</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">zeta_func</span><span class="p">,</span>
+            <span class="n">func_params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;zeta&#39;</span><span class="p">:</span> <span class="s1">&#39;zeta&#39;</span><span class="p">},</span> <span class="n">latex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">zeta_func_doc</span><span class="p">),</span>
+        <span class="s1">&#39;dp_char&#39;</span><span class="p">:</span> <span class="n">dc_cc</span><span class="p">(</span>
+            <span class="n">param</span><span class="o">=</span><span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="n">num_eq</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">deriv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dp_char_deriv</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dp_char_func</span><span class="p">,</span>
+            <span class="n">char_params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;abs&#39;</span><span class="p">},</span> <span class="n">latex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dp_char_func_doc</span><span class="p">)</span>
+    <span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="inlets-and-outlets">
+<h3>Inlets and outlets<a class="headerlink" href="#inlets-and-outlets" title="Permalink to this headline">¶</a></h3>
+<p><code class="code docutils literal notranslate"><span class="pre">inlets(self)</span></code> and <code class="code docutils literal notranslate"><span class="pre">outlets(self)</span></code> respectively must return a list
+of strings. The list may look like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">inlets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;in1&#39;</span><span class="p">,</span> <span class="s1">&#39;in2&#39;</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">outlets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="s1">&#39;out2&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>The number of inlets and outlets might even be generic, e.g. if you have added
+an attribute <code class="code docutils literal notranslate"><span class="pre">'num_in'</span></code> your code could look like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">inlets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_in</span><span class="o">.</span><span class="n">is_set</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;in&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_in</span><span class="o">.</span><span class="n">val</span><span class="p">)]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># default number is 2</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;in1&#39;</span><span class="p">,</span> <span class="s1">&#39;in2&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="defining-equations-and-derivatives">
+<h3>Defining equations and derivatives<a class="headerlink" href="#defining-equations-and-derivatives" title="Permalink to this headline">¶</a></h3>
+<p>Every equation required by the mandatory constraints and in the variables of
+the component must be individual methods returning the residual value of the
+equation applied. This logic accounts for the derivatives and the LaTeX
+equation, too. The Valve’s dp_char parameter methods are the following.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">dp_char_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Equation for characteristic line of difference pressure to mass flow.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    residual : ndarray</span>
+<span class="sd">        Residual value of equation.</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            0=p_\mathrm{in}-p_\mathrm{out}-f\left( expr \right)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dp_char</span><span class="o">.</span><span class="n">param</span>
+    <span class="n">expr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_char_expr</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">dp_char</span><span class="o">.</span><span class="n">char_params</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">expr</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Please choose a valid parameter, you want to link the &#39;</span>
+               <span class="s1">&#39;pressure drop to at component &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dp_char</span><span class="o">.</span><span class="n">char_func</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">expr</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">dp_char_func_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Equation for characteristic line of difference pressure to mass flow.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    label : str</span>
+<span class="sd">        Label for equation.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    latex : str</span>
+<span class="sd">        LaTeX code of equations applied.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dp_char</span><span class="o">.</span><span class="n">param</span>
+    <span class="n">expr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_char_expr_doc</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">dp_char</span><span class="o">.</span><span class="n">char_params</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">expr</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Please choose a valid parameter, you want to link the &#39;</span>
+               <span class="s1">&#39;pressure drop to at component &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="n">latex</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="sa">r</span><span class="s1">&#39;0=p_\mathrm</span><span class="si">{in}</span><span class="s1">-p_\mathrm</span><span class="si">{out}</span><span class="s1">-f\left(&#39;</span> <span class="o">+</span> <span class="n">expr</span> <span class="o">+</span>
+        <span class="sa">r</span><span class="s1">&#39;\right)&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">generate_latex_eq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latex</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">dp_char_deriv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">increment_filter</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate partial derivatives of difference pressure characteristic.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    increment_filter : ndarray</span>
+<span class="sd">        Matrix for filtering non-changing variables.</span>
+
+<span class="sd">    k : int</span>
+<span class="sd">        Position of derivatives in Jacobian matrix (k-th equation).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">increment_filter</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dp_char_func</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dp_char</span><span class="o">.</span><span class="n">param</span> <span class="o">==</span> <span class="s1">&#39;v&#39;</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dp_char_func</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dp_char_func</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+</pre></div>
+</div>
+<p>For the derivative, the partial derivatives to all variables of the network
+are required. This means, that you have to calculate the partial derivatives
+to mass flow, pressure, enthalpy and all fluids in the fluid vector on each
+connection affecting the equation defined before.</p>
+<p>The derivatives can be calculated analytically (preferred if possible) or
+numerically by using the inbuilt method
+<a class="reference internal" href="../api/tespy.components.html#tespy.components.component.Component.numeric_deriv" title="tespy.components.component.Component.numeric_deriv"><code class="xref py py-meth docutils literal notranslate"><span class="pre">tespy.components.component.Component.numeric_deriv()</span></code></a>, where</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">func</span></code> is the function you want to calculate the derivatives for,</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">dx</span></code> is the variable you want to calculate the derivative to and</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">pos</span></code> indicates the connection you want to calculate the derivative
+for, e.g. <code class="code docutils literal notranslate"><span class="pre">pos=1</span></code> means, that counting your inlets and outlets from
+low index to high index (first inlets, then outlets), the connection to be
+used is the second connection in that list.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">kwargs</span></code> are additional keyword arguments required for the function.</p></li>
+</ul>
+</section>
+<section id="latex-documentation">
+<h3>LaTeX documentation<a class="headerlink" href="#latex-documentation" title="Permalink to this headline">¶</a></h3>
+<p>Finally, add a method that returns the equation as LaTeX string for the
+automatic model documentation feature. Simple write the equation and return
+it with the <a class="reference internal" href="../api/tespy.tools.html#tespy.tools.document_models.generate_latex_eq" title="tespy.tools.document_models.generate_latex_eq"><code class="xref py py-meth docutils literal notranslate"><span class="pre">tespy.tools.document_models.generate_latex_eq()</span></code></a> method,
+which automatically generates a LaTeX equation environment and labels the
+equation, so you can reference it later. Therefore, the latex generation
+methods needs the label as parameter.</p>
+</section>
+<section id="need-assistance">
+<h3>Need assistance?<a class="headerlink" href="#need-assistance" title="Permalink to this headline">¶</a></h3>
+<p>You are very welcome to submit an issue on our GitHub!</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2020, Francesco Witte.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

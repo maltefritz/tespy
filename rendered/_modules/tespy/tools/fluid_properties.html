@@ -1,0 +1,1858 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tespy.tools.fluid_properties &mdash; tespy 0.6.0 - Colored Chemicals documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> tespy
+            <img src="../../../_static/logo_tespy_mid.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.6.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../introduction.html">Thermal Engineering Systems in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../first_steps.html">First steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials_examples.html">Examples and Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tespy_modules.html">TESPy modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tespy_analyses.html">Thermodynamic analyses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developing_tespy.html">Developing TESPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../zliterature.html">Literature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">tespy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>tespy.tools.fluid_properties</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for tespy.tools.fluid_properties</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8</span>
+
+<span class="sd">&quot;&quot;&quot;Module for fluid property integration.</span>
+
+<span class="sd">TESPy uses the CoolProp python interface for all fluid property functions.</span>
+
+
+<span class="sd">This file is part of project TESPy (github.com/oemof/tespy). It&#39;s copyrighted</span>
+<span class="sd">by the contributors recorded in the version control history of the file,</span>
+<span class="sd">available from its original location tespy/tools/fluid_properties.py</span>
+
+<span class="sd">SPDX-License-Identifier: MIT</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">import</span> <span class="nn">CoolProp</span> <span class="k">as</span> <span class="nn">CP</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">CoolProp.CoolProp</span> <span class="kn">import</span> <span class="n">PropsSI</span> <span class="k">as</span> <span class="n">CPPSI</span>
+<span class="kn">from</span> <span class="nn">CoolProp.CoolProp</span> <span class="kn">import</span> <span class="n">get_aliases</span>
+
+<span class="kn">from</span> <span class="nn">tespy.tools.global_vars</span> <span class="kn">import</span> <span class="n">err</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.global_vars</span> <span class="kn">import</span> <span class="n">gas_constants</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.global_vars</span> <span class="kn">import</span> <span class="n">molar_masses</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.helpers</span> <span class="kn">import</span> <span class="n">molar_mass_flow</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.helpers</span> <span class="kn">import</span> <span class="n">newton</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.helpers</span> <span class="kn">import</span> <span class="n">single_fluid</span>
+
+
+<div class="viewcode-block" id="Memorise"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.Memorise">[docs]</a><span class="k">class</span> <span class="nc">Memorise</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Memorization of fluid properties.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Memorise.add_fluids"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.Memorise.add_fluids">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">add_fluids</span><span class="p">(</span><span class="n">fluids</span><span class="p">,</span> <span class="n">memorise_fluid_properties</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add list of fluids to fluid memorisation class.</span>
+
+<span class="sd">        - Generate arrays for fluid property lookup if memorisation is</span>
+<span class="sd">          activated.</span>
+<span class="sd">        - Calculate/set fluid property value ranges for convergence checks.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        fluids : dict</span>
+<span class="sd">            Dict of fluid and corresponding CoolProp back end for fluid</span>
+<span class="sd">            property memorization.</span>
+
+<span class="sd">        memorise_fluid_properties : boolean</span>
+<span class="sd">            Activate or deactivate fluid property value memorisation. Default</span>
+<span class="sd">            state is activated (:code:`True`).</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        The Memorise class creates globally accessible variables for different</span>
+<span class="sd">        fluid property calls as dictionaries:</span>
+
+<span class="sd">        - T(p,h)</span>
+<span class="sd">        - T(p,s)</span>
+<span class="sd">        - v(p,h)</span>
+<span class="sd">        - visc(p,h)</span>
+<span class="sd">        - s(p,h)</span>
+
+<span class="sd">        Each dictionary uses the list of fluids passed to the Memorise class as</span>
+<span class="sd">        identifier for the fluid property memorisation. The fluid properties</span>
+<span class="sd">        are stored as numpy array, where each column represents the mass</span>
+<span class="sd">        fraction of the respective fluid and the additional columns are the</span>
+<span class="sd">        values for the fluid properties. The fluid property function will then</span>
+<span class="sd">        look for identical fluid property inputs (p, h, (s), fluid mass</span>
+<span class="sd">        fraction). If the inputs are in the array, the first column of that row</span>
+<span class="sd">        is returned, see example.</span>
+
+<span class="sd">        Example</span>
+<span class="sd">        -------</span>
+<span class="sd">        T(p,h) for set of fluids (&#39;water&#39;, &#39;air&#39;):</span>
+
+<span class="sd">        - row 1: [282.64527752319697, 10000, 40000, 1, 0]</span>
+<span class="sd">        - row 2: [284.3140698256616, 10000, 47000, 1, 0]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># number of fluids</span>
+        <span class="n">num_fl</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">fluids</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">memorise_fluid_properties</span> <span class="ow">and</span> <span class="n">num_fl</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">fl</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">fluids</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+            <span class="c1"># fluid property tables</span>
+            <span class="n">Memorise</span><span class="o">.</span><span class="n">T_ph</span><span class="p">[</span><span class="n">fl</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_fl</span> <span class="o">+</span> <span class="mi">4</span><span class="p">),</span> <span class="nb">float</span><span class="p">)</span>
+            <span class="n">Memorise</span><span class="o">.</span><span class="n">T_ps</span><span class="p">[</span><span class="n">fl</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_fl</span> <span class="o">+</span> <span class="mi">5</span><span class="p">),</span> <span class="nb">float</span><span class="p">)</span>
+            <span class="n">Memorise</span><span class="o">.</span><span class="n">v_ph</span><span class="p">[</span><span class="n">fl</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_fl</span> <span class="o">+</span> <span class="mi">4</span><span class="p">),</span> <span class="nb">float</span><span class="p">)</span>
+            <span class="n">Memorise</span><span class="o">.</span><span class="n">visc_ph</span><span class="p">[</span><span class="n">fl</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_fl</span> <span class="o">+</span> <span class="mi">4</span><span class="p">),</span> <span class="nb">float</span><span class="p">)</span>
+            <span class="n">Memorise</span><span class="o">.</span><span class="n">s_ph</span><span class="p">[</span><span class="n">fl</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_fl</span> <span class="o">+</span> <span class="mi">4</span><span class="p">),</span> <span class="nb">float</span><span class="p">)</span>
+
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s1">&#39;Added fluids &#39;</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fl</span><span class="p">)</span> <span class="o">+</span>
+                <span class="s1">&#39; to memorise lookup tables.&#39;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="n">Memorise</span><span class="o">.</span><span class="n">water</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">f</span><span class="p">,</span> <span class="n">back_end</span> <span class="ow">in</span> <span class="n">fluids</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+
+            <span class="c1"># save name for water in memorise</span>
+            <span class="k">if</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">get_aliases</span><span class="p">(</span><span class="s2">&quot;H2O&quot;</span><span class="p">):</span>
+                <span class="n">Memorise</span><span class="o">.</span><span class="n">water</span> <span class="o">=</span> <span class="n">f</span>
+
+            <span class="k">if</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">f</span><span class="p">]</span>
+
+            <span class="c1"># create CoolProp.AbstractState object</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="n">CP</span><span class="o">.</span><span class="n">AbstractState</span><span class="p">(</span><span class="n">back_end</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+                <span class="n">Memorise</span><span class="o">.</span><span class="n">back_end</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="n">back_end</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="s1">&#39;Could not find the fluid &quot;&#39;</span> <span class="o">+</span> <span class="n">f</span> <span class="o">+</span> <span class="s1">&#39;&quot; in the fluid &#39;</span>
+                    <span class="s1">&#39;property database.&#39;</span>
+                <span class="p">)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">continue</span>
+
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s1">&#39;Created CoolProp.AbstractState object for fluid &#39;</span> <span class="o">+</span>
+                <span class="n">f</span> <span class="o">+</span> <span class="s1">&#39; with back end &#39;</span> <span class="o">+</span> <span class="n">back_end</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="c1"># pressure range</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">pmin</span> <span class="o">=</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">f</span><span class="p">]</span><span class="o">.</span><span class="n">trivial_keyed_output</span><span class="p">(</span><span class="n">CP</span><span class="o">.</span><span class="n">iP_min</span><span class="p">)</span>
+                <span class="n">pmax</span> <span class="o">=</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">f</span><span class="p">]</span><span class="o">.</span><span class="n">trivial_keyed_output</span><span class="p">(</span><span class="n">CP</span><span class="o">.</span><span class="n">iP_max</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="n">pmin</span> <span class="o">=</span> <span class="mf">1e4</span>
+                <span class="n">pmax</span> <span class="o">=</span> <span class="mf">1e8</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="s1">&#39;Could not find values for maximum and minimum &#39;</span>
+                    <span class="s1">&#39;pressure.&#39;</span><span class="p">)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+            <span class="c1"># temperature range</span>
+            <span class="n">Tmin</span> <span class="o">=</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">f</span><span class="p">]</span><span class="o">.</span><span class="n">trivial_keyed_output</span><span class="p">(</span><span class="n">CP</span><span class="o">.</span><span class="n">iT_min</span><span class="p">)</span>
+            <span class="n">Tmax</span> <span class="o">=</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">f</span><span class="p">]</span><span class="o">.</span><span class="n">trivial_keyed_output</span><span class="p">(</span><span class="n">CP</span><span class="o">.</span><span class="n">iT_max</span><span class="p">)</span>
+
+            <span class="c1"># value range for fluid properties</span>
+            <span class="n">Memorise</span><span class="o">.</span><span class="n">value_range</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">pmin</span><span class="p">,</span> <span class="n">pmax</span><span class="p">,</span> <span class="n">Tmin</span><span class="p">,</span> <span class="n">Tmax</span><span class="p">]</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">molar_masses</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">f</span><span class="p">]</span><span class="o">.</span><span class="n">molar_mass</span><span class="p">()</span>
+                <span class="n">gas_constants</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">f</span><span class="p">]</span><span class="o">.</span><span class="n">gas_constant</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">molar_masses</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="n">CPPSI</span><span class="p">(</span><span class="s1">&#39;M&#39;</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+                    <span class="n">gas_constants</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="n">CPPSI</span><span class="p">(</span><span class="s1">&#39;GAS_CONSTANT&#39;</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="n">molar_masses</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="n">gas_constants</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="s1">&#39;Could not find values for molar mass and gas &#39;</span>
+                        <span class="s1">&#39;constant.&#39;</span><span class="p">)</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s1">&#39;Specifying fluid property ranges for pressure and &#39;</span>
+                <span class="s1">&#39;temperature for convergence check of fluid &#39;</span> <span class="o">+</span> <span class="n">f</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Memorise.del_memory"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.Memorise.del_memory">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">del_memory</span><span class="p">(</span><span class="n">fluids</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Delete non frequently used fluid property values from memorise class.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        fluids : list</span>
+<span class="sd">            List of fluid for fluid property memorization.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fl</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">fluids</span><span class="p">)</span>
+        <span class="n">threshold</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># delete memory</span>
+            <span class="n">Memorise</span><span class="o">.</span><span class="n">s_ph</span><span class="p">[</span><span class="n">fl</span><span class="p">]</span> <span class="o">=</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">s_ph</span><span class="p">[</span><span class="n">fl</span><span class="p">][</span>
+                <span class="n">Memorise</span><span class="o">.</span><span class="n">s_ph</span><span class="p">[</span><span class="n">fl</span><span class="p">][:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">threshold</span><span class="p">]</span>
+            <span class="n">Memorise</span><span class="o">.</span><span class="n">s_ph</span><span class="p">[</span><span class="n">fl</span><span class="p">][:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="n">Memorise</span><span class="o">.</span><span class="n">T_ph</span><span class="p">[</span><span class="n">fl</span><span class="p">]</span> <span class="o">=</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">T_ph</span><span class="p">[</span><span class="n">fl</span><span class="p">][</span>
+                <span class="n">Memorise</span><span class="o">.</span><span class="n">T_ph</span><span class="p">[</span><span class="n">fl</span><span class="p">][:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">threshold</span><span class="p">]</span>
+            <span class="n">Memorise</span><span class="o">.</span><span class="n">T_ph</span><span class="p">[</span><span class="n">fl</span><span class="p">][:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="n">Memorise</span><span class="o">.</span><span class="n">T_ps</span><span class="p">[</span><span class="n">fl</span><span class="p">]</span> <span class="o">=</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">T_ps</span><span class="p">[</span><span class="n">fl</span><span class="p">][</span>
+                <span class="n">Memorise</span><span class="o">.</span><span class="n">T_ps</span><span class="p">[</span><span class="n">fl</span><span class="p">][:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">threshold</span><span class="p">]</span>
+            <span class="n">Memorise</span><span class="o">.</span><span class="n">T_ps</span><span class="p">[</span><span class="n">fl</span><span class="p">][:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="n">Memorise</span><span class="o">.</span><span class="n">v_ph</span><span class="p">[</span><span class="n">fl</span><span class="p">]</span> <span class="o">=</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">v_ph</span><span class="p">[</span><span class="n">fl</span><span class="p">][</span>
+                <span class="n">Memorise</span><span class="o">.</span><span class="n">v_ph</span><span class="p">[</span><span class="n">fl</span><span class="p">][:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">threshold</span><span class="p">]</span>
+            <span class="n">Memorise</span><span class="o">.</span><span class="n">v_ph</span><span class="p">[</span><span class="n">fl</span><span class="p">][:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="n">Memorise</span><span class="o">.</span><span class="n">visc_ph</span><span class="p">[</span><span class="n">fl</span><span class="p">]</span> <span class="o">=</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">visc_ph</span><span class="p">[</span><span class="n">fl</span><span class="p">][</span>
+                <span class="n">Memorise</span><span class="o">.</span><span class="n">visc_ph</span><span class="p">[</span><span class="n">fl</span><span class="p">][:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">threshold</span><span class="p">]</span>
+            <span class="n">Memorise</span><span class="o">.</span><span class="n">visc_ph</span><span class="p">[</span><span class="n">fl</span><span class="p">][:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Dropping not frequently used fluid property values from &#39;</span>
+                   <span class="s1">&#39;memorise class for fluids &#39;</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fl</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">pass</span></div></div>
+
+
+<span class="c1"># create memorise dictionaries</span>
+<span class="n">Memorise</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">Memorise</span><span class="o">.</span><span class="n">back_end</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">Memorise</span><span class="o">.</span><span class="n">T_ph</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">Memorise</span><span class="o">.</span><span class="n">T_ps</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">Memorise</span><span class="o">.</span><span class="n">v_ph</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">Memorise</span><span class="o">.</span><span class="n">visc_ph</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">Memorise</span><span class="o">.</span><span class="n">s_ph</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">Memorise</span><span class="o">.</span><span class="n">value_range</span> <span class="o">=</span> <span class="p">{}</span>
+
+
+<div class="viewcode-block" id="T_mix_ph"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.T_mix_ph">[docs]</a><span class="k">def</span> <span class="nf">T_mix_ph</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">T0</span><span class="o">=</span><span class="mi">675</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the temperature from pressure and enthalpy.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    flow : list</span>
+<span class="sd">        Fluid property vector containing mass flow, pressure, enthalpy and</span>
+<span class="sd">        fluid composition.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    T : float</span>
+<span class="sd">        Temperature T / K.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    First, check if fluid property has been memorised already.</span>
+<span class="sd">    If this is the case, return stored value, otherwise calculate value and</span>
+<span class="sd">    store it in the memorisation class.</span>
+
+<span class="sd">    Uses CoolProp interface for pure fluids, newton algorithm for mixtures:</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        T_{mix}\left(p,h\right) = T_{i}\left(p,h_{i}\right)\;</span>
+<span class="sd">        \forall i \in \text{fluid components}\\</span>
+
+<span class="sd">        h_{i} = h \left(pp_{i}, T_{mix} \right)\\</span>
+<span class="sd">        pp: \text{partial pressure}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># check if fluid properties have been calculated before</span>
+    <span class="n">fl</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">memorisation</span> <span class="o">=</span> <span class="n">fl</span> <span class="ow">in</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">T_ph</span>
+    <span class="k">if</span> <span class="n">memorisation</span><span class="p">:</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">T_ph</span><span class="p">[</span><span class="n">fl</span><span class="p">][:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">flow</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">flow</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+        <span class="n">ix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">a</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">err</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">ix</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># known fluid properties</span>
+            <span class="n">Memorise</span><span class="o">.</span><span class="n">T_ph</span><span class="p">[</span><span class="n">fl</span><span class="p">][</span><span class="n">ix</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">return</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">T_ph</span><span class="p">[</span><span class="n">fl</span><span class="p">][</span><span class="n">ix</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># unknown fluid properties</span>
+    <span class="n">fluid</span> <span class="o">=</span> <span class="n">single_fluid</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">fluid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># calculate the fluid properties for fluid mixtures</span>
+        <span class="n">valmin</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">Memorise</span><span class="o">.</span><span class="n">value_range</span><span class="p">[</span><span class="n">f</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fl</span> <span class="k">if</span> <span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="n">f</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">err</span><span class="p">]</span>
+        <span class="p">)</span> <span class="o">+</span> <span class="mf">0.1</span>
+        <span class="k">if</span> <span class="n">T0</span> <span class="o">&lt;</span> <span class="n">valmin</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">T0</span><span class="p">):</span>
+            <span class="n">T0</span> <span class="o">=</span> <span class="n">valmin</span> <span class="o">*</span> <span class="mf">1.1</span>
+
+        <span class="n">val</span> <span class="o">=</span> <span class="n">newton</span><span class="p">(</span><span class="n">h_mix_pT</span><span class="p">,</span> <span class="n">dh_mix_pdT</span><span class="p">,</span> <span class="n">flow</span><span class="p">,</span> <span class="n">flow</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">val0</span><span class="o">=</span><span class="n">T0</span><span class="p">,</span>
+                     <span class="n">valmin</span><span class="o">=</span><span class="n">valmin</span><span class="p">,</span> <span class="n">valmax</span><span class="o">=</span><span class="mi">3000</span><span class="p">,</span> <span class="n">imax</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># calculate fluid property for pure fluids</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">T_ph</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">flow</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">fluid</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">memorisation</span><span class="p">:</span>
+        <span class="c1"># memorise the newly calculated value</span>
+        <span class="n">new</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
+            <span class="p">[[</span><span class="n">flow</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">flow</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">+</span> <span class="p">[</span><span class="n">val</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
+        <span class="n">Memorise</span><span class="o">.</span><span class="n">T_ph</span><span class="p">[</span><span class="n">fl</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Memorise</span><span class="o">.</span><span class="n">T_ph</span><span class="p">[</span><span class="n">fl</span><span class="p">],</span> <span class="n">new</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">val</span></div>
+
+
+<div class="viewcode-block" id="T_ph"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.T_ph">[docs]</a><span class="k">def</span> <span class="nf">T_ph</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">fluid</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the temperature from pressure and enthalpy for a pure fluid.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    p : float</span>
+<span class="sd">        Pressure p / Pa.</span>
+
+<span class="sd">    h : float</span>
+<span class="sd">        Specific enthalpy h / (J/kg).</span>
+
+<span class="sd">    fluid : str</span>
+<span class="sd">        Fluid name.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    T : float</span>
+<span class="sd">        Temperature T / K.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">back_end</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;IF97&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">entropy_iteration_IF97</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">fluid</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">CP</span><span class="o">.</span><span class="n">HmassP_INPUTS</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="dT_mix_dph"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.dT_mix_dph">[docs]</a><span class="k">def</span> <span class="nf">dT_mix_dph</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">T0</span><span class="o">=</span><span class="mi">675</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate partial derivate of temperature to pressure.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    flow : list</span>
+<span class="sd">        Fluid property vector containing mass flow, pressure, enthalpy and</span>
+<span class="sd">        fluid composition.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dT / dp : float</span>
+<span class="sd">        Partial derivative of temperature to pressure dT /dp / (K/Pa).</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            \frac{\partial T_{mix}}{\partial p} = \frac{T_{mix}(p+d,h)-</span>
+<span class="sd">            T_{mix}(p-d,h)}{2 \cdot d}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">up</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">lo</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">up</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">d</span>
+    <span class="n">lo</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-=</span> <span class="n">d</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">T_mix_ph</span><span class="p">(</span><span class="n">up</span><span class="p">,</span> <span class="n">T0</span><span class="o">=</span><span class="n">T0</span><span class="p">)</span> <span class="o">-</span> <span class="n">T_mix_ph</span><span class="p">(</span><span class="n">lo</span><span class="p">,</span> <span class="n">T0</span><span class="o">=</span><span class="n">T0</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">d</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="dT_mix_pdh"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.dT_mix_pdh">[docs]</a><span class="k">def</span> <span class="nf">dT_mix_pdh</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">T0</span><span class="o">=</span><span class="mi">675</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate partial derivate of temperature to enthalpy.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    flow : list</span>
+<span class="sd">        Fluid property vector containing mass flow, pressure, enthalpy and</span>
+<span class="sd">        fluid composition.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dT / dh : float</span>
+<span class="sd">        Partial derivative of temperature to enthalpy dT /dh / ((kgK)/J).</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            \frac{\partial T_{mix}}{\partial h} = \frac{T_{mix}(p,h+d)-</span>
+<span class="sd">            T_{mix}(p,h-d)}{2 \cdot d}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">up</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">lo</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">up</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+=</span> <span class="n">d</span>
+    <span class="n">lo</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-=</span> <span class="n">d</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">T_mix_ph</span><span class="p">(</span><span class="n">up</span><span class="p">,</span> <span class="n">T0</span><span class="o">=</span><span class="n">T0</span><span class="p">)</span> <span class="o">-</span> <span class="n">T_mix_ph</span><span class="p">(</span><span class="n">lo</span><span class="p">,</span> <span class="n">T0</span><span class="o">=</span><span class="n">T0</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">d</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="dT_mix_ph_dfluid"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.dT_mix_ph_dfluid">[docs]</a><span class="k">def</span> <span class="nf">dT_mix_ph_dfluid</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">T0</span><span class="o">=</span><span class="mi">675</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate partial derivate of temperature to fluid composition.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    flow : list</span>
+<span class="sd">        Fluid property vector containing mass flow, pressure, enthalpy and</span>
+<span class="sd">        fluid composition.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dT / dfluid : ndarray</span>
+<span class="sd">        Partial derivatives of temperature to fluid composition</span>
+<span class="sd">        dT / dfluid / K.</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            \frac{\partial T_{mix}}{\partial fluid_{i}} =</span>
+<span class="sd">            \frac{T_{mix}(p,h,fluid_{i}+d)-</span>
+<span class="sd">            T_{mix}(p,h,fluid_{i}-d)}{2 \cdot d}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="mf">1e-5</span>
+    <span class="n">up</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">lo</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">vec_deriv</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">fluid</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">up</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="n">fluid</span><span class="p">]</span> <span class="o">+=</span> <span class="n">d</span>
+            <span class="n">lo</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="n">fluid</span><span class="p">]</span> <span class="o">-=</span> <span class="n">d</span>
+            <span class="n">vec_deriv</span> <span class="o">+=</span> <span class="p">[</span>
+                <span class="p">(</span><span class="n">T_mix_ph</span><span class="p">(</span><span class="n">up</span><span class="p">,</span> <span class="n">T0</span><span class="o">=</span><span class="n">T0</span><span class="p">)</span> <span class="o">-</span> <span class="n">T_mix_ph</span><span class="p">(</span><span class="n">lo</span><span class="p">,</span> <span class="n">T0</span><span class="o">=</span><span class="n">T0</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">d</span><span class="p">)]</span>
+            <span class="n">up</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="n">fluid</span><span class="p">]</span> <span class="o">-=</span> <span class="n">d</span>
+            <span class="n">lo</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="n">fluid</span><span class="p">]</span> <span class="o">+=</span> <span class="n">d</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">vec_deriv</span> <span class="o">+=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">vec_deriv</span></div>
+
+
+<div class="viewcode-block" id="T_mix_ps"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.T_mix_ps">[docs]</a><span class="k">def</span> <span class="nf">T_mix_ps</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">T0</span><span class="o">=</span><span class="mi">675</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the temperature from pressure and entropy.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    flow : list</span>
+<span class="sd">        Fluid property vector containing mass flow, pressure, enthalpy and</span>
+<span class="sd">        fluid composition.</span>
+
+<span class="sd">    s : float</span>
+<span class="sd">        Entropy of flow in J / (kgK).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    T : float</span>
+<span class="sd">        Temperature T / K.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    First, check if fluid property has been memorised already.</span>
+<span class="sd">    If this is the case, return stored value, otherwise calculate value and</span>
+<span class="sd">    store it in the memorisation class.</span>
+
+<span class="sd">    Uses CoolProp interface for pure fluids, newton algorithm for mixtures:</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        T_{mix}\left(p,s\right) = T_{i}\left(p,s_{i}\right)\;</span>
+<span class="sd">        \forall i \in \text{fluid components}\\</span>
+
+<span class="sd">        s_{i} = s \left(pp_{i}, T_{mix} \right)\\</span>
+<span class="sd">        pp: \text{partial pressure}</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># check if fluid properties have been calculated before</span>
+    <span class="n">fl</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">memorisation</span> <span class="o">=</span> <span class="n">fl</span> <span class="ow">in</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">T_ps</span>
+    <span class="k">if</span> <span class="n">memorisation</span><span class="p">:</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">T_ps</span><span class="p">[</span><span class="n">fl</span><span class="p">][:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="n">flow</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">flow</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">+</span> <span class="p">[</span><span class="n">s</span><span class="p">])</span>
+        <span class="n">ix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">a</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">err</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">ix</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># known fluid properties</span>
+            <span class="n">Memorise</span><span class="o">.</span><span class="n">T_ps</span><span class="p">[</span><span class="n">fl</span><span class="p">][</span><span class="n">ix</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">return</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">T_ps</span><span class="p">[</span><span class="n">fl</span><span class="p">][</span><span class="n">ix</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># unknown fluid properties</span>
+    <span class="n">fluid</span> <span class="o">=</span> <span class="n">single_fluid</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">fluid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># calculate the fluid properties for fluid mixtures</span>
+        <span class="n">valmin</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">Memorise</span><span class="o">.</span><span class="n">value_range</span><span class="p">[</span><span class="n">f</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fl</span> <span class="k">if</span> <span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="n">f</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">err</span><span class="p">]</span>
+        <span class="p">)</span> <span class="o">+</span> <span class="mf">0.1</span>
+        <span class="k">if</span> <span class="n">T0</span> <span class="o">&lt;</span> <span class="n">valmin</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">T0</span><span class="p">):</span>
+            <span class="n">T0</span> <span class="o">=</span> <span class="n">valmin</span> <span class="o">*</span> <span class="mf">1.1</span>
+
+        <span class="n">val</span> <span class="o">=</span> <span class="n">newton</span><span class="p">(</span><span class="n">s_mix_pT</span><span class="p">,</span> <span class="n">ds_mix_pdT</span><span class="p">,</span> <span class="n">flow</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">val0</span><span class="o">=</span><span class="n">T0</span><span class="p">,</span>
+                     <span class="n">valmin</span><span class="o">=</span><span class="n">valmin</span><span class="p">,</span> <span class="n">valmax</span><span class="o">=</span><span class="mi">3000</span><span class="p">,</span> <span class="n">imax</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># calculate fluid property for pure fluids</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">T_ps</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">s</span><span class="p">,</span> <span class="n">fluid</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">memorisation</span><span class="p">:</span>
+        <span class="n">new</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
+            <span class="p">[[</span><span class="n">flow</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">flow</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">+</span> <span class="p">[</span><span class="n">s</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
+        <span class="c1"># memorise the newly calculated value</span>
+        <span class="n">Memorise</span><span class="o">.</span><span class="n">T_ps</span><span class="p">[</span><span class="n">fl</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Memorise</span><span class="o">.</span><span class="n">T_ps</span><span class="p">[</span><span class="n">fl</span><span class="p">],</span> <span class="n">new</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">val</span></div>
+
+
+<div class="viewcode-block" id="T_ps"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.T_ps">[docs]</a><span class="k">def</span> <span class="nf">T_ps</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">fluid</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the temperature from pressure and entropy for a pure fluid.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    p : float</span>
+<span class="sd">       Pressure p / Pa.</span>
+
+<span class="sd">    s : float</span>
+<span class="sd">       Specific entropy h / (J/(kgK)).</span>
+
+<span class="sd">    fluid : str</span>
+<span class="sd">       Fluid name.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    T : float</span>
+<span class="sd">       Temperature T / K.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">CP</span><span class="o">.</span><span class="n">PSmass_INPUTS</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="h_mix_pT"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.h_mix_pT">[docs]</a><span class="k">def</span> <span class="nf">h_mix_pT</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">force_gas</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the enthalpy from pressure and Temperature.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    flow : list</span>
+<span class="sd">        Fluid property vector containing mass flow, pressure, enthalpy and</span>
+<span class="sd">        fluid composition.</span>
+
+<span class="sd">    T : float</span>
+<span class="sd">        Temperature of flow T / K.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    h : float</span>
+<span class="sd">        Enthalpy h / (J/kg).</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    Calculation for fluid mixtures.</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        h_{mix}(p,T)=\sum_{i} h(pp_{i},T,fluid_{i})\;</span>
+<span class="sd">        \forall i \in \text{fluid components}\\</span>
+<span class="sd">        pp: \text{partial pressure}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">molar_mass_flow</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+
+    <span class="n">h</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">fluid_name</span> <span class="o">=</span> <span class="n">single_fluid</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">fluid_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">x_i</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">fluid</span><span class="p">:</span> <span class="n">y</span> <span class="o">/</span> <span class="p">(</span><span class="n">molar_masses</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span> <span class="o">*</span> <span class="n">n</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">fluid</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span>
+
+        <span class="n">water</span> <span class="o">=</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">water</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">water</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">force_gas</span> <span class="ow">and</span> <span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="n">water</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">err</span><span class="p">):</span>
+            <span class="n">y_i_gas</span><span class="p">,</span> <span class="n">x_i_gas</span><span class="p">,</span> <span class="n">y_water_liq</span><span class="p">,</span> <span class="n">x_water_liq</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">cond_check</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">x_i</span><span class="p">,</span> <span class="n">flow</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">n</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">y_i_gas</span> <span class="o">=</span> <span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+            <span class="n">y_water_liq</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">x_i_gas</span> <span class="o">=</span> <span class="n">x_i</span>
+
+        <span class="k">for</span> <span class="n">fluid</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">y_i_gas</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">y</span> <span class="o">&gt;</span> <span class="n">err</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">fluid</span> <span class="o">==</span> <span class="n">water</span> <span class="ow">and</span> <span class="n">y_water_liq</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">CP</span><span class="o">.</span><span class="n">QT_INPUTS</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span>
+                    <span class="n">h</span> <span class="o">+=</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">hmass</span><span class="p">()</span> <span class="o">*</span> <span class="n">y_water_liq</span>
+                    <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">CP</span><span class="o">.</span><span class="n">QT_INPUTS</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span>
+                    <span class="n">h</span> <span class="o">+=</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">hmass</span><span class="p">()</span> <span class="o">*</span> <span class="n">y</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">y_water_liq</span><span class="p">)</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">h</span> <span class="o">+=</span> <span class="n">h_pT</span><span class="p">(</span>
+                        <span class="n">flow</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">x_i_gas</span><span class="p">[</span><span class="n">fluid</span><span class="p">],</span> <span class="n">T</span><span class="p">,</span> <span class="n">fluid</span><span class="p">,</span> <span class="n">force_gas</span>
+                    <span class="p">)</span> <span class="o">*</span> <span class="n">y</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">y_water_liq</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">h_pT</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">T</span><span class="p">,</span> <span class="n">fluid_name</span><span class="p">,</span> <span class="n">force_gas</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">h</span></div>
+
+
+<div class="viewcode-block" id="h_pT"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.h_pT">[docs]</a><span class="k">def</span> <span class="nf">h_pT</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">fluid</span><span class="p">,</span> <span class="n">force_gas</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the enthalpy from pressure and temperature for a pure fluid.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    p : float</span>
+<span class="sd">        Pressure p / Pa.</span>
+
+<span class="sd">    T : float</span>
+<span class="sd">        Temperature T / K.</span>
+
+<span class="sd">    fluid : str</span>
+<span class="sd">        Fluid name.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    h : float</span>
+<span class="sd">        Specific enthalpy h / (J/kg).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">force_gas</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">T</span> <span class="o">&lt;</span> <span class="n">get_T_crit</span><span class="p">(</span><span class="n">fluid</span><span class="p">):</span>
+            <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">CP</span><span class="o">.</span><span class="n">PT_INPUTS</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span>
+            <span class="n">h</span> <span class="o">=</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">hmass</span><span class="p">()</span>
+            <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">CP</span><span class="o">.</span><span class="n">QT_INPUTS</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span>
+            <span class="n">h_sat</span> <span class="o">=</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">hmass</span><span class="p">()</span>
+            <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">h_sat</span><span class="p">)</span>
+
+    <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">CP</span><span class="o">.</span><span class="n">PT_INPUTS</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">hmass</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="dh_mix_pdT"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.dh_mix_pdT">[docs]</a><span class="k">def</span> <span class="nf">dh_mix_pdT</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">T</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate partial derivate of enthalpy to temperature.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    flow : list</span>
+<span class="sd">        Fluid property vector containing mass flow, pressure, enthalpy and</span>
+<span class="sd">        fluid composition.</span>
+
+<span class="sd">    T : float</span>
+<span class="sd">        Temperature T / K.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dh / dT : float</span>
+<span class="sd">        Partial derivative of enthalpy to temperature dh / dT / (J/(kgK)).</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            \frac{\partial h_{mix}}{\partial T} =</span>
+<span class="sd">            \frac{h_{mix}(p,T+d)-h_{mix}(p,T-d)}{2 \cdot d}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="mf">0.01</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">h_mix_pT</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">T</span> <span class="o">+</span> <span class="n">d</span><span class="p">)</span> <span class="o">-</span> <span class="n">h_mix_pT</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">T</span> <span class="o">-</span> <span class="n">d</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">d</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="h_mix_ps"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.h_mix_ps">[docs]</a><span class="k">def</span> <span class="nf">h_mix_ps</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">T0</span><span class="o">=</span><span class="mi">675</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the enthalpy from pressure and temperature.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    flow : list</span>
+<span class="sd">        Fluid property vector containing mass flow, pressure, enthalpy and</span>
+<span class="sd">        fluid composition.</span>
+
+<span class="sd">    s : float</span>
+<span class="sd">        Specific entropy of flow s / (J/(kgK)).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    h : float</span>
+<span class="sd">        Specific enthalpy h / (J/kg).</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    Calculation for fluid mixtures.</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        h_{mix}\left(p,s\right)=h\left(p, T_{mix}\left(p,s\right)\right)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">h_mix_pT</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">T_mix_ps</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">T0</span><span class="o">=</span><span class="n">T0</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="h_ps"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.h_ps">[docs]</a><span class="k">def</span> <span class="nf">h_ps</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">fluid</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the enthalpy from pressure and entropy for a pure fluid.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    p : float</span>
+<span class="sd">        Pressure p / Pa.</span>
+
+<span class="sd">    s : float</span>
+<span class="sd">        Specific entropy h / (J/(kgK)).</span>
+
+<span class="sd">    fluid : str</span>
+<span class="sd">        Fluid name.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    h : float</span>
+<span class="sd">        Specific enthalpy h / (J/kg).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">CP</span><span class="o">.</span><span class="n">PSmass_INPUTS</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">hmass</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="h_ps_IF97"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.h_ps_IF97">[docs]</a><span class="k">def</span> <span class="nf">h_ps_IF97</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the enthalpy from pressure and entropy for IF97 backend.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fluid : str</span>
+<span class="sd">        Fluid name.</span>
+
+<span class="sd">    p : float</span>
+<span class="sd">        Pressure p / Pa.</span>
+
+<span class="sd">    s : float</span>
+<span class="sd">        Specific entropy h / (J/(kgK)).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    h : float</span>
+<span class="sd">        Specific enthalpy h / (J/kg).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">CP</span><span class="o">.</span><span class="n">PSmass_INPUTS</span><span class="p">,</span> <span class="n">params</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">s</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">hmass</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="dh_pds_IF97"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.dh_pds_IF97">[docs]</a><span class="k">def</span> <span class="nf">dh_pds_IF97</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the derivative of enthalpy to entropy at constant pressure.</span>
+
+<span class="sd">    For pure fluids only, required for IF97 entropy iteration only.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    p : float</span>
+<span class="sd">        Pressure p / Pa.</span>
+
+<span class="sd">    s : float</span>
+<span class="sd">        Specific entropy h / (J/(kgK)).</span>
+
+<span class="sd">    fluid : str</span>
+<span class="sd">        Fluid name.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dh : float</span>
+<span class="sd">        Derivative of specific enthalpy dh / ds / K.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="mf">1e-2</span>
+    <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">CP</span><span class="o">.</span><span class="n">PSmass_INPUTS</span><span class="p">,</span> <span class="n">params</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">s</span> <span class="o">+</span> <span class="n">d</span><span class="p">)</span>
+    <span class="n">h_upper</span> <span class="o">=</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">hmass</span><span class="p">()</span>
+
+    <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">CP</span><span class="o">.</span><span class="n">PSmass_INPUTS</span><span class="p">,</span> <span class="n">params</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">s</span> <span class="o">-</span> <span class="n">d</span><span class="p">)</span>
+    <span class="n">h_lower</span> <span class="o">=</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">hmass</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">h_upper</span> <span class="o">-</span> <span class="n">h_lower</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">d</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="h_mix_pQ"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.h_mix_pQ">[docs]</a><span class="k">def</span> <span class="nf">h_mix_pQ</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">Q</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the enthalpy from pressure and vapour mass fraction.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    flow : list</span>
+<span class="sd">        Fluid property vector containing mass flow, pressure, enthalpy and</span>
+<span class="sd">        fluid composition.</span>
+
+<span class="sd">    Q : float</span>
+<span class="sd">        Vapour mass fraction Q / 1.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    h : float</span>
+<span class="sd">        Specific enthalpy h / (J/kg).</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    This function works for pure fluids only!</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fluid</span> <span class="o">=</span> <span class="n">single_fluid</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">fluid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;The function h_mix_pQ is called without fluid information.&#39;</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;The function h_mix_pQ can only be used for pure fluids.&#39;</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">CP</span><span class="o">.</span><span class="n">PQ_INPUTS</span><span class="p">,</span> <span class="n">flow</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">Q</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="n">p_crit</span> <span class="o">=</span> <span class="n">get_p_crit</span><span class="p">(</span><span class="n">fluid</span><span class="p">)</span>
+        <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">CP</span><span class="o">.</span><span class="n">PQ_INPUTS</span><span class="p">,</span> <span class="n">p_crit</span> <span class="o">*</span> <span class="mf">0.99</span><span class="p">,</span> <span class="n">Q</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">hmass</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="dh_mix_dpQ"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.dh_mix_dpQ">[docs]</a><span class="k">def</span> <span class="nf">dh_mix_dpQ</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">Q</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate partial derivate of enthalpy to vapour mass fraction.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    flow : list</span>
+<span class="sd">        Fluid property vector containing mass flow, pressure, enthalpy and</span>
+<span class="sd">        fluid composition.</span>
+
+<span class="sd">    Q : float</span>
+<span class="sd">        Vapour mass fraction Q / 1.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dh / dQ : float</span>
+<span class="sd">        Partial derivative of enthalpy to vapour mass fraction</span>
+<span class="sd">        dh / dQ / (J/kg).</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            \frac{\partial h_{mix}}{\partial p} =</span>
+<span class="sd">            \frac{h_{mix}(p+d,Q)-h_{mix}(p-d,Q)}{2 \cdot d}\\</span>
+<span class="sd">            Q: \text{vapour mass fraction}</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    This works for pure fluids only!</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">up</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">lo</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">up</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">d</span>
+    <span class="n">lo</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-=</span> <span class="n">d</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">h_mix_pQ</span><span class="p">(</span><span class="n">up</span><span class="p">,</span> <span class="n">Q</span><span class="p">)</span> <span class="o">-</span> <span class="n">h_mix_pQ</span><span class="p">(</span><span class="n">lo</span><span class="p">,</span> <span class="n">Q</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">d</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_p_crit"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.get_p_crit">[docs]</a><span class="k">def</span> <span class="nf">get_p_crit</span><span class="p">(</span><span class="n">fluid</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get critical point pressure.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fluid : str</span>
+<span class="sd">        Fluid name.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    p_crit : float</span>
+<span class="sd">        Critical point pressure.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">trivial_keyed_output</span><span class="p">(</span><span class="n">CP</span><span class="o">.</span><span class="n">iP_critical</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_T_crit"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.get_T_crit">[docs]</a><span class="k">def</span> <span class="nf">get_T_crit</span><span class="p">(</span><span class="n">fluid</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get critical point temperature.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fluid : str</span>
+<span class="sd">        Fluid name.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    T_crit : float</span>
+<span class="sd">        Critical point temperature.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">trivial_keyed_output</span><span class="p">(</span><span class="n">CP</span><span class="o">.</span><span class="n">iT_critical</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="T_bp_p"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.T_bp_p">[docs]</a><span class="k">def</span> <span class="nf">T_bp_p</span><span class="p">(</span><span class="n">flow</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate temperature from boiling point pressure.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    flow : list</span>
+<span class="sd">        Fluid property vector containing mass flow, pressure, enthalpy and</span>
+<span class="sd">        fluid composition.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    T : float</span>
+<span class="sd">        Temperature at boiling point.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    This function works for pure fluids only!</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fluid</span> <span class="o">=</span> <span class="n">single_fluid</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+    <span class="n">p_crit</span> <span class="o">=</span> <span class="n">get_p_crit</span><span class="p">(</span><span class="n">fluid</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">flow</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">p_crit</span><span class="p">:</span>
+        <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">CP</span><span class="o">.</span><span class="n">PQ_INPUTS</span><span class="p">,</span> <span class="n">p_crit</span> <span class="o">*</span> <span class="mf">0.99</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">CP</span><span class="o">.</span><span class="n">PQ_INPUTS</span><span class="p">,</span> <span class="n">flow</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="dT_bp_dp"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.dT_bp_dp">[docs]</a><span class="k">def</span> <span class="nf">dT_bp_dp</span><span class="p">(</span><span class="n">flow</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate partial derivate of temperature to boiling point pressure.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    flow : list</span>
+<span class="sd">        Fluid property vector containing mass flow, pressure, enthalpy and</span>
+<span class="sd">        fluid composition.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dT / dp : float</span>
+<span class="sd">        Partial derivative of temperature to boiling point pressure in K / Pa.</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            \frac{\partial h_{mix}}{\partial p} =</span>
+<span class="sd">            \frac{T_{bp}(p+d)-T_{bp}(p-d)}{2 \cdot d}\\</span>
+<span class="sd">            Q: \text{vapour mass fraction}</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    This works for pure fluids only!</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">up</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">lo</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">up</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">d</span>
+    <span class="n">lo</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-=</span> <span class="n">d</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">T_bp_p</span><span class="p">(</span><span class="n">up</span><span class="p">)</span> <span class="o">-</span> <span class="n">T_bp_p</span><span class="p">(</span><span class="n">lo</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">d</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="cond_check"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.cond_check">[docs]</a><span class="k">def</span> <span class="nf">cond_check</span><span class="p">(</span><span class="n">y_i</span><span class="p">,</span> <span class="n">x_i</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">T</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;_summary_</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    y_i : dict</span>
+<span class="sd">        Mass specific fluid composition.</span>
+<span class="sd">    x_i : dict</span>
+<span class="sd">        Mole specific fluid composition.</span>
+<span class="sd">    p : float</span>
+<span class="sd">        Pressure of mass flow.</span>
+<span class="sd">    n : float</span>
+<span class="sd">        Molar mass flow.</span>
+<span class="sd">    T : float</span>
+<span class="sd">        Temperatrure of mass flow.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tuple</span>
+<span class="sd">        Tuple containing gasphase mass specific and molar specific compositions</span>
+<span class="sd">        and overall liquid water mass fraction.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x_i_gas</span> <span class="o">=</span> <span class="n">x_i</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">y_i_gas</span> <span class="o">=</span> <span class="n">y_i</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">y_water_liq</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">x_water_liq</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">water_label</span> <span class="o">=</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">water</span>
+
+    <span class="k">if</span> <span class="n">T</span> <span class="o">&lt;</span> <span class="n">get_T_crit</span><span class="p">(</span><span class="n">water_label</span><span class="p">):</span>
+        <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">water_label</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">CP</span><span class="o">.</span><span class="n">QT_INPUTS</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span>
+        <span class="n">p_sat</span> <span class="o">=</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">water_label</span><span class="p">]</span><span class="o">.</span><span class="n">p</span><span class="p">()</span>
+
+        <span class="n">pp_water</span> <span class="o">=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">y_i</span><span class="p">[</span><span class="n">water_label</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span>
+            <span class="n">molar_masses</span><span class="p">[</span><span class="n">water_label</span><span class="p">]</span> <span class="o">*</span> <span class="n">n</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">p_sat</span> <span class="o">&lt;</span> <span class="n">pp_water</span><span class="p">:</span>
+            <span class="n">x_water_gas</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">x_i</span><span class="p">[</span><span class="n">water_label</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">p</span> <span class="o">/</span> <span class="n">p_sat</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">x_water_liq</span> <span class="o">=</span> <span class="n">x_i</span><span class="p">[</span><span class="n">water_label</span><span class="p">]</span> <span class="o">-</span> <span class="n">x_water_gas</span>
+            <span class="n">x_gas_sum</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">x_water_liq</span>
+
+            <span class="n">x_i_gas</span> <span class="o">=</span> <span class="p">{</span><span class="n">f</span><span class="p">:</span> <span class="n">x</span> <span class="o">/</span> <span class="n">x_gas_sum</span> <span class="k">for</span> <span class="n">f</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">x_i</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+            <span class="n">x_i_gas</span><span class="p">[</span><span class="n">water_label</span><span class="p">]</span> <span class="o">=</span> <span class="n">x_water_gas</span> <span class="o">/</span> <span class="n">x_gas_sum</span>
+
+            <span class="n">y_water_liq</span> <span class="o">=</span> <span class="n">x_water_liq</span> <span class="o">*</span> <span class="n">molar_masses</span><span class="p">[</span><span class="n">water_label</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span>
+                <span class="nb">sum</span><span class="p">([</span>
+                    <span class="n">x</span> <span class="o">*</span> <span class="n">molar_masses</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">fluid</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">x_i</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                <span class="p">])</span>
+            <span class="p">)</span>
+
+            <span class="n">M</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">x</span> <span class="o">*</span> <span class="n">molar_masses</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span> <span class="k">for</span> <span class="n">fluid</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">x_i_gas</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
+            <span class="n">y_i_gas</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">fluid</span><span class="p">:</span> <span class="n">x</span> <span class="o">/</span> <span class="n">M</span> <span class="o">*</span> <span class="n">molar_masses</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">fluid</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">x_i_gas</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">y_i_gas</span><span class="p">,</span> <span class="n">x_i_gas</span><span class="p">,</span> <span class="n">y_water_liq</span><span class="p">,</span> <span class="n">x_water_liq</span></div>
+
+
+<div class="viewcode-block" id="v_mix_ph"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.v_mix_ph">[docs]</a><span class="k">def</span> <span class="nf">v_mix_ph</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">T0</span><span class="o">=</span><span class="mi">675</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the specific volume from pressure and enthalpy.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    flow : list</span>
+<span class="sd">        Fluid property vector containing mass flow, pressure, enthalpy and</span>
+<span class="sd">        fluid composition.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    v : float</span>
+<span class="sd">        Specific volume v / (:math:`\mathrm{m}^3`/kg).</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    First, check if fluid property has been memorised already.</span>
+<span class="sd">    If this is the case, return stored value, otherwise calculate value and</span>
+<span class="sd">    store it in the memorisation class.</span>
+
+<span class="sd">    Uses CoolProp interface for pure fluids, newton algorithm for mixtures:</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        v_{mix}\left(p,h\right) = v\left(p,T_{mix}(p,h)\right)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># check if fluid properties have been calculated before</span>
+    <span class="n">fl</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">memorisation</span> <span class="o">=</span> <span class="n">fl</span> <span class="ow">in</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">v_ph</span>
+    <span class="k">if</span> <span class="n">memorisation</span><span class="p">:</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">v_ph</span><span class="p">[</span><span class="n">fl</span><span class="p">][:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="n">flow</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">flow</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+        <span class="n">ix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">a</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">err</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">ix</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># known fluid properties</span>
+            <span class="n">Memorise</span><span class="o">.</span><span class="n">v_ph</span><span class="p">[</span><span class="n">fl</span><span class="p">][</span><span class="n">ix</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">return</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">v_ph</span><span class="p">[</span><span class="n">fl</span><span class="p">][</span><span class="n">ix</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># unknown fluid properties</span>
+    <span class="n">fluid</span> <span class="o">=</span> <span class="n">single_fluid</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">fluid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># calculate the fluid properties for fluid mixtures</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">v_mix_pT</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">T_mix_ph</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">T0</span><span class="o">=</span><span class="n">T0</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># calculate fluid property for pure fluids</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">d_ph</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">flow</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">fluid</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">memorisation</span><span class="p">:</span>
+        <span class="c1"># memorise the newly calculated value</span>
+        <span class="n">new</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
+            <span class="p">[[</span><span class="n">flow</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">flow</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">+</span> <span class="p">[</span><span class="n">val</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
+        <span class="n">Memorise</span><span class="o">.</span><span class="n">v_ph</span><span class="p">[</span><span class="n">fl</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Memorise</span><span class="o">.</span><span class="n">v_ph</span><span class="p">[</span><span class="n">fl</span><span class="p">],</span> <span class="n">new</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">val</span></div>
+
+
+<div class="viewcode-block" id="d_ph"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.d_ph">[docs]</a><span class="k">def</span> <span class="nf">d_ph</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">fluid</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the density from pressure and enthalpy for a pure fluid.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    p : float</span>
+<span class="sd">        Pressure p / Pa.</span>
+
+<span class="sd">    h : float</span>
+<span class="sd">        Specific enthalpy h / (J/kg).</span>
+
+<span class="sd">    fluid : str</span>
+<span class="sd">        Fluid name.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    d : float</span>
+<span class="sd">        Density d / (kg/:math:`\mathrm{m}^3`).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">back_end</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;IF97&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">entropy_iteration_IF97</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">fluid</span><span class="p">,</span> <span class="s1">&#39;rho&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">CP</span><span class="o">.</span><span class="n">HmassP_INPUTS</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">rhomass</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Q_ph"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.Q_ph">[docs]</a><span class="k">def</span> <span class="nf">Q_ph</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">fluid</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate vapor mass fraction from pressure and enthalpy for a pure fluid.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    p : float</span>
+<span class="sd">        Pressure p / Pa.</span>
+
+<span class="sd">    h : float</span>
+<span class="sd">        Specific enthalpy h / (J/kg).</span>
+
+<span class="sd">    fluid : str</span>
+<span class="sd">        Fluid name.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    x : float</span>
+<span class="sd">        Vapor mass fraction.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">CP</span><span class="o">.</span><span class="n">HmassP_INPUTS</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">Q</span><span class="p">()</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span></div>
+
+
+<div class="viewcode-block" id="dv_mix_dph"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.dv_mix_dph">[docs]</a><span class="k">def</span> <span class="nf">dv_mix_dph</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">T0</span><span class="o">=</span><span class="mi">675</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate partial derivate of specific volume to pressure.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    flow : list</span>
+<span class="sd">        Fluid property vector containing mass flow, pressure, enthalpy and</span>
+<span class="sd">        fluid composition.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dv / dp : float</span>
+<span class="sd">        Partial derivative of specific volume to pressure</span>
+<span class="sd">        dv /dp / (:math:`\mathrm{m}^3`/(Pa kg)).</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            \frac{\partial v_{mix}}{\partial p} = \frac{v_{mix}(p+d,h)-</span>
+<span class="sd">            v_{mix}(p-d,h)}{2 \cdot d}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">up</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">lo</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">up</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">d</span>
+    <span class="n">lo</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-=</span> <span class="n">d</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">v_mix_ph</span><span class="p">(</span><span class="n">up</span><span class="p">,</span> <span class="n">T0</span><span class="o">=</span><span class="n">T0</span><span class="p">)</span> <span class="o">-</span> <span class="n">v_mix_ph</span><span class="p">(</span><span class="n">lo</span><span class="p">,</span> <span class="n">T0</span><span class="o">=</span><span class="n">T0</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">d</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="dv_mix_pdh"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.dv_mix_pdh">[docs]</a><span class="k">def</span> <span class="nf">dv_mix_pdh</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">T0</span><span class="o">=</span><span class="mi">675</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate partial derivate of specific volume to enthalpy.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    flow : list</span>
+<span class="sd">        Fluid property vector containing mass flow, pressure, enthalpy and</span>
+<span class="sd">        fluid composition.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dv / dh : float</span>
+<span class="sd">        Partial derivative of specific volume to enthalpy</span>
+<span class="sd">        dv /dh / (:math:`\mathrm{m}^3`/J).</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            \frac{\partial v_{mix}}{\partial h} = \frac{v_{mix}(p,h+d)-</span>
+<span class="sd">            v_{mix}(p,h-d)}{2 \cdot d}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">up</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">lo</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">up</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+=</span> <span class="n">d</span>
+    <span class="n">lo</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-=</span> <span class="n">d</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">v_mix_ph</span><span class="p">(</span><span class="n">up</span><span class="p">,</span> <span class="n">T0</span><span class="o">=</span><span class="n">T0</span><span class="p">)</span> <span class="o">-</span> <span class="n">v_mix_ph</span><span class="p">(</span><span class="n">lo</span><span class="p">,</span> <span class="n">T0</span><span class="o">=</span><span class="n">T0</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">d</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="v_mix_pT"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.v_mix_pT">[docs]</a><span class="k">def</span> <span class="nf">v_mix_pT</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">T</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the specific volume from pressure and temperature.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    flow : list</span>
+<span class="sd">        Fluid property vector containing mass flow, pressure, enthalpy and</span>
+<span class="sd">        fluid composition.</span>
+
+<span class="sd">    T : float</span>
+<span class="sd">        Temperature T / K.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    v : float</span>
+<span class="sd">        Specific volume v / (:math:`\mathrm{m}^3`/kg).</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    Calculation for fluid mixtures.</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        v_{mix}(p,T)=\frac{1}{\sum_{i} \rho(pp_{i}, T, fluid_{i})}\;</span>
+<span class="sd">        \forall i \in \text{fluid components}\\</span>
+<span class="sd">        pp: \text{partial pressure}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">molar_mass_flow</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+
+    <span class="n">d</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">fluid</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">ni</span> <span class="o">=</span> <span class="n">x</span> <span class="o">/</span> <span class="n">molar_masses</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span>
+            <span class="n">d</span> <span class="o">+=</span> <span class="n">d_pT</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">ni</span> <span class="o">/</span> <span class="n">n</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">fluid</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">d</span></div>
+
+
+<div class="viewcode-block" id="d_mix_pT"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.d_mix_pT">[docs]</a><span class="k">def</span> <span class="nf">d_mix_pT</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">T</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the density from pressure and temperature.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    flow : list</span>
+<span class="sd">        Fluid property vector containing mass flow, pressure, enthalpy and</span>
+<span class="sd">        fluid composition.</span>
+
+<span class="sd">    T : float</span>
+<span class="sd">        Temperature T / K.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    d : float</span>
+<span class="sd">        Density d / (kg/:math:`\mathrm{m}^3`).</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    Calculation for fluid mixtures.</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \rho_{mix}\left(p,T\right)=\frac{1}{v_{mix}\left(p,T\right)}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">v_mix_pT</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="d_pT"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.d_pT">[docs]</a><span class="k">def</span> <span class="nf">d_pT</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">fluid</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the density from pressure and temperature for a pure fluid.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    p : float</span>
+<span class="sd">        Pressure p / Pa.</span>
+
+<span class="sd">    T : float</span>
+<span class="sd">        Temperature T / K.</span>
+
+<span class="sd">    fluid : str</span>
+<span class="sd">        Fluid name.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    d : float</span>
+<span class="sd">        Density d / (kg/:math:`\mathrm{m}^3`).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">CP</span><span class="o">.</span><span class="n">PT_INPUTS</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">rhomass</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="visc_mix_ph"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.visc_mix_ph">[docs]</a><span class="k">def</span> <span class="nf">visc_mix_ph</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">T0</span><span class="o">=</span><span class="mi">675</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the dynamic viscorsity from pressure and enthalpy.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    flow : list</span>
+<span class="sd">        Fluid property vector containing mass flow, pressure, enthalpy and</span>
+<span class="sd">        fluid composition.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    visc : float</span>
+<span class="sd">        Dynamic viscosity visc / Pa s.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    First, check if fluid property has been memorised already.</span>
+<span class="sd">    If this is the case, return stored value, otherwise calculate value and</span>
+<span class="sd">    store it in the memorisation class.</span>
+
+<span class="sd">    Uses CoolProp interface for pure fluids, newton algorithm for mixtures:</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \eta_{mix}\left(p,h\right) = \eta\left(p,T_{mix}(p,h)\right)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># check if fluid properties have been calculated before</span>
+    <span class="n">fl</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">memorisation</span> <span class="o">=</span> <span class="n">fl</span> <span class="ow">in</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">visc_ph</span>
+    <span class="k">if</span> <span class="n">memorisation</span><span class="p">:</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">visc_ph</span><span class="p">[</span><span class="n">fl</span><span class="p">][:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="n">flow</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">flow</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+        <span class="n">ix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">a</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">err</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">ix</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># known fluid properties</span>
+            <span class="n">Memorise</span><span class="o">.</span><span class="n">visc_ph</span><span class="p">[</span><span class="n">fl</span><span class="p">][</span><span class="n">ix</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">return</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">visc_ph</span><span class="p">[</span><span class="n">fl</span><span class="p">][</span><span class="n">ix</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># unknown fluid properties</span>
+    <span class="n">fluid</span> <span class="o">=</span> <span class="n">single_fluid</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">fluid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># calculate the fluid properties for fluid mixtures</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">visc_mix_pT</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">T_mix_ph</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">T0</span><span class="o">=</span><span class="n">T0</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># calculate the fluid properties for pure fluids</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">visc_ph</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">flow</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">fluid</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">memorisation</span><span class="p">:</span>
+        <span class="c1"># memorise the newly calculated value</span>
+        <span class="n">new</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
+            <span class="p">[[</span><span class="n">flow</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">flow</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">+</span> <span class="p">[</span><span class="n">val</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
+        <span class="n">Memorise</span><span class="o">.</span><span class="n">visc_ph</span><span class="p">[</span><span class="n">fl</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Memorise</span><span class="o">.</span><span class="n">visc_ph</span><span class="p">[</span><span class="n">fl</span><span class="p">],</span> <span class="n">new</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">val</span></div>
+
+
+<div class="viewcode-block" id="visc_ph"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.visc_ph">[docs]</a><span class="k">def</span> <span class="nf">visc_ph</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">fluid</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate dynamic viscosity from pressure and enthalpy for a pure fluid.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    p : float</span>
+<span class="sd">        Pressure p / Pa.</span>
+
+<span class="sd">    h : float</span>
+<span class="sd">        Specific enthalpy h / (J/kg).</span>
+
+<span class="sd">    fluid : str</span>
+<span class="sd">        Fluid name.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    visc : float</span>
+<span class="sd">        Viscosity visc / Pa s.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">back_end</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;IF97&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">entropy_iteration_IF97</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">fluid</span><span class="p">,</span> <span class="s1">&#39;visc&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">CP</span><span class="o">.</span><span class="n">HmassP_INPUTS</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">viscosity</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="visc_mix_pT"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.visc_mix_pT">[docs]</a><span class="k">def</span> <span class="nf">visc_mix_pT</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">T</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate dynamic viscosity from pressure and temperature.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    flow : list</span>
+<span class="sd">        Fluid property vector containing mass flow, pressure, enthalpy and</span>
+<span class="sd">        fluid composition.</span>
+
+<span class="sd">    T : float</span>
+<span class="sd">        Temperature T / K.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    visc : float</span>
+<span class="sd">        Dynamic viscosity visc / Pa s.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    Calculation for fluid mixtures.</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \eta_{mix}(p,T)=\frac{\sum_{i} \left( \eta(p,T,fluid_{i}) \cdot y_{i}</span>
+<span class="sd">        \cdot \sqrt{M_{i}} \right)}</span>
+<span class="sd">        {\sum_{i} \left(y_{i} \cdot \sqrt{M_{i}} \right)}\;</span>
+<span class="sd">        \forall i \in \text{fluid components}\\</span>
+<span class="sd">        y: \text{volume fraction}\\</span>
+<span class="sd">        M: \text{molar mass}</span>
+
+<span class="sd">    Reference: :cite:`Herning1936`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">molar_mass_flow</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+
+    <span class="n">a</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">fluid</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">bi</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">molar_masses</span><span class="p">[</span><span class="n">fluid</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">molar_masses</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span> <span class="o">*</span> <span class="n">n</span><span class="p">)</span>
+            <span class="n">b</span> <span class="o">+=</span> <span class="n">bi</span>
+            <span class="n">a</span> <span class="o">+=</span> <span class="n">bi</span> <span class="o">*</span> <span class="n">visc_pT</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">T</span><span class="p">,</span> <span class="n">fluid</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">a</span> <span class="o">/</span> <span class="n">b</span></div>
+
+
+<div class="viewcode-block" id="visc_pT"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.visc_pT">[docs]</a><span class="k">def</span> <span class="nf">visc_pT</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">fluid</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate dynamic viscosity from pressure and temperature for a pure fluid.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    p : float</span>
+<span class="sd">        Pressure p / Pa.</span>
+
+<span class="sd">    T : float</span>
+<span class="sd">        Temperature T / K.</span>
+
+<span class="sd">    fluid : str</span>
+<span class="sd">        Fluid name.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    visc : float</span>
+<span class="sd">        Viscosity visc / Pa s.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">CP</span><span class="o">.</span><span class="n">PT_INPUTS</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">viscosity</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="s_mix_ph"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.s_mix_ph">[docs]</a><span class="k">def</span> <span class="nf">s_mix_ph</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">T0</span><span class="o">=</span><span class="mi">675</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the entropy from pressure and enthalpy.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    flow : list</span>
+<span class="sd">        Fluid property vector containing mass flow, pressure, enthalpy and</span>
+<span class="sd">        fluid composition.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    s : float</span>
+<span class="sd">        Specific entropy s / (J/(kgK)).</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    First, check if fluid property has been memorised already.</span>
+<span class="sd">    If this is the case, return stored value, otherwise calculate value and</span>
+<span class="sd">    store it in the memorisation class.</span>
+
+<span class="sd">    Uses CoolProp interface for pure fluids, newton algorithm for mixtures:</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        s_{mix}\left(p,h\right) = s\left(p,T_{mix}(p,h)\right)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># check if fluid properties have been calculated before</span>
+    <span class="n">fl</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">memorisation</span> <span class="o">=</span> <span class="n">fl</span> <span class="ow">in</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">s_ph</span>
+    <span class="k">if</span> <span class="n">memorisation</span><span class="p">:</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">s_ph</span><span class="p">[</span><span class="n">fl</span><span class="p">][:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="n">flow</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">flow</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+        <span class="n">ix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">a</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">err</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">ix</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># known fluid properties</span>
+            <span class="n">Memorise</span><span class="o">.</span><span class="n">s_ph</span><span class="p">[</span><span class="n">fl</span><span class="p">][</span><span class="n">ix</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">return</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">s_ph</span><span class="p">[</span><span class="n">fl</span><span class="p">][</span><span class="n">ix</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># unknown fluid properties</span>
+    <span class="n">fluid</span> <span class="o">=</span> <span class="n">single_fluid</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">fluid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># calculate the fluid properties for fluid mixtures</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">s_mix_pT</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">T_mix_ph</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">T0</span><span class="o">=</span><span class="n">T0</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># calculate fluid property for pure fluids</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">s_ph</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">flow</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">fluid</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">memorisation</span><span class="p">:</span>
+        <span class="c1"># memorise the newly calculated value</span>
+        <span class="n">new</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
+            <span class="p">[[</span><span class="n">flow</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">flow</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">+</span> <span class="p">[</span><span class="n">val</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
+        <span class="n">Memorise</span><span class="o">.</span><span class="n">s_ph</span><span class="p">[</span><span class="n">fl</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Memorise</span><span class="o">.</span><span class="n">s_ph</span><span class="p">[</span><span class="n">fl</span><span class="p">],</span> <span class="n">new</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">val</span></div>
+
+
+<div class="viewcode-block" id="s_ph"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.s_ph">[docs]</a><span class="k">def</span> <span class="nf">s_ph</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">fluid</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the entropy from pressure and enthalpy for a pure fluid.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    p : float</span>
+<span class="sd">        Pressure p / Pa.</span>
+
+<span class="sd">    h : float</span>
+<span class="sd">        Specific enthalpy h / (J/kg).</span>
+
+<span class="sd">    fluid : str</span>
+<span class="sd">        Fluid name.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    s : float</span>
+<span class="sd">        Specific entropy s / (J/(kgK)).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">back_end</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;IF97&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">entropy_iteration_IF97</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">fluid</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">CP</span><span class="o">.</span><span class="n">HmassP_INPUTS</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">smass</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="s_mix_pT"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.s_mix_pT">[docs]</a><span class="k">def</span> <span class="nf">s_mix_pT</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">force_gas</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the entropy from pressure and temperature.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    flow : list</span>
+<span class="sd">        Fluid property vector containing mass flow, pressure, enthalpy and</span>
+<span class="sd">        fluid composition.</span>
+
+<span class="sd">    T : float</span>
+<span class="sd">        Temperature T / K.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    s : float</span>
+<span class="sd">        Specific entropy s / (J/(kgK)).</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    Calculation for fluid mixtures.</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        s_{mix}(p,T)=\sum_{i} x_{i} \cdot s(pp_{i},T,fluid_{i})-</span>
+<span class="sd">        \sum_{i} x_{i} \cdot R_{i} \cdot \ln \frac{pp_{i}}{p}\;</span>
+<span class="sd">        \forall i \in \text{fluid components}\\</span>
+<span class="sd">        pp: \text{partial pressure}\\</span>
+<span class="sd">        R: \text{gas constant}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">molar_mass_flow</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">fluid_name</span> <span class="o">=</span> <span class="n">single_fluid</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">fluid_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">x_i</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">fluid</span><span class="p">:</span> <span class="n">y</span> <span class="o">/</span> <span class="p">(</span><span class="n">molar_masses</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span> <span class="o">*</span> <span class="n">n</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">fluid</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span>
+
+        <span class="n">water</span> <span class="o">=</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">water</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">water</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">force_gas</span> <span class="ow">and</span> <span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="n">water</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">err</span><span class="p">):</span>
+            <span class="n">y_i_gas</span><span class="p">,</span> <span class="n">x_i_gas</span><span class="p">,</span> <span class="n">y_water_liq</span><span class="p">,</span> <span class="n">x_water_liq</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">cond_check</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">x_i</span><span class="p">,</span> <span class="n">flow</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">n</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">y_i_gas</span> <span class="o">=</span> <span class="n">flow</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+            <span class="n">y_water_liq</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">x_i_gas</span> <span class="o">=</span> <span class="n">x_i</span>
+
+        <span class="k">for</span> <span class="n">fluid</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">y_i_gas</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">y</span> <span class="o">&gt;</span> <span class="n">err</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">fluid</span> <span class="o">==</span> <span class="n">water</span> <span class="ow">and</span> <span class="n">y_water_liq</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">water</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">CP</span><span class="o">.</span><span class="n">QT_INPUTS</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span>
+                    <span class="n">s</span> <span class="o">+=</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">water</span><span class="p">]</span><span class="o">.</span><span class="n">smass</span><span class="p">()</span> <span class="o">*</span> <span class="n">y</span> <span class="o">*</span> <span class="p">(</span>
+                        <span class="mi">1</span> <span class="o">-</span> <span class="n">y_water_liq</span>
+                    <span class="p">)</span>
+                    <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">water</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">CP</span><span class="o">.</span><span class="n">QT_INPUTS</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span>
+                    <span class="n">s</span> <span class="o">+=</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">water</span><span class="p">]</span><span class="o">.</span><span class="n">smass</span><span class="p">()</span> <span class="o">*</span> <span class="n">y_water_liq</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">pp</span> <span class="o">=</span> <span class="n">flow</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">x_i_gas</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span>
+                    <span class="n">s</span> <span class="o">+=</span> <span class="n">y</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">y_water_liq</span><span class="p">)</span> <span class="o">*</span> <span class="n">s_pT</span><span class="p">(</span><span class="n">pp</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">fluid</span><span class="p">,</span> <span class="n">force_gas</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">s_pT</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">T</span><span class="p">,</span> <span class="n">fluid_name</span><span class="p">,</span> <span class="n">force_gas</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">s</span></div>
+
+
+<div class="viewcode-block" id="s_pT"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.s_pT">[docs]</a><span class="k">def</span> <span class="nf">s_pT</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">fluid</span><span class="p">,</span> <span class="n">force_gas</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the entropy from pressure and temperature for a pure fluid.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    p : float</span>
+<span class="sd">        Pressure p / Pa.</span>
+
+<span class="sd">    T : float</span>
+<span class="sd">        Temperature T / K.</span>
+
+<span class="sd">    fluid : str</span>
+<span class="sd">        Fluid name.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    s : float</span>
+<span class="sd">        Specific entropy s / (J/(kgK)).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">force_gas</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">T</span> <span class="o">&lt;</span> <span class="n">get_T_crit</span><span class="p">(</span><span class="n">fluid</span><span class="p">):</span>
+            <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">CP</span><span class="o">.</span><span class="n">PT_INPUTS</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">smass</span><span class="p">()</span>
+            <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">CP</span><span class="o">.</span><span class="n">QT_INPUTS</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span>
+            <span class="n">s_sat</span> <span class="o">=</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">smass</span><span class="p">()</span>
+            <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">s_sat</span><span class="p">)</span>
+
+    <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">CP</span><span class="o">.</span><span class="n">PT_INPUTS</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">smass</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ds_mix_pdT"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.ds_mix_pdT">[docs]</a><span class="k">def</span> <span class="nf">ds_mix_pdT</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">T</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate partial derivate of entropy to temperature.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    flow : list</span>
+<span class="sd">        Fluid property vector containing mass flow, pressure, enthalpy and</span>
+<span class="sd">        fluid composition.</span>
+
+<span class="sd">    T : float</span>
+<span class="sd">        Temperature T / K.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ds / dT : float</span>
+<span class="sd">        Partial derivative of specific entropy to temperature</span>
+<span class="sd">        ds / dT / (J/(kg :math:`\mathrm{K}^2`)).</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            \frac{\partial s_{mix}}{\partial T} =</span>
+<span class="sd">            \frac{s_{mix}(p,T+d)-s_{mix}(p,T-d)}{2 \cdot d}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="mf">0.01</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">s_mix_pT</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">T</span> <span class="o">+</span> <span class="n">d</span><span class="p">)</span> <span class="o">-</span> <span class="n">s_mix_pT</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">T</span> <span class="o">-</span> <span class="n">d</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">d</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="isentropic"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.isentropic">[docs]</a><span class="k">def</span> <span class="nf">isentropic</span><span class="p">(</span><span class="n">inflow</span><span class="p">,</span> <span class="n">outflow</span><span class="p">,</span> <span class="n">T0</span><span class="o">=</span><span class="mi">675</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the enthalpy at the outlet after isentropic process.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    inflow : list</span>
+<span class="sd">        Inflow fluid property vector containing mass flow, pressure, enthalpy</span>
+<span class="sd">        and fluid composition.</span>
+
+<span class="sd">    outflow : list</span>
+<span class="sd">        Outflow fluid property vector containing mass flow, pressure, enthalpy</span>
+<span class="sd">        and fluid composition.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    h_s : float</span>
+<span class="sd">        Enthalpy after isentropic state change.</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            h_\mathrm{s} = \begin{cases}</span>
+<span class="sd">            h\left(p_{out}, s\left(p_{in}, h_{in}\right) \right) &amp;</span>
+<span class="sd">            \text{pure fluids}\\</span>
+<span class="sd">            h\left(p_{out}, s\left(p_{in}, T_{in}\right) \right) &amp;</span>
+<span class="sd">            \text{mixtures}\\</span>
+<span class="sd">            \end{cases}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fluid</span> <span class="o">=</span> <span class="n">single_fluid</span><span class="p">(</span><span class="n">inflow</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">fluid</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">h_ps</span><span class="p">(</span><span class="n">outflow</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">s_ph</span><span class="p">(</span><span class="n">inflow</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">inflow</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">fluid</span><span class="p">),</span> <span class="n">fluid</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">s_mix</span> <span class="o">=</span> <span class="n">s_mix_ph</span><span class="p">(</span><span class="n">inflow</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">h_mix_ps</span><span class="p">(</span><span class="n">outflow</span><span class="p">,</span> <span class="n">s_mix</span><span class="p">,</span> <span class="n">T0</span><span class="o">=</span><span class="n">T0</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="calc_physical_exergy"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.calc_physical_exergy">[docs]</a><span class="k">def</span> <span class="nf">calc_physical_exergy</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">p0</span><span class="p">,</span> <span class="n">T0</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate specific physical exergy.</span>
+
+<span class="sd">    Physical exergy is allocated to a thermal and a mechanical share according</span>
+<span class="sd">    to :cite:`Morosuk2019`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    conn : tespy.connections.connection.Connection</span>
+<span class="sd">        Connection to calculate specific physical exergy for.</span>
+
+<span class="sd">    p0 : float</span>
+<span class="sd">        Ambient pressure p0 / Pa.</span>
+
+<span class="sd">    T0 : float</span>
+<span class="sd">        Ambient temperature T0 / K.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    e_ph : tuple</span>
+<span class="sd">        Specific thermal and mechanical exergy</span>
+<span class="sd">        (:math:`e^\mathrm{T}`, :math:`e^\mathrm{M}`) in J / kg.</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            e^\mathrm{T} = \left( h - h \left( p, T_0 \right) \right) -</span>
+<span class="sd">            T_0 \cdot \left(s - s\left(p, T_0\right)\right)</span>
+
+<span class="sd">            e^\mathrm{M}=\left(h\left(p,T_0\right)-h\left(p_0,T_0\right)\right)</span>
+<span class="sd">            -T_0\cdot\left(s\left(p, T_0\right)-s\left(p_0,T_0\right)\right)</span>
+
+<span class="sd">            e^\mathrm{PH} = e^\mathrm{T} + e^\mathrm{M}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">h_T0_p</span> <span class="o">=</span> <span class="n">h_mix_pT</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">conn</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">val_SI</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">conn</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">],</span> <span class="n">T0</span><span class="p">)</span>
+    <span class="n">s_T0_p</span> <span class="o">=</span> <span class="n">s_mix_pT</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">conn</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">val_SI</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">conn</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">],</span> <span class="n">T0</span><span class="p">)</span>
+    <span class="n">ex_therm</span> <span class="o">=</span> <span class="p">(</span><span class="n">conn</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="n">h_T0_p</span><span class="p">)</span> <span class="o">-</span> <span class="n">T0</span> <span class="o">*</span> <span class="p">(</span><span class="n">conn</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="n">s_T0_p</span><span class="p">)</span>
+    <span class="n">h0</span> <span class="o">=</span> <span class="n">h_mix_pT</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">p0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">conn</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">],</span> <span class="n">T0</span><span class="p">)</span>
+    <span class="n">s0</span> <span class="o">=</span> <span class="n">s_mix_pT</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">p0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">conn</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">],</span> <span class="n">T0</span><span class="p">)</span>
+    <span class="n">ex_mech</span> <span class="o">=</span> <span class="p">(</span><span class="n">h_T0_p</span> <span class="o">-</span> <span class="n">h0</span><span class="p">)</span> <span class="o">-</span> <span class="n">T0</span> <span class="o">*</span> <span class="p">(</span><span class="n">s_T0_p</span> <span class="o">-</span> <span class="n">s0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ex_therm</span><span class="p">,</span> <span class="n">ex_mech</span></div>
+
+
+<div class="viewcode-block" id="entropy_iteration_IF97"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.fluid_properties.entropy_iteration_IF97">[docs]</a><span class="k">def</span> <span class="nf">entropy_iteration_IF97</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">fluid</span><span class="p">,</span> <span class="n">output</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate state in IF97 back-end via entropy iteration.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    p : float</span>
+<span class="sd">        Pressure p / Pa.</span>
+
+<span class="sd">    h : float</span>
+<span class="sd">        Specific enthalpy h / (J/kg).</span>
+
+<span class="sd">    fluid : str</span>
+<span class="sd">        Fluid name.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    T : float</span>
+<span class="sd">        Temperature T / K.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># region 1 exclusive issue!</span>
+    <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">CP</span><span class="o">.</span><span class="n">HmassP_INPUTS</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">p</span> <span class="o">&lt;=</span> <span class="mf">16.529164252605</span> <span class="o">*</span> <span class="mf">1e6</span><span class="p">:</span>
+        <span class="n">h_at_ph</span> <span class="o">=</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">hmass</span><span class="p">()</span>
+        <span class="n">deviation</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">h_at_ph</span> <span class="o">-</span> <span class="n">h</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">deviation</span> <span class="o">/</span> <span class="n">h</span> <span class="o">&gt;</span> <span class="mf">0.001</span><span class="p">:</span>
+            <span class="c1"># region 1, where isenthalpic lines are tangent to saturation dome</span>
+            <span class="k">if</span> <span class="n">p</span> <span class="o">&gt;</span> <span class="mf">1e6</span> <span class="ow">and</span> <span class="n">p</span> <span class="o">&lt;</span> <span class="mf">1e7</span> <span class="ow">and</span> <span class="n">h</span> <span class="o">&gt;</span> <span class="mi">2700000</span> <span class="ow">and</span> <span class="n">h</span> <span class="o">&lt;</span> <span class="mi">2850000</span><span class="p">:</span>
+                <span class="n">smin</span> <span class="o">=</span> <span class="mi">5750</span>
+                <span class="n">smax</span> <span class="o">=</span> <span class="mi">6500</span>
+            <span class="c1"># bottom left corner in Ts diagram</span>
+            <span class="k">elif</span> <span class="n">h</span> <span class="o">&lt;</span> <span class="mi">10000</span><span class="p">:</span>
+                <span class="n">smin</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">smax</span> <span class="o">=</span> <span class="mi">50</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># proximity to saturated liquid</span>
+                <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">CP</span><span class="o">.</span><span class="n">PQ_INPUTS</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="n">h_sat_l</span> <span class="o">=</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">hmass</span><span class="p">()</span>
+                <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">h</span> <span class="o">-</span> <span class="n">h_sat_l</span><span class="p">)</span> <span class="o">/</span> <span class="n">h_sat_l</span> <span class="o">&lt;</span> <span class="mf">1e-1</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">p</span> <span class="o">&lt;</span> <span class="mi">1000</span><span class="p">:</span>
+                        <span class="n">smin</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="k">elif</span> <span class="n">p</span> <span class="o">&lt;</span> <span class="mi">60000</span><span class="p">:</span>
+                        <span class="n">smin</span> <span class="o">=</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">smass</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.9</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">smin</span> <span class="o">=</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">smass</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.95</span>
+
+                    <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">CP</span><span class="o">.</span><span class="n">PQ_INPUTS</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">)</span>
+                    <span class="n">smax</span> <span class="o">=</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">smass</span><span class="p">()</span>
+                <span class="c1"># all others</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">CP</span><span class="o">.</span><span class="n">HmassP_INPUTS</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+                    <span class="n">s0</span> <span class="o">=</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">smass</span><span class="p">()</span>
+                    <span class="n">smin</span> <span class="o">=</span> <span class="mf">0.8</span> <span class="o">*</span> <span class="n">s0</span>
+                    <span class="n">smax</span> <span class="o">=</span> <span class="mf">1.2</span> <span class="o">*</span> <span class="n">s0</span>
+
+            <span class="n">s0</span> <span class="o">=</span> <span class="p">(</span><span class="n">smax</span> <span class="o">+</span> <span class="n">smin</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">newton</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">h_ps_IF97</span><span class="p">,</span> <span class="n">deriv</span><span class="o">=</span><span class="n">dh_pds_IF97</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">[</span><span class="n">fluid</span><span class="p">,</span> <span class="n">p</span><span class="p">],</span>
+                       <span class="n">y</span><span class="o">=</span><span class="n">h</span><span class="p">,</span> <span class="n">val0</span><span class="o">=</span><span class="n">s0</span><span class="p">,</span> <span class="n">valmin</span><span class="o">=</span><span class="n">smin</span><span class="p">,</span> <span class="n">valmax</span><span class="o">=</span><span class="n">smax</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                       <span class="n">tol_rel</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">tol_mode</span><span class="o">=</span><span class="s1">&#39;rel&#39;</span><span class="p">)</span>
+            <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">CP</span><span class="o">.</span><span class="n">PSmass_INPUTS</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">output</span> <span class="o">==</span> <span class="s1">&#39;T&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">output</span> <span class="o">==</span> <span class="s1">&#39;s&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">smass</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">output</span> <span class="o">==</span> <span class="s1">&#39;rho&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">rhomass</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Memorise</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span><span class="o">.</span><span class="n">viscosity</span><span class="p">()</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2020, Francesco Witte.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tespy.tools.analyses &mdash; tespy 0.6.0 - Colored Chemicals documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> tespy
+            <img src="../../../_static/logo_tespy_mid.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.6.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../introduction.html">Thermal Engineering Systems in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../first_steps.html">First steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials_examples.html">Examples and Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tespy_modules.html">TESPy modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tespy_analyses.html">Thermodynamic analyses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developing_tespy.html">Developing TESPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../zliterature.html">Literature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">tespy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>tespy.tools.analyses</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for tespy.tools.analyses</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8</span>
+
+<span class="sd">&quot;&quot;&quot;Module for thermodynamic analyses.</span>
+
+<span class="sd">The analyses module provides thermodynamic analysis tools for your simulation.</span>
+<span class="sd">Different analysis classes are available:</span>
+
+<span class="sd">- :py:class:`tespy.tools.analyses.ExergyAnalysis`</span>
+
+
+<span class="sd">This file is part of project TESPy (github.com/oemof/tespy). It&#39;s copyrighted</span>
+<span class="sd">by the contributors recorded in the version control history of the file,</span>
+<span class="sd">available from its original location tespy/tools/analyses.py</span>
+
+<span class="sd">SPDX-License-Identifier: MIT</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">cm</span>
+<span class="kn">from</span> <span class="nn">tabulate</span> <span class="kn">import</span> <span class="n">tabulate</span>
+
+<span class="kn">from</span> <span class="nn">tespy.tools</span> <span class="kn">import</span> <span class="n">helpers</span> <span class="k">as</span> <span class="n">hlp</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.global_vars</span> <span class="kn">import</span> <span class="n">err</span>
+
+<span class="c1"># %%</span>
+
+
+<div class="viewcode-block" id="ExergyAnalysis"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.analyses.ExergyAnalysis">[docs]</a><span class="k">class</span> <span class="nc">ExergyAnalysis</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for exergy analysis of TESPy models.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">network</span><span class="p">,</span> <span class="n">E_F</span><span class="p">,</span> <span class="n">E_P</span><span class="p">,</span> <span class="n">E_L</span><span class="o">=</span><span class="p">[],</span> <span class="n">internal_busses</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        E_F : float</span>
+<span class="sd">            List containing busses which represent fuel exergy input of the</span>
+<span class="sd">            network, e.g. heat exchangers of the steam generator.</span>
+
+<span class="sd">        E_P : list</span>
+<span class="sd">            List containing busses which represent exergy production of the</span>
+<span class="sd">            network, e.g. the motors and generators of a power plant.</span>
+
+<span class="sd">        E_L : list</span>
+<span class="sd">            Optional: List containing busses which represent exergy loss</span>
+<span class="sd">            streams of the network to the ambient, e.g. flue gases of a gas</span>
+<span class="sd">            turbine.</span>
+
+<span class="sd">        internal_busses : list</span>
+<span class="sd">            Optional: List containing internal busses that represent exergy</span>
+<span class="sd">            transfer within your network but neither exergy production or</span>
+<span class="sd">            exergy fuel, e.g. a steam turbine driven feed water pump. The</span>
+<span class="sd">            conversion factors of the bus are applied to calculate exergy</span>
+<span class="sd">            destruction which is allocated to the respective components.</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        The nomenclature of the variables used in the exergy analysis is</span>
+<span class="sd">        according to :cite:`Tsatsaronis2007`.</span>
+
+<span class="sd">        The analysis is carried out by the</span>
+<span class="sd">        :py:meth:`tespy.tools.analyses.ExergyAnalysis.analyse` method. Given</span>
+<span class="sd">        the ambient state (pressure and temperature), it will</span>
+
+<span class="sd">        - Calculate the values of physical exergy on all connections</span>
+<span class="sd">        - Calculate exergy balance for all components. The individual exergy</span>
+<span class="sd">          balance methods are documented in the API-documentation of the</span>
+<span class="sd">          respective components.</span>
+
+<span class="sd">          - Components for which no exergy balance has yet been implemented,</span>
+<span class="sd">            :code:`nan` (not defined) is assigned for fuel and product</span>
+<span class="sd">            exergy as well as exergy destruction and exergetic efficiency.</span>
+<span class="sd">          - Dissipative components do not have product exergy (:code:`nan`) per</span>
+<span class="sd">            definition.</span>
+
+<span class="sd">        - Calculate exergy balances for busses passed to ExergyAnalysis class</span>
+<span class="sd">          instance.</span>
+<span class="sd">        - Calculate network fuel exergy, product exergy as well as exergy loss</span>
+<span class="sd">          from data provided by the busses passed to the instance.</span>
+<span class="sd">        - Calculate network exergetic efficiency.</span>
+<span class="sd">        - Calculate exergy destruction ratios for components.</span>
+
+<span class="sd">          - :math:`y_\mathrm{D}` compare the rate of exergy destruction in a</span>
+<span class="sd">            component to the exergy rate of the fuel provided to the overall</span>
+<span class="sd">            system.</span>
+<span class="sd">          - :math:`y^*_\mathrm{D}` compare the component exergy destruction</span>
+<span class="sd">            rate to the total exergy destruction rate within the system.</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            \begin{split}</span>
+<span class="sd">            \dot{E}_{\mathrm{D},comp} = \dot{E}_{\mathrm{F},comp} - \dot{E}_{\mathrm{P},comp}</span>
+<span class="sd">            \;&amp; \\</span>
+<span class="sd">            \varepsilon_{\mathrm{comp}} =</span>
+<span class="sd">            \frac{\dot{E}_{\mathrm{P},comp}}{\dot{E}_{\mathrm{F},comp}} \;&amp; \\</span>
+<span class="sd">            \dot{E}_{\mathrm{D}} = \sum_{comp} \dot{E}_{\mathrm{D},comp} \;&amp;</span>
+<span class="sd">            \forall comp \in \text{ network components}\\</span>
+<span class="sd">            \dot{E}_{\mathrm{P}} = \sum_{comp} \dot{E}_{\mathrm{P},comp} \;&amp;</span>
+<span class="sd">            \forall comp \in</span>
+<span class="sd">            \text{ components of busses in E\_P if &#39;base&#39;: &#39;component&#39;}\\</span>
+<span class="sd">            \dot{E}_{\mathrm{P}} = \dot{E}_{\mathrm{P}} - \sum_{comp} \dot{E}_{\mathrm{F},comp}</span>
+<span class="sd">            \;&amp; \forall comp \in</span>
+<span class="sd">            \text{ components of busses in E\_P if &#39;base&#39;: &#39;bus&#39;}\\</span>
+<span class="sd">            \dot{E}_{\mathrm{F}} = \sum_{comp} \dot{E}_{\mathrm{F},comp} \;&amp;</span>
+<span class="sd">            \forall comp \in</span>
+<span class="sd">            \text{ components of busses in E\_F if &#39;base&#39;: &#39;bus&#39;}\\</span>
+<span class="sd">            \dot{E}_{\mathrm{F}} = \dot{E}_{\mathrm{F}} - \sum_{comp} \dot{E}_{\mathrm{P},comp}</span>
+<span class="sd">            \;&amp; \forall comp \in</span>
+<span class="sd">            \text{ components of busses in E\_F if &#39;base&#39;: &#39;component&#39;}\\</span>
+<span class="sd">            \dot{E}_{\mathrm{L}} = \sum_{comp} \dot{E}_{\mathrm{D},comp} \;&amp;</span>
+<span class="sd">            \forall comp \in</span>
+<span class="sd">            \text{ sinks of network components if parameter exergy=&#39;loss&#39;}</span>
+<span class="sd">            \end{split}</span>
+
+<span class="sd">        The exergy balance of the network must be closed, meaning fuel exergy</span>
+<span class="sd">        minus product exergy, exergy destruction and exergy losses must be</span>
+<span class="sd">        zero (:math:`\Delta \dot{E}_\text{max}=0.001`). If the balance is violated a</span>
+<span class="sd">        warning message is prompted.</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            |\dot{E}_{\text{F}} - \dot{E}_{\text{P}} - \dot{E}_{\text{L}} - \dot{E}_{\text{D}}| \leq</span>
+<span class="sd">            \Delta \dot{E}_\text{max}\\</span>
+
+<span class="sd">            \varepsilon = \frac{\dot{E}_{\text{P}}}{\dot{E}_{\text{F}}}</span>
+
+<span class="sd">            y_{\text{D},comp} =</span>
+<span class="sd">            \frac{\dot{E}_{\text{D},comp}}{\dot{E}_{\text{F}}}\\</span>
+<span class="sd">            y^*_{\text{D},comp} =</span>
+<span class="sd">            \frac{\dot{E}_{\text{D},comp}}{\dot{E}_{\text{D}}}</span>
+
+<span class="sd">        Example</span>
+<span class="sd">        -------</span>
+<span class="sd">        In this example a simple clausius rankine cycle is set up and an</span>
+<span class="sd">        exergy analysis is performed after simulation of the power plant.</span>
+<span class="sd">        Start by defining ambient state and genereral network setup.</span>
+
+<span class="sd">        &gt;&gt;&gt; from tespy.components import (CycleCloser, HeatExchangerSimple,</span>
+<span class="sd">        ... Merge, Splitter, Valve, Compressor, Pump, Turbine)</span>
+<span class="sd">        &gt;&gt;&gt; from tespy.connections import Bus</span>
+<span class="sd">        &gt;&gt;&gt; from tespy.connections import Connection</span>
+<span class="sd">        &gt;&gt;&gt; from tespy.networks import Network</span>
+<span class="sd">        &gt;&gt;&gt; from tespy.tools import ExergyAnalysis</span>
+
+<span class="sd">        &gt;&gt;&gt; Tamb = 20</span>
+<span class="sd">        &gt;&gt;&gt; pamb = 1</span>
+<span class="sd">        &gt;&gt;&gt; fluids = [&#39;water&#39;]</span>
+<span class="sd">        &gt;&gt;&gt; nw = Network(fluids=fluids)</span>
+<span class="sd">        &gt;&gt;&gt; nw.set_attr(p_unit=&#39;bar&#39;, T_unit=&#39;C&#39;, h_unit=&#39;kJ / kg&#39;,</span>
+<span class="sd">        ... iterinfo=False)</span>
+
+<span class="sd">        In order to show all functionalities available we use a feed water pump</span>
+<span class="sd">        that is not driven electrically by a motor but instead internally by</span>
+<span class="sd">        an own steam turbine. Therefore we split up the live steam from the</span>
+<span class="sd">        steam generator and merge the streams after both steam turbines. For</span>
+<span class="sd">        simplicity the steam generator and the condenser are modeled as simple</span>
+<span class="sd">        heat exchangers.</span>
+
+<span class="sd">        &gt;&gt;&gt; cycle_close = CycleCloser(&#39;cycle closer&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; splitter1 = Splitter(&#39;splitter 1&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; merge1 = Merge(&#39;merge 1&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; turb = Turbine(&#39;turbine&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; fwp_turb = Turbine(&#39;feed water pump turbine&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; condenser = HeatExchangerSimple(&#39;condenser&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; fwp = Pump(&#39;pump&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; steam_generator = HeatExchangerSimple(&#39;steam generator&#39;)</span>
+
+<span class="sd">        &gt;&gt;&gt; fs_in = Connection(cycle_close, &#39;out1&#39;, splitter1, &#39;in1&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; fs_fwpt = Connection(splitter1, &#39;out1&#39;, fwp_turb, &#39;in1&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; fs_t = Connection(splitter1, &#39;out2&#39;, turb, &#39;in1&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; fwpt_ws = Connection(fwp_turb, &#39;out1&#39;, merge1, &#39;in1&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; t_ws = Connection(turb, &#39;out1&#39;, merge1, &#39;in2&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; ws = Connection(merge1, &#39;out1&#39;, condenser, &#39;in1&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; cond = Connection(condenser, &#39;out1&#39;, fwp, &#39;in1&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; fw = Connection(fwp, &#39;out1&#39;, steam_generator, &#39;in1&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; fs_out = Connection(steam_generator, &#39;out1&#39;, cycle_close, &#39;in1&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; nw.add_conns(fs_in, fs_fwpt, fs_t, fwpt_ws, t_ws, ws, cond,</span>
+<span class="sd">        ... fw, fs_out)</span>
+
+<span class="sd">        Next step is to set up the busses to later pass them according to the</span>
+<span class="sd">        convetions in the list below:</span>
+
+<span class="sd">        - E_F for fuel exergy</span>
+<span class="sd">        - E_P for product exergy</span>
+<span class="sd">        - internal_busses for internal energy transport</span>
+<span class="sd">        - E_L for exergy loss streams to the ambient (sources and sinks go</span>
+<span class="sd">          here, in case you use e.g. flue gases or air input)</span>
+
+<span class="sd">        The first bus is for output power, which is only represented by the</span>
+<span class="sd">        main steam turbine. The efficiency is set to 0.97. This bus will</span>
+<span class="sd">        represent the product exergy.</span>
+
+<span class="sd">        &gt;&gt;&gt; power = Bus(&#39;power_output&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; power.add_comps({&#39;comp&#39;: turb, &#39;char&#39;: 0.97})</span>
+
+<span class="sd">        The second bus is for driving the feed water pump. The total power of</span>
+<span class="sd">        this bus is specified to be 0 in order to make sure, the power genrated</span>
+<span class="sd">        by the secondary steam turbine is transferred to the feed water pump.</span>
+<span class="sd">        For mechanical efficiency we choose 0.985 for both components, but</span>
+<span class="sd">        we need to make sure, the :code:`&#39;base&#39;` of the feed water pump is</span>
+<span class="sd">        :code:`&#39;bus&#39;` as the energy from the turbine drives the feed water</span>
+<span class="sd">        pump.</span>
+
+<span class="sd">        &gt;&gt;&gt; fwp_power = Bus(&#39;feed water pump power&#39;, P=0)</span>
+<span class="sd">        &gt;&gt;&gt; fwp_power.add_comps(</span>
+<span class="sd">        ... {&#39;comp&#39;: fwp_turb, &#39;char&#39;: 0.985},</span>
+<span class="sd">        ... {&#39;comp&#39;: fwp, &#39;char&#39;: 0.985, &#39;base&#39;: &#39;bus&#39;})</span>
+
+<span class="sd">        The fuel exergy is the exergy input into the network which is</span>
+<span class="sd">        represented by the heat input bus. Here again, as we have an energy</span>
+<span class="sd">        input from outside of the network, the :code:`&#39;base&#39;` keyword must be</span>
+<span class="sd">        specified to :code:`&#39;bus&#39;`.</span>
+
+<span class="sd">        &gt;&gt;&gt; heat = Bus(&#39;heat_input&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; heat.add_comps({&#39;comp&#39;: steam_generator, &#39;base&#39;: &#39;bus&#39;})</span>
+<span class="sd">        &gt;&gt;&gt; nw.add_busses(power, fwp_power, heat)</span>
+
+<span class="sd">        After setting up the busses, we specify the parameters for components</span>
+<span class="sd">        and connections and start the simulation.</span>
+
+<span class="sd">        &gt;&gt;&gt; turb.set_attr(eta_s=0.9)</span>
+<span class="sd">        &gt;&gt;&gt; fwp_turb.set_attr(eta_s=0.87)</span>
+<span class="sd">        &gt;&gt;&gt; condenser.set_attr(pr=0.98)</span>
+<span class="sd">        &gt;&gt;&gt; fwp.set_attr(eta_s=0.75)</span>
+<span class="sd">        &gt;&gt;&gt; steam_generator.set_attr(pr=0.89)</span>
+<span class="sd">        &gt;&gt;&gt; fs_in.set_attr(m=10, p=120, T=600, fluid={&#39;water&#39;: 1})</span>
+<span class="sd">        &gt;&gt;&gt; cond.set_attr(T=Tamb + 3, x=0)</span>
+<span class="sd">        &gt;&gt;&gt; nw.solve(&#39;design&#39;)</span>
+
+<span class="sd">        To evaluate the exergy balance of the network, we create an instance of</span>
+<span class="sd">        class :py:class:`tespy.tools.analyses.ExergyAnalysis`</span>
+<span class="sd">        passing the network to analyse as well as the respective busses. To run</span>
+<span class="sd">        the analysis, the ambient state is passed subsequently. The results of</span>
+<span class="sd">        the analysis can be printed using the</span>
+<span class="sd">        :py:meth:`tespy.tools.analyses.ExergyAnalysis.print_results` method.</span>
+<span class="sd">        The exergy balance should be closed, if you set up your network</span>
+<span class="sd">        analysis correctly. If not, an error is prompted.</span>
+
+<span class="sd">        &gt;&gt;&gt; ean = ExergyAnalysis(network=nw, E_F=[heat], E_P=[power],</span>
+<span class="sd">        ... internal_busses=[fwp_power])</span>
+<span class="sd">        &gt;&gt;&gt; ean.analyse(pamb=pamb, Tamb=Tamb)</span>
+<span class="sd">        &gt;&gt;&gt; abs(round(ean.network_data[&#39;E_F&#39;] - ean.network_data[&#39;E_P&#39;] -</span>
+<span class="sd">        ... ean.network_data[&#39;E_L&#39;] - ean.network_data[&#39;E_D&#39;], 3))</span>
+<span class="sd">        0.0</span>
+<span class="sd">        &gt;&gt;&gt; ();ean.print_results();() # doctest: +ELLIPSIS</span>
+<span class="sd">        (...)</span>
+
+<span class="sd">        The exergy data of the passed busses, the network&#39;s components and</span>
+<span class="sd">        connections as well as the network itself are stored as dataframes and</span>
+<span class="sd">        therefore accessible for further investigation.</span>
+
+<span class="sd">        &gt;&gt;&gt; busses = ean.bus_data</span>
+<span class="sd">        &gt;&gt;&gt; components = ean.component_data</span>
+<span class="sd">        &gt;&gt;&gt; connections = ean.connection_data</span>
+<span class="sd">        &gt;&gt;&gt; network = ean.network_data</span>
+
+<span class="sd">        Additionally, if you defined component groups for your components, the</span>
+<span class="sd">        exergy data of these groups are accumulated and saved in an own</span>
+<span class="sd">        DataFrame. Please note, that the exergy destruction values of the</span>
+<span class="sd">        busses are allocated to the component groups in this case.</span>
+
+<span class="sd">        &gt;&gt;&gt; groups = ean.group_data</span>
+
+<span class="sd">        Lastly, the tool offers an automatically generated data input for the</span>
+<span class="sd">        sankey plotting functionalities of the plotly library to create a</span>
+<span class="sd">        Grassmann diagram of your network. For more information on the usage</span>
+<span class="sd">        of the functionality look up the corresponding method documentation:</span>
+<span class="sd">        :py:meth:`tespy.tools.analyses.ExergyAnalysis.generate_plotly_sankey_input`.</span>
+<span class="sd">        The method returns a dictionary containting the links for the sankey</span>
+<span class="sd">        as well as a list of the nodes.</span>
+
+<span class="sd">        &gt;&gt;&gt; links, nodes = ean.generate_plotly_sankey_input()</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">E_F</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Missing fuel exergy E_F of network.&#39;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">hlp</span><span class="o">.</span><span class="n">TESPyNetworkError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">E_P</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Missing product exergy E_P of network.&#39;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">hlp</span><span class="o">.</span><span class="n">TESPyNetworkError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">nw</span> <span class="o">=</span> <span class="n">network</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">E_F</span> <span class="o">=</span> <span class="n">E_F</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">E_P</span> <span class="o">=</span> <span class="n">E_P</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">E_L</span> <span class="o">=</span> <span class="n">E_L</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">internal_busses</span> <span class="o">=</span> <span class="n">internal_busses</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">reserved_fkt_groups</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">[</span><span class="s1">&#39;E_P&#39;</span><span class="p">,</span> <span class="s1">&#39;E_F&#39;</span><span class="p">,</span> <span class="s1">&#39;E_D&#39;</span><span class="p">,</span> <span class="s1">&#39;E_L&#39;</span><span class="p">]</span> <span class="o">+</span>
+            <span class="p">[</span><span class="n">b</span><span class="o">.</span><span class="n">label</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">internal_busses</span> <span class="o">+</span> <span class="n">E_F</span> <span class="o">+</span> <span class="n">E_P</span> <span class="o">+</span> <span class="n">E_L</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">grassmann_diagram</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="ExergyAnalysis.analyse"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.analyses.ExergyAnalysis.analyse">[docs]</a>    <span class="k">def</span> <span class="nf">analyse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pamb</span><span class="p">,</span> <span class="n">Tamb</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Run the exergy analysis.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        pamb : float</span>
+<span class="sd">            Ambient pressure value for analysis, provide value in network&#39;s</span>
+<span class="sd">            pressure unit.</span>
+
+<span class="sd">        Tamb : float</span>
+<span class="sd">            Ambient temperature value for analysis, provide value in network&#39;s</span>
+<span class="sd">            temperature unit.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pamb_SI</span> <span class="o">=</span> <span class="n">hlp</span><span class="o">.</span><span class="n">convert_to_SI</span><span class="p">(</span><span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="n">pamb</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nw</span><span class="o">.</span><span class="n">p_unit</span><span class="p">)</span>
+        <span class="n">Tamb_SI</span> <span class="o">=</span> <span class="n">hlp</span><span class="o">.</span><span class="n">convert_to_SI</span><span class="p">(</span><span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="n">Tamb</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nw</span><span class="o">.</span><span class="n">T_unit</span><span class="p">)</span>
+
+        <span class="c1"># reset data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">component_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;E_F&#39;</span><span class="p">,</span> <span class="s1">&#39;E_P&#39;</span><span class="p">,</span> <span class="s1">&#39;E_D&#39;</span><span class="p">,</span> <span class="s1">&#39;epsilon&#39;</span><span class="p">,</span> <span class="s1">&#39;group&#39;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float64&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bus_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">component_data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bus_data</span><span class="p">[</span><span class="s1">&#39;base&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;e_PH&#39;</span><span class="p">,</span> <span class="s1">&#39;e_T&#39;</span><span class="p">,</span> <span class="s1">&#39;e_M&#39;</span><span class="p">,</span> <span class="s1">&#39;E_PH&#39;</span><span class="p">,</span> <span class="s1">&#39;E_T&#39;</span><span class="p">,</span> <span class="s1">&#39;E_M&#39;</span><span class="p">],</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float64&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">network_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
+            <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;E_F&#39;</span><span class="p">,</span> <span class="s1">&#39;E_P&#39;</span><span class="p">,</span> <span class="s1">&#39;E_D&#39;</span><span class="p">,</span> <span class="s1">&#39;E_L&#39;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float64&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">network_data</span><span class="p">[:]</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># physical exergy of connections</span>
+        <span class="k">for</span> <span class="n">conn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nw</span><span class="o">.</span><span class="n">conns</span><span class="p">[</span><span class="s1">&#39;object&#39;</span><span class="p">]:</span>
+            <span class="n">conn</span><span class="o">.</span><span class="n">get_physical_exergy</span><span class="p">(</span><span class="n">pamb_SI</span><span class="p">,</span> <span class="n">Tamb_SI</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connection_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">conn</span><span class="o">.</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">conn</span><span class="o">.</span><span class="n">ex_physical</span><span class="p">,</span> <span class="n">conn</span><span class="o">.</span><span class="n">ex_therm</span><span class="p">,</span> <span class="n">conn</span><span class="o">.</span><span class="n">ex_mech</span><span class="p">,</span>
+                <span class="n">conn</span><span class="o">.</span><span class="n">Ex_physical</span><span class="p">,</span> <span class="n">conn</span><span class="o">.</span><span class="n">Ex_therm</span><span class="p">,</span> <span class="n">conn</span><span class="o">.</span><span class="n">Ex_mech</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sankey_data</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">reserved_fkt_groups</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sankey_data</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="s1">&#39;cat&#39;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;object&#39;</span><span class="p">)</span>
+
+        <span class="c1"># exergy balance of components</span>
+        <span class="k">for</span> <span class="n">cp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nw</span><span class="o">.</span><span class="n">comps</span><span class="p">[</span><span class="s1">&#39;object&#39;</span><span class="p">]:</span>
+            <span class="c1"># save component information</span>
+            <span class="n">cp</span><span class="o">.</span><span class="n">exergy_balance</span><span class="p">(</span><span class="n">Tamb_SI</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="s1">&#39;fkt_group&#39;</span><span class="p">):</span>
+                <span class="n">cp</span><span class="o">.</span><span class="n">fkt_group</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">label</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">component_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">cp</span><span class="o">.</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">cp</span><span class="o">.</span><span class="n">E_F</span><span class="p">,</span> <span class="n">cp</span><span class="o">.</span><span class="n">E_P</span><span class="p">,</span> <span class="n">cp</span><span class="o">.</span><span class="n">E_D</span><span class="p">,</span> <span class="n">cp</span><span class="o">.</span><span class="n">epsilon</span><span class="p">,</span> <span class="n">cp</span><span class="o">.</span><span class="n">fkt_group</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">cp</span><span class="o">.</span><span class="n">fkt_group</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">reserved_fkt_groups</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="s1">&#39;The labels &#39;</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reserved_fkt_groups</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span>
+                    <span class="s1">&#39;cannot be used by components (if no group was assigned) &#39;</span>
+                    <span class="s1">&#39;or component groups in the exergy analysis. Found &#39;</span>
+                    <span class="s1">&#39;component/group with name &#39;</span> <span class="o">+</span> <span class="n">cp</span><span class="o">.</span><span class="n">fkt_group</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">cp</span><span class="o">.</span><span class="n">fkt_group</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sankey_data</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sankey_data</span><span class="p">[</span><span class="n">cp</span><span class="o">.</span><span class="n">fkt_group</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="s1">&#39;cat&#39;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;object&#39;</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">evaluate_busses</span><span class="p">(</span><span class="n">cp</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">network_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;E_D&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">component_data</span><span class="p">[</span><span class="s1">&#39;E_D&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">bus_data</span><span class="p">[</span><span class="s1">&#39;E_D&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">network_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;E_F&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">network_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;E_F&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">network_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;E_P&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">network_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;E_P&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">network_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;epsilon&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">network_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;E_P&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">network_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;E_F&#39;</span><span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="c1"># calculate exergy destruction ratios for components/busses</span>
+        <span class="n">E_F</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">network_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;E_F&#39;</span><span class="p">]</span>
+        <span class="n">E_D</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">network_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;E_D&#39;</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">component_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bus_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">aggregation_data</span><span class="p">]:</span>
+            <span class="n">d</span><span class="p">[</span><span class="s1">&#39;y_Dk&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;E_D&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">E_F</span>
+            <span class="n">d</span><span class="p">[</span><span class="s1">&#39;y*_Dk&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;E_D&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">E_D</span>
+            <span class="n">d</span><span class="p">[</span><span class="s1">&#39;epsilon&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;E_P&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;E_F&#39;</span><span class="p">]</span>
+
+        <span class="n">residual</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">network_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;E_F&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">network_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;E_P&#39;</span><span class="p">]</span> <span class="o">-</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">network_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;E_D&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">network_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;E_L&#39;</span><span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">residual</span> <span class="o">&gt;=</span> <span class="n">err</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s1">&#39;The exergy balance of your network is not closed (residual &#39;</span>
+                <span class="s1">&#39;value is &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">residual</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span> <span class="o">+</span> <span class="s1">&#39;, but should be &#39;</span>
+                <span class="s1">&#39;smaller than &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;), you should check the &#39;</span>
+                <span class="s1">&#39;component and network exergy data and check, if network is &#39;</span>
+                <span class="s1">&#39;properly setup for the exergy analysis.&#39;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_group_data</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ExergyAnalysis.evaluate_busses"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.analyses.ExergyAnalysis.evaluate_busses">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate_busses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cp</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Evaluate the exergy balances of busses.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        cp : tespy.components.component.Component</span>
+<span class="sd">            Component to analyse the bus exergy balance of.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cp_on_num_busses</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">E_F</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">E_P</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">internal_busses</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">E_L</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">cp</span> <span class="ow">in</span> <span class="n">b</span><span class="o">.</span><span class="n">comps</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">cp_on_num_busses</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="s1">&#39;The component &#39;</span> <span class="o">+</span> <span class="n">cp</span><span class="o">.</span><span class="n">label</span> <span class="o">+</span> <span class="s1">&#39; is on multiple &#39;</span>
+                        <span class="s1">&#39;busses in the exergy analysis. Make sure that no &#39;</span>
+                        <span class="s1">&#39;component is connected to more than one of the &#39;</span>
+                        <span class="s1">&#39;busses passed to the exergy_analysis method.&#39;</span><span class="p">)</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="n">hlp</span><span class="o">.</span><span class="n">TESPyNetworkError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">comps</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">cp</span><span class="p">,</span> <span class="s1">&#39;base&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;bus&#39;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">bus_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">cp</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="s1">&#39;E_P&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">E_bus</span>
+                    <span class="n">E_F</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">E_bus</span> <span class="o">/</span> <span class="n">cp</span><span class="o">.</span><span class="n">calc_bus_efficiency</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">bus_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">cp</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="s1">&#39;E_F&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">E_F</span>
+                    <span class="k">if</span> <span class="n">b</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">E_F</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">network_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;E_F&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">E_F</span>
+                        <span class="n">cat</span> <span class="o">=</span> <span class="s1">&#39;E_F&#39;</span>
+                    <span class="k">elif</span> <span class="n">b</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">E_P</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">network_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;E_P&#39;</span><span class="p">]</span> <span class="o">-=</span> <span class="n">E_F</span>
+                        <span class="n">cat</span> <span class="o">=</span> <span class="s1">&#39;E_P&#39;</span>
+                    <span class="k">elif</span> <span class="n">b</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">E_L</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">network_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;E_L&#39;</span><span class="p">]</span> <span class="o">-=</span> <span class="n">E_F</span>
+                        <span class="n">cat</span> <span class="o">=</span> <span class="s1">&#39;E_L&#39;</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">cat</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">label</span>
+
+                    <span class="k">if</span> <span class="n">cp</span><span class="o">.</span><span class="n">fkt_group</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sankey_data</span><span class="p">[</span><span class="n">b</span><span class="o">.</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">sankey_data</span><span class="p">[</span><span class="n">b</span><span class="o">.</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+                            <span class="n">cp</span><span class="o">.</span><span class="n">fkt_group</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">E_F</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">sankey_data</span><span class="p">[</span><span class="n">b</span><span class="o">.</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">cp</span><span class="o">.</span><span class="n">fkt_group</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">E_F</span><span class="p">,</span> <span class="n">cat</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">E_P</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">E_bus</span> <span class="o">*</span> <span class="n">cp</span><span class="o">.</span><span class="n">calc_bus_efficiency</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">bus_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">cp</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="s1">&#39;E_P&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">E_P</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">bus_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">cp</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="s1">&#39;E_F&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">E_bus</span>
+                    <span class="k">if</span> <span class="n">b</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">E_F</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">network_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;E_F&#39;</span><span class="p">]</span> <span class="o">-=</span> <span class="n">E_P</span>
+                        <span class="n">cat</span> <span class="o">=</span> <span class="s1">&#39;E_F&#39;</span>
+                    <span class="k">elif</span> <span class="n">b</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">E_P</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">network_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;E_P&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">E_P</span>
+                        <span class="n">cat</span> <span class="o">=</span> <span class="s1">&#39;E_P&#39;</span>
+                    <span class="k">elif</span> <span class="n">b</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">E_L</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">network_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;E_L&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">E_P</span>
+                        <span class="n">cat</span> <span class="o">=</span> <span class="s1">&#39;E_L&#39;</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">cat</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">label</span>
+
+                    <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sankey_data</span><span class="p">[</span><span class="n">cp</span><span class="o">.</span><span class="n">fkt_group</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">sankey_data</span><span class="p">[</span><span class="n">cp</span><span class="o">.</span><span class="n">fkt_group</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+                            <span class="n">b</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">E_P</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">sankey_data</span><span class="p">[</span><span class="n">cp</span><span class="o">.</span><span class="n">fkt_group</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">b</span><span class="o">.</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">E_P</span><span class="p">,</span> <span class="n">cat</span><span class="p">]</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">bus_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">cp</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="s1">&#39;base&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">comps</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">cp</span><span class="p">,</span> <span class="s1">&#39;base&#39;</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bus_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">cp</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="s1">&#39;group&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">fkt_group</span>
+
+                <span class="n">cp_on_num_busses</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">bus_data</span><span class="p">[</span><span class="s1">&#39;E_D&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bus_data</span><span class="p">[</span><span class="s1">&#39;E_F&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">bus_data</span><span class="p">[</span><span class="s1">&#39;E_P&#39;</span><span class="p">]</span>
+
+        <span class="c1"># create a table that includes exergy destruction attributed to the</span>
+        <span class="c1"># components</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aggregation_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">component_data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">bus_based</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bus_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">bus_data</span><span class="p">[</span><span class="s1">&#39;base&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;bus&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">index</span>
+        <span class="n">component_based</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bus_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">bus_data</span><span class="p">[</span><span class="s1">&#39;base&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;component&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">index</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">aggregation_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">bus_based</span><span class="p">,</span> <span class="s1">&#39;E_F&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bus_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">bus_based</span><span class="p">,</span> <span class="s1">&#39;E_F&#39;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aggregation_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">component_based</span><span class="p">,</span> <span class="s1">&#39;E_P&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bus_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">component_based</span><span class="p">,</span> <span class="s1">&#39;E_P&#39;</span><span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="n">E_P_notna</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">aggregation_data</span><span class="p">[</span>
+            <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aggregation_data</span><span class="p">[</span><span class="s1">&#39;E_P&#39;</span><span class="p">])</span>
+        <span class="p">]</span><span class="o">.</span><span class="n">index</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aggregation_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">E_P_notna</span><span class="p">,</span> <span class="s1">&#39;E_D&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">aggregation_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">E_P_notna</span><span class="p">,</span> <span class="s1">&#39;E_F&#39;</span><span class="p">]</span> <span class="o">-</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">aggregation_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">E_P_notna</span><span class="p">,</span> <span class="s1">&#39;E_P&#39;</span><span class="p">]</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="ExergyAnalysis.create_group_data"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.analyses.ExergyAnalysis.create_group_data">[docs]</a>    <span class="k">def</span> <span class="nf">create_group_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Collect the component group exergy data.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sankey_data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">E_D</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">aggregation_data</span><span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">aggregation_data</span><span class="p">[</span><span class="s1">&#39;group&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">group</span>
+            <span class="p">][</span><span class="s1">&#39;E_D&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sankey_data</span><span class="p">[</span><span class="n">group</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;E_D&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">E_D</span><span class="p">,</span> <span class="s1">&#39;E_D&#39;</span><span class="p">]</span>
+
+        <span class="c1"># establish connections for fuel exergy via bus balance</span>
+        <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">E_F</span><span class="p">:</span>
+            <span class="n">input_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_group_input_value</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sankey_data</span><span class="p">[</span><span class="s1">&#39;E_F&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">b</span><span class="o">.</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sankey_data</span><span class="p">[</span><span class="n">b</span><span class="o">.</span><span class="n">label</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">-</span> <span class="n">input_value</span><span class="p">,</span> <span class="s1">&#39;E_F&#39;</span><span class="p">]</span>
+
+        <span class="c1"># establish connections for product exergy via bus balance</span>
+        <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">E_P</span><span class="p">:</span>
+            <span class="n">input_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_group_input_value</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sankey_data</span><span class="p">[</span><span class="n">b</span><span class="o">.</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;E_P&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">input_value</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">sankey_data</span><span class="p">[</span><span class="n">b</span><span class="o">.</span><span class="n">label</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="s1">&#39;E_P&#39;</span><span class="p">]</span>
+
+        <span class="c1"># establish connections for exergy loss via bus balance</span>
+        <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">E_L</span><span class="p">:</span>
+            <span class="n">input_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_group_input_value</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sankey_data</span><span class="p">[</span><span class="n">b</span><span class="o">.</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;E_L&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">input_value</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">sankey_data</span><span class="p">[</span><span class="n">b</span><span class="o">.</span><span class="n">label</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="s1">&#39;E_L&#39;</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">fkt_group</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sankey_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">comps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">component_data</span><span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">component_data</span><span class="p">[</span><span class="s1">&#39;group&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">fkt_group</span><span class="p">]</span><span class="o">.</span><span class="n">index</span>
+            <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">comps</span><span class="p">:</span>
+                <span class="n">comp_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nw</span><span class="o">.</span><span class="n">get_comp</span><span class="p">(</span><span class="n">comp</span><span class="p">)</span>
+                <span class="n">sources</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nw</span><span class="o">.</span><span class="n">conns</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">nw</span><span class="o">.</span><span class="n">conns</span><span class="p">[</span><span class="s1">&#39;source&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">comp_obj</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">conn</span> <span class="ow">in</span> <span class="n">sources</span><span class="p">[</span><span class="s1">&#39;object&#39;</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">conn</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">label</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">comps</span><span class="p">:</span>
+                        <span class="n">target_group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">component_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+                            <span class="n">conn</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="s1">&#39;group&#39;</span><span class="p">]</span>
+                        <span class="n">target_value</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">Ex_physical</span>
+                        <span class="n">cat</span> <span class="o">=</span> <span class="n">hlp</span><span class="o">.</span><span class="n">single_fluid</span><span class="p">(</span><span class="n">conn</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">cat</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">cat</span> <span class="o">=</span> <span class="s1">&#39;mix&#39;</span>
+                        <span class="k">if</span> <span class="n">target_group</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">sankey_data</span><span class="p">[</span><span class="n">fkt_group</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+                                <span class="n">target_group</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">target_value</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">sankey_data</span><span class="p">[</span><span class="n">fkt_group</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">target_group</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                                <span class="n">target_value</span><span class="p">,</span> <span class="n">cat</span><span class="p">]</span>
+
+        <span class="c1"># create overview of component groups</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;E_in&#39;</span><span class="p">,</span> <span class="s1">&#39;E_out&#39;</span><span class="p">,</span> <span class="s1">&#39;E_D&#39;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float64&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">fkt_group</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">component_data</span><span class="p">[</span><span class="s1">&#39;group&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">group_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">fkt_group</span><span class="p">,</span> <span class="s1">&#39;E_in&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calculate_group_input_value</span><span class="p">(</span><span class="n">fkt_group</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">group_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">fkt_group</span><span class="p">,</span> <span class="s1">&#39;E_D&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sankey_data</span><span class="p">[</span><span class="n">fkt_group</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;E_D&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">])</span>
+
+        <span class="c1"># calculate missing values</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group_data</span><span class="p">[</span><span class="s1">&#39;E_out&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">group_data</span><span class="p">[</span><span class="s1">&#39;E_in&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">group_data</span><span class="p">[</span><span class="s1">&#39;E_D&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group_data</span><span class="p">[</span><span class="s1">&#39;y_Dk&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">group_data</span><span class="p">[</span><span class="s1">&#39;E_D&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">network_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;E_F&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group_data</span><span class="p">[</span><span class="s1">&#39;y*_Dk&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">group_data</span><span class="p">[</span><span class="s1">&#39;E_D&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">network_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;E_D&#39;</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="ExergyAnalysis.calculate_group_input_value"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.analyses.ExergyAnalysis.calculate_group_input_value">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_group_input_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_label</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate the total exergy input of a component group.&quot;&quot;&quot;</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">fkt_group</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sankey_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">group_label</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">+=</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">group_label</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">value</span></div>
+
+<div class="viewcode-block" id="ExergyAnalysis.single_group_input"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.analyses.ExergyAnalysis.single_group_input">[docs]</a>    <span class="k">def</span> <span class="nf">single_group_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_label</span><span class="p">,</span> <span class="n">group_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate the total exergy input of a component group.&quot;&quot;&quot;</span>
+        <span class="n">inputs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">fkt_group</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">group_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">group_label</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">index</span> <span class="ow">and</span> <span class="n">fkt_group</span> <span class="o">!=</span> <span class="n">group_label</span><span class="p">:</span>
+                <span class="n">inputs</span> <span class="o">+=</span> <span class="p">[</span><span class="n">fkt_group</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">inputs</span>
+
+        <span class="k">return</span> <span class="n">inputs</span></div>
+
+<div class="viewcode-block" id="ExergyAnalysis.remove_transit_groups"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.analyses.ExergyAnalysis.remove_transit_groups">[docs]</a>    <span class="k">def</span> <span class="nf">remove_transit_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Remove transit only component groups from sankey display.</span>
+
+<span class="sd">        Method is recursively called if a group was removed from display to</span>
+<span class="sd">        catch cases, where multiple groups are attached in line without</span>
+<span class="sd">        any streams leaving the line.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        group_data : dict</span>
+<span class="sd">            Dictionary containing the modified component group data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">fkt_group</span> <span class="ow">in</span> <span class="n">group_data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">source_groups</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">single_group_input</span><span class="p">(</span><span class="n">fkt_group</span><span class="p">,</span> <span class="n">group_data</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">source_groups</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">group_data</span><span class="p">[</span><span class="n">fkt_group</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">source_group</span> <span class="o">=</span> <span class="n">source_groups</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">target_group</span> <span class="o">=</span> <span class="n">group_data</span><span class="p">[</span><span class="n">fkt_group</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">target_value</span> <span class="o">=</span> <span class="n">group_data</span><span class="p">[</span><span class="n">fkt_group</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">target_group</span><span class="p">]</span>
+                <span class="n">group_data</span><span class="p">[</span><span class="n">source_group</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">target_group</span><span class="p">]</span> <span class="o">=</span> <span class="n">target_value</span>
+                <span class="n">group_data</span><span class="p">[</span><span class="n">source_group</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">target_group</span><span class="p">]</span> <span class="o">=</span> <span class="n">target_value</span>
+                <span class="n">group_data</span><span class="p">[</span><span class="n">source_group</span><span class="p">]</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">fkt_group</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">del</span> <span class="n">group_data</span><span class="p">[</span><span class="n">fkt_group</span><span class="p">]</span>
+                <span class="c1"># recursive call in case multiple components are attached in</span>
+                <span class="c1"># a line without any conversion</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">remove_transit_groups</span><span class="p">(</span><span class="n">group_data</span><span class="p">)</span>
+                <span class="c1"># exit to stop further iterations inside the groups</span>
+                <span class="k">return</span>
+            <span class="c1"># remove groups without any connection</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">source_groups</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">group_data</span><span class="p">[</span><span class="n">fkt_group</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">group_data</span><span class="p">[</span><span class="n">fkt_group</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="ExergyAnalysis.generate_plotly_sankey_input"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.analyses.ExergyAnalysis.generate_plotly_sankey_input">[docs]</a>    <span class="k">def</span> <span class="nf">generate_plotly_sankey_input</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">node_order</span><span class="o">=</span><span class="p">[],</span> <span class="n">colors</span><span class="o">=</span><span class="p">{},</span> <span class="n">display_thresold</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generate input data for sankey plots.</span>
+
+<span class="sd">        Only exergy flow above the display threshold is included. All</span>
+<span class="sd">        component groups with transit only (one input and one output) are cut</span>
+<span class="sd">        out of the display.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        node_order : list</span>
+<span class="sd">            Order for the nodes in the sankey diagram (optional).</span>
+<span class="sd">            In case no order is passed, a generic order will be used.</span>
+
+<span class="sd">        colors : dict</span>
+<span class="sd">            Dictionary containing a color for every stream type (optional).</span>
+<span class="sd">            Stream type is the key, the color is the corresponding value.</span>
+<span class="sd">            Stream types are:</span>
+
+<span class="sd">            - :code:`E_F`, :code:`E_P`, :code:`E_L`, :code:`E_D`</span>
+<span class="sd">            - names of the pure fluids of the tespy Network</span>
+<span class="sd">            - :code:`mix` (used in case of any gas mixture)</span>
+<span class="sd">            - labels of internal busses</span>
+
+<span class="sd">            In case no colors are passed, the matplotlib :code:`Set1` colormap</span>
+<span class="sd">            will be applied.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple</span>
+<span class="sd">            Tuple containing the links and node_order for the plotly sankey</span>
+<span class="sd">            diagram.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">group_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sankey_data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">fkt_group</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sankey_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">group_data</span><span class="p">[</span><span class="n">fkt_group</span><span class="p">]</span> <span class="o">=</span> <span class="n">group_data</span><span class="p">[</span><span class="n">fkt_group</span><span class="p">][</span>
+                <span class="n">data</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="n">display_thresold</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">remove_transit_groups</span><span class="p">(</span><span class="n">group_data</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">node_order</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">node_order</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="p">[</span><span class="s1">&#39;E_F&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">b</span><span class="o">.</span><span class="n">label</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">E_F</span><span class="p">]</span> <span class="o">+</span>
+                <span class="p">[</span><span class="n">fkt_group</span> <span class="k">for</span> <span class="n">fkt_group</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">group_data</span><span class="o">.</span><span class="n">index</span><span class="p">]</span> <span class="o">+</span>
+                <span class="p">[</span><span class="n">b</span><span class="o">.</span><span class="n">label</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">internal_busses</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">E_P</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">E_L</span><span class="p">]</span> <span class="o">+</span>
+                <span class="p">[</span><span class="s1">&#39;E_P&#39;</span><span class="p">,</span> <span class="s1">&#39;E_L&#39;</span><span class="p">,</span> <span class="s1">&#39;E_D&#39;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">missing</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">group_data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">node</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">node_order</span><span class="p">:</span>
+                    <span class="n">missing</span> <span class="o">+=</span> <span class="p">[</span><span class="n">node</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="s1">&#39;The list of nodes passed is missing the following &#39;</span>
+                    <span class="s1">&#39;nodes: &quot;&#39;</span> <span class="o">+</span> <span class="s1">&#39;&quot;, &quot;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;&quot;.&#39;</span><span class="p">)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="n">cmap</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s1">&#39;Set1&#39;</span><span class="p">)(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+        <span class="n">cmap</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">*=</span> <span class="mi">255</span>
+        <span class="n">cmap</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">*=</span> <span class="mf">0.75</span>
+        <span class="n">rgba_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cmap</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">rgba_list</span> <span class="o">+=</span> <span class="p">[</span>
+                <span class="s1">&#39;rgba(&#39;</span> <span class="o">+</span>
+                <span class="nb">str</span><span class="p">(</span><span class="n">cmap</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span> <span class="o">+</span>
+                <span class="nb">str</span><span class="p">(</span><span class="n">cmap</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span> <span class="o">+</span>
+                <span class="nb">str</span><span class="p">(</span><span class="n">cmap</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span> <span class="o">+</span>
+                <span class="nb">str</span><span class="p">(</span><span class="n">cmap</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span><span class="p">]</span>
+
+        <span class="bp">cls</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;E_P&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rgba_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;E_F&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rgba_list</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;E_D&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rgba_list</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="bp">cls</span><span class="p">[</span><span class="s1">&#39;E_L&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rgba_list</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">4</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nw</span><span class="o">.</span><span class="n">fluids</span><span class="p">:</span>
+            <span class="bp">cls</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="n">rgba_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">internal_busses</span><span class="p">:</span>
+            <span class="bp">cls</span><span class="p">[</span><span class="n">b</span><span class="o">.</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">rgba_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span>
+
+        <span class="n">links</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;source&#39;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s1">&#39;target&#39;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="p">[]</span>
+        <span class="p">}</span>
+
+        <span class="k">for</span> <span class="n">fkt_group</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">group_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">source_id</span> <span class="o">=</span> <span class="n">node_order</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">fkt_group</span><span class="p">)</span>
+            <span class="n">links</span><span class="p">[</span><span class="s1">&#39;source&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="n">source_id</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))]</span>
+            <span class="n">links</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span>
+                <span class="n">node_order</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">target</span><span class="p">)</span> <span class="k">for</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
+            <span class="n">links</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span>
+                <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">target</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
+            <span class="c1"># connection colors</span>
+            <span class="k">for</span> <span class="n">cat</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;cat&#39;</span><span class="p">]:</span>
+                <span class="n">links</span><span class="p">[</span><span class="s1">&#39;color&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="p">[</span><span class="n">cat</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">links</span><span class="p">,</span> <span class="n">node_order</span></div>
+
+<div class="viewcode-block" id="ExergyAnalysis.print_results"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.analyses.ExergyAnalysis.print_results">[docs]</a>    <span class="k">def</span> <span class="nf">print_results</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">sort_desc</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">busses</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">connections</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">groups</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">network</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">aggregation</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Print the results of the exergy analysis to prompt.</span>
+
+<span class="sd">        - The results are sorted beginning with the component having the</span>
+<span class="sd">          biggest exergy destruction by default.</span>
+<span class="sd">        - Components with an exergy destruction smaller than 1000 W is not</span>
+<span class="sd">          printed to prompt by default.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sort_des : boolean</span>
+<span class="sd">            Sort the component results descending by exergy destruction.</span>
+
+<span class="sd">        busses : boolean</span>
+<span class="sd">            Print bus results, default value :code:`True`.</span>
+
+<span class="sd">        components : boolean</span>
+<span class="sd">            Print component results, default value :code:`True`.</span>
+
+<span class="sd">        connections : boolean</span>
+<span class="sd">            Print connection results, default value :code:`True`.</span>
+
+<span class="sd">        network : boolean</span>
+<span class="sd">            Print network results, default value :code:`True`.</span>
+
+<span class="sd">        aggregation : boolean</span>
+<span class="sd">            Print aggregated component results, default value :code:`True`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">connections</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;##### RESULTS: Connection specific physical exergy and &#39;</span> <span class="o">+</span>
+                  <span class="s1">&#39;physical exergy #####&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">tabulate</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">connection_data</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="s1">&#39;keys&#39;</span><span class="p">,</span>
+                <span class="n">tablefmt</span><span class="o">=</span><span class="s1">&#39;psql&#39;</span><span class="p">,</span> <span class="n">floatfmt</span><span class="o">=</span><span class="s1">&#39;.3e&#39;</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">components</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">component_data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">!=</span> <span class="s1">&#39;group&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">sort_desc</span><span class="p">:</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;E_D&#39;</span><span class="p">],</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;##### RESULTS: Component exergy analysis #####&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">tabulate</span><span class="p">(</span>
+                <span class="n">df</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="s1">&#39;keys&#39;</span><span class="p">,</span> <span class="n">tablefmt</span><span class="o">=</span><span class="s1">&#39;psql&#39;</span><span class="p">,</span> <span class="n">floatfmt</span><span class="o">=</span><span class="s1">&#39;.3e&#39;</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">busses</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bus_data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">!=</span> <span class="s1">&#39;group&#39;</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">!=</span> <span class="s1">&#39;base&#39;</span><span class="p">)]</span>
+            <span class="k">if</span> <span class="n">sort_desc</span><span class="p">:</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;E_D&#39;</span><span class="p">],</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;##### RESULTS: Bus exergy analysis #####&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">tabulate</span><span class="p">(</span>
+                <span class="n">df</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="s1">&#39;keys&#39;</span><span class="p">,</span> <span class="n">tablefmt</span><span class="o">=</span><span class="s1">&#39;psql&#39;</span><span class="p">,</span> <span class="n">floatfmt</span><span class="o">=</span><span class="s1">&#39;.3e&#39;</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">aggregation</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">aggregation_data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">!=</span> <span class="s1">&#39;group&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">sort_desc</span><span class="p">:</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;E_D&#39;</span><span class="p">],</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;##### RESULTS: Aggregation of components and busses #####&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">tabulate</span><span class="p">(</span>
+                <span class="n">df</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="s1">&#39;keys&#39;</span><span class="p">,</span> <span class="n">tablefmt</span><span class="o">=</span><span class="s1">&#39;psql&#39;</span><span class="p">,</span> <span class="n">floatfmt</span><span class="o">=</span><span class="s1">&#39;.3e&#39;</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">network</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;##### RESULTS: Network exergy analysis #####&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">tabulate</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">network_data</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">transpose</span><span class="p">(),</span>
+                <span class="n">headers</span><span class="o">=</span><span class="s1">&#39;keys&#39;</span><span class="p">,</span> <span class="n">tablefmt</span><span class="o">=</span><span class="s1">&#39;psql&#39;</span><span class="p">,</span> <span class="n">floatfmt</span><span class="o">=</span><span class="s1">&#39;.3e&#39;</span><span class="p">,</span>
+                <span class="n">showindex</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">groups</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group_data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">sort_desc</span><span class="p">:</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;E_D&#39;</span><span class="p">],</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;##### RESULTS: Functional groups exergy flows #####&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">tabulate</span><span class="p">(</span>
+                <span class="n">df</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="s1">&#39;keys&#39;</span><span class="p">,</span> <span class="n">tablefmt</span><span class="o">=</span><span class="s1">&#39;psql&#39;</span><span class="p">,</span> <span class="n">floatfmt</span><span class="o">=</span><span class="s1">&#39;.3e&#39;</span><span class="p">))</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2020, Francesco Witte.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tespy.components.nodes.drum &mdash; tespy 0.6.0 - Colored Chemicals documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../../index.html" class="icon icon-home"> tespy
+            <img src="../../../../_static/logo_tespy_mid.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.6.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../introduction.html">Thermal Engineering Systems in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installation and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../first_steps.html">First steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials_examples.html">Examples and Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tespy_modules.html">TESPy modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tespy_analyses.html">Thermodynamic analyses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../developing_tespy.html">Developing TESPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../zliterature.html">Literature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">tespy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+      <li>tespy.components.nodes.drum</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for tespy.components.nodes.drum</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8</span>
+
+<span class="sd">&quot;&quot;&quot;Module of class Drum.</span>
+
+
+<span class="sd">This file is part of project TESPy (github.com/oemof/tespy). It&#39;s copyrighted</span>
+<span class="sd">by the contributors recorded in the version control history of the file,</span>
+<span class="sd">available from its original location tespy/components/nodes/drum.py</span>
+
+<span class="sd">SPDX-License-Identifier: MIT</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">tespy.components.nodes.droplet_separator</span> <span class="kn">import</span> <span class="n">DropletSeparator</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.fluid_properties</span> <span class="kn">import</span> <span class="n">h_mix_pQ</span>
+
+
+<div class="viewcode-block" id="Drum"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.nodes.drum.Drum">[docs]</a><span class="k">class</span> <span class="nc">Drum</span><span class="p">(</span><span class="n">DropletSeparator</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A drum separates saturated gas from saturated liquid.</span>
+
+<span class="sd">    **Mandatory Equations**</span>
+
+<span class="sd">    - :py:meth:`tespy.components.nodes.base.NodeBase.mass_flow_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.nodes.base.NodeBase.pressure_equality_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.nodes.droplet_separator.DropletSeparator.fluid_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.nodes.droplet_separator.DropletSeparator.energy_balance_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.nodes.droplet_separator.DropletSeparator.outlet_states_func`</span>
+
+<span class="sd">    Inlets/Outlets</span>
+
+<span class="sd">    - in1, in2 (index 1: from economiser, index 2: from evaporator)</span>
+<span class="sd">    - out1, out2 (index 1: saturated liquid, index 2: saturated gas)</span>
+
+<span class="sd">    Image</span>
+
+<span class="sd">    .. image:: _images/Drum.svg</span>
+<span class="sd">       :alt: alternative text</span>
+<span class="sd">       :align: center</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    label : str</span>
+<span class="sd">        The label of the component.</span>
+
+<span class="sd">    design : list</span>
+<span class="sd">        List containing design parameters (stated as String).</span>
+
+<span class="sd">    offdesign : list</span>
+<span class="sd">        List containing offdesign parameters (stated as String).</span>
+
+<span class="sd">    design_path : str</span>
+<span class="sd">        Path to the components design case.</span>
+
+<span class="sd">    local_offdesign : boolean</span>
+<span class="sd">        Treat this component in offdesign mode in a design calculation.</span>
+
+<span class="sd">    local_design : boolean</span>
+<span class="sd">        Treat this component in design mode in an offdesign calculation.</span>
+
+<span class="sd">    char_warnings : boolean</span>
+<span class="sd">        Ignore warnings on default characteristics usage for this component.</span>
+
+<span class="sd">    printout : boolean</span>
+<span class="sd">        Include this component in the network&#39;s results printout.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    If you are using a drum in a network with multiple fluids, it is likely</span>
+<span class="sd">    the fluid propagation causes trouble. If this is the case, try to</span>
+<span class="sd">    specify the fluid composition at another connection of your network.</span>
+
+<span class="sd">    This component assumes, that the fluid composition between outlet 1 and</span>
+<span class="sd">    inlet 2 does not change, thus there is no equation for the fluid mass</span>
+<span class="sd">    fraction at the inlet 2!</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    The drum separates saturated gas from saturated liquid. The liquid phase is</span>
+<span class="sd">    transported to an evaporator, the staturated gas phase is extracted from</span>
+<span class="sd">    the drum. In this example ammonia is evaporated using ambient air. A</span>
+<span class="sd">    characteristic function is applied for the heat transfer coefficient of the</span>
+<span class="sd">    evaporator. It is possible to load the CharLine with the function</span>
+<span class="sd">    :code:`load_default_char` from the default lines. We want to use the</span>
+<span class="sd">    &#39;EVAPORATING FLUID&#39; lines of the heat exchanger.</span>
+
+<span class="sd">    &gt;&gt;&gt; from tespy.components import Sink, Source, Drum, Pump, HeatExchanger</span>
+<span class="sd">    &gt;&gt;&gt; from tespy.connections import Connection, Ref</span>
+<span class="sd">    &gt;&gt;&gt; from tespy.networks import Network</span>
+<span class="sd">    &gt;&gt;&gt; from tespy.tools.characteristics import CharLine</span>
+<span class="sd">    &gt;&gt;&gt; from tespy.tools.characteristics import load_default_char as ldc</span>
+<span class="sd">    &gt;&gt;&gt; import shutil</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; nw = Network(fluids=[&#39;NH3&#39;, &#39;air&#39;], T_unit=&#39;C&#39;, p_unit=&#39;bar&#39;,</span>
+<span class="sd">    ...     h_unit=&#39;kJ / kg&#39;, iterinfo=False)</span>
+<span class="sd">    &gt;&gt;&gt; fa = Source(&#39;feed ammonia&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; amb_in = Source(&#39;air inlet&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; amb_out = Sink(&#39;air outlet&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; s = Sink(&#39;steam&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; dr = Drum(&#39;drum&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; dr.component()</span>
+<span class="sd">    &#39;drum&#39;</span>
+<span class="sd">    &gt;&gt;&gt; ev = HeatExchanger(&#39;evaporator&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; erp = Pump(&#39;evaporator reciculation pump&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; f_dr = Connection(fa, &#39;out1&#39;, dr, &#39;in1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; dr_erp = Connection(dr, &#39;out1&#39;, erp, &#39;in1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; erp_ev = Connection(erp, &#39;out1&#39;, ev, &#39;in2&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; ev_dr = Connection(ev, &#39;out2&#39;, dr, &#39;in2&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; dr_s = Connection(dr, &#39;out2&#39;, s, &#39;in1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; nw.add_conns(f_dr, dr_erp, erp_ev, ev_dr, dr_s)</span>
+<span class="sd">    &gt;&gt;&gt; amb_ev = Connection(amb_in, &#39;out1&#39;, ev, &#39;in1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; ev_amb = Connection(ev, &#39;out1&#39;, amb_out, &#39;in1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; nw.add_conns(amb_ev, ev_amb)</span>
+
+<span class="sd">    The ambient air enters the evaporator at 30 °C. The pinch point temperature</span>
+<span class="sd">    difference (ttd_l) of the evaporator is at 5 K, and 1 MW of heat should be</span>
+<span class="sd">    transferred. State of ammonia at the inlet is at -5 °C and 5 bar. From this</span>
+<span class="sd">    design it is possible to calculate offdesign performance at 75 % part load.</span>
+
+<span class="sd">    &gt;&gt;&gt; char1 = ldc(&#39;heat exchanger&#39;, &#39;kA_char1&#39;, &#39;DEFAULT&#39;,</span>
+<span class="sd">    ... CharLine)</span>
+<span class="sd">    &gt;&gt;&gt; char2 = ldc(&#39;heat exchanger&#39;, &#39;kA_char2&#39;, &#39;EVAPORATING FLUID&#39;,</span>
+<span class="sd">    ... CharLine)</span>
+<span class="sd">    &gt;&gt;&gt; ev.set_attr(pr1=0.999, pr2=0.99, ttd_l=5, kA_char1=char1,</span>
+<span class="sd">    ...     kA_char2=char2, design=[&#39;pr1&#39;, &#39;ttd_l&#39;],</span>
+<span class="sd">    ...     offdesign=[&#39;zeta1&#39;, &#39;kA_char&#39;])</span>
+<span class="sd">    &gt;&gt;&gt; ev.set_attr(Q=-1e6)</span>
+<span class="sd">    &gt;&gt;&gt; erp.set_attr(eta_s=0.8)</span>
+<span class="sd">    &gt;&gt;&gt; f_dr.set_attr(p=5, T=-5)</span>
+<span class="sd">    &gt;&gt;&gt; erp_ev.set_attr(m=Ref(f_dr, 4, 0), fluid={&#39;air&#39;: 0, &#39;NH3&#39;: 1})</span>
+<span class="sd">    &gt;&gt;&gt; amb_ev.set_attr(fluid={&#39;air&#39;: 1, &#39;NH3&#39;: 0}, T=30)</span>
+<span class="sd">    &gt;&gt;&gt; ev_amb.set_attr(p=1)</span>
+<span class="sd">    &gt;&gt;&gt; nw.solve(&#39;design&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; nw.save(&#39;tmp&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; round(ev_amb.T.val - erp_ev.T.val ,1)</span>
+<span class="sd">    5.0</span>
+<span class="sd">    &gt;&gt;&gt; round(f_dr.h.val, 1)</span>
+<span class="sd">    322.7</span>
+<span class="sd">    &gt;&gt;&gt; round(dr_erp.h.val, 1)</span>
+<span class="sd">    364.9</span>
+<span class="sd">    &gt;&gt;&gt; round(ev_dr.h.val, 1)</span>
+<span class="sd">    687.2</span>
+<span class="sd">    &gt;&gt;&gt; round(f_dr.m.val, 2)</span>
+<span class="sd">    0.78</span>
+<span class="sd">    &gt;&gt;&gt; ev.set_attr(Q=-0.75e6)</span>
+<span class="sd">    &gt;&gt;&gt; nw.solve(&#39;offdesign&#39;, design_path=&#39;tmp&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; round(f_dr.m.val, 2)</span>
+<span class="sd">    0.58</span>
+<span class="sd">    &gt;&gt;&gt; round(ev_amb.T.val - erp_ev.T.val ,1)</span>
+<span class="sd">    3.0</span>
+<span class="sd">    &gt;&gt;&gt; shutil.rmtree(&#39;./tmp&#39;, ignore_errors=True)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Drum.component"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.nodes.drum.Drum.component">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">component</span><span class="p">():</span>
+        <span class="k">return</span> <span class="s1">&#39;drum&#39;</span></div>
+
+<div class="viewcode-block" id="Drum.inlets"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.nodes.drum.Drum.inlets">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">inlets</span><span class="p">():</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;in1&#39;</span><span class="p">,</span> <span class="s1">&#39;in2&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Drum.outlets"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.nodes.drum.Drum.outlets">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">outlets</span><span class="p">():</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="s1">&#39;out2&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Drum.initialise_source"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.nodes.drum.Drum.initialise_source">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">initialise_source</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a starting value for pressure and enthalpy at outlet.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        c : tespy.connections.connection.Connection</span>
+<span class="sd">            Connection to perform initialisation on.</span>
+
+<span class="sd">        key : str</span>
+<span class="sd">            Fluid property to retrieve.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        val : float</span>
+<span class="sd">            Starting value for pressure/enthalpy in SI units.</span>
+
+<span class="sd">            .. math::</span>
+
+<span class="sd">                val = \begin{cases}</span>
+<span class="sd">                10^6 &amp; \text{key = &#39;p&#39;}\\</span>
+<span class="sd">                h\left(p, x=0 \right) &amp; \text{key = &#39;h&#39; at outlet 1}\\</span>
+<span class="sd">                h\left(p, x=1 \right) &amp; \text{key = &#39;h&#39; at outlet 2}</span>
+<span class="sd">                \end{cases}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;p&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">10e5</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;h&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">source_id</span> <span class="o">==</span> <span class="s1">&#39;out1&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">h_mix_pQ</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">get_flow</span><span class="p">(),</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">h_mix_pQ</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">get_flow</span><span class="p">(),</span> <span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Drum.initialise_target"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.nodes.drum.Drum.initialise_target">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">initialise_target</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a starting value for pressure and enthalpy at inlet.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        c : tespy.connections.connection.Connection</span>
+<span class="sd">            Connection to perform initialisation on.</span>
+
+<span class="sd">        key : str</span>
+<span class="sd">            Fluid property to retrieve.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        val : float</span>
+<span class="sd">            Starting value for pressure/enthalpy in SI units.</span>
+
+<span class="sd">            .. math::</span>
+
+<span class="sd">                val = \begin{cases}</span>
+<span class="sd">                10^6 &amp; \text{key = &#39;p&#39;}\\</span>
+<span class="sd">                h\left(p, x=0 \right) &amp; \text{key = &#39;h&#39; at inlet 1}\\</span>
+<span class="sd">                h\left(p, x=0.7 \right) &amp; \text{key = &#39;h&#39; at inlet 2}</span>
+<span class="sd">                \end{cases}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;p&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">10e5</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;h&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">target_id</span> <span class="o">==</span> <span class="s1">&#39;in1&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">h_mix_pQ</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">get_flow</span><span class="p">(),</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">h_mix_pQ</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">get_flow</span><span class="p">(),</span> <span class="mf">0.7</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Drum.propagate_fluid_to_target"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.nodes.drum.Drum.propagate_fluid_to_target">[docs]</a>    <span class="k">def</span> <span class="nf">propagate_fluid_to_target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inconn</span><span class="p">,</span> <span class="n">start</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Propagate the fluids towards connection&#39;s target in recursion.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        inconn : tespy.connections.connection.Connection</span>
+<span class="sd">            Connection to initialise.</span>
+
+<span class="sd">        start : tespy.components.component.Component</span>
+<span class="sd">            This component is the fluid propagation starting point.</span>
+<span class="sd">            The starting component is saved to prevent infinite looping.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span> <span class="o">!=</span> <span class="n">start</span><span class="p">:</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span>
+            <span class="k">for</span> <span class="n">outconn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">fluid</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">inconn</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">outconn</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val_set</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span>
+                            <span class="n">outconn</span><span class="o">.</span><span class="n">good_starting_values</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">):</span>
+                        <span class="n">outconn</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span>
+
+                <span class="n">outconn</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">propagate_fluid_to_target</span><span class="p">(</span><span class="n">outconn</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Drum.propagate_fluid_to_source"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.nodes.drum.Drum.propagate_fluid_to_source">[docs]</a>    <span class="k">def</span> <span class="nf">propagate_fluid_to_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outconn</span><span class="p">,</span> <span class="n">start</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Propagate the fluids towards connection&#39;s source in recursion.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        outconn : tespy.connections.connection.Connection</span>
+<span class="sd">            Connection to initialise.</span>
+
+<span class="sd">        start : tespy.components.component.Component</span>
+<span class="sd">            This component is the fluid propagation starting point.</span>
+<span class="sd">            The starting component is saved to prevent infinite looping.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span> <span class="o">!=</span> <span class="n">start</span><span class="p">:</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span>
+            <span class="k">for</span> <span class="n">inconn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">fluid</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">outconn</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">inconn</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val_set</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span>
+                            <span class="n">inconn</span><span class="o">.</span><span class="n">good_starting_values</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">):</span>
+                        <span class="n">inconn</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span>
+
+                <span class="n">inconn</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">propagate_fluid_to_source</span><span class="p">(</span><span class="n">inconn</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Drum.exergy_balance"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.nodes.drum.Drum.exergy_balance">[docs]</a>    <span class="k">def</span> <span class="nf">exergy_balance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">T0</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate exergy balance of a merge.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        T0 : float</span>
+<span class="sd">            Ambient temperature T0 / K.</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        Please note, that the exergy balance accounts for physical exergy only.</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            \dot{E}_\mathrm{P} = \sum \dot{E}_{\mathrm{out,}j}^\mathrm{PH}\\</span>
+<span class="sd">            \dot{E}_\mathrm{F} = \sum \dot{E}_{\mathrm{in,}i}^\mathrm{PH}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">E_P</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_physical</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_physical</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">E_F</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_physical</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_physical</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">E_bus</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">E_D</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">E_F</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">E_P</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">E_P</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">E_F</span></div>
+
+<div class="viewcode-block" id="Drum.get_plotting_data"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.nodes.drum.Drum.get_plotting_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_plotting_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate a dictionary containing FluProDia plotting information.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        data : dict</span>
+<span class="sd">            A nested dictionary containing the keywords required by the</span>
+<span class="sd">            :code:`calc_individual_isoline` method of the</span>
+<span class="sd">            :code:`FluidPropertyDiagram` class. First level keys are the</span>
+<span class="sd">            connection index (&#39;in1&#39; -&gt; &#39;out1&#39;, therefore :code:`1` etc.).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="mi">1</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;isoline_property&#39;</span><span class="p">:</span> <span class="s1">&#39;p&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;isoline_value&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">val</span><span class="p">,</span>
+                <span class="s1">&#39;isoline_value_end&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">val</span><span class="p">,</span>
+                <span class="s1">&#39;starting_point_property&#39;</span><span class="p">:</span> <span class="s1">&#39;v&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;starting_point_value&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">vol</span><span class="o">.</span><span class="n">val</span><span class="p">,</span>
+                <span class="s1">&#39;ending_point_property&#39;</span><span class="p">:</span> <span class="s1">&#39;v&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;ending_point_value&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">vol</span><span class="o">.</span><span class="n">val</span>
+            <span class="p">}}</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2020, Francesco Witte.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>v0.0.3 (July 05, 2018) &mdash; tespy 0.6.0 - Colored Chemicals documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> tespy
+            <img src="../_static/logo_tespy_mid.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.6.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Thermal Engineering Systems in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../first_steps.html">First steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials_examples.html">Examples and Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tespy_modules.html">TESPy modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tespy_analyses.html">Thermodynamic analyses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developing_tespy.html">Developing TESPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zliterature.html">Literature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">tespy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>v0.0.3 (July 05, 2018)</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/whats_new/v0-0-3.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="v0-0-3-july-05-2018">
+<h1>v0.0.3 (July 05, 2018)<a class="headerlink" href="#v0-0-3-july-05-2018" title="Permalink to this headline">¶</a></h1>
+<section id="new-features">
+<h2>New Features<a class="headerlink" href="#new-features" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>added new component: stoichiometric combustion chamber (<a class="reference external" href="https://github.com/oemof/tespy/commit/0989493b888e6aafa277521a9f84194272d63ce0">0989493</a>, <a class="reference external" href="https://github.com/oemof/tespy/commit/1e84386468456339238c119ab07468c6216f60b7">1e84386</a>, <a class="reference external" href="https://github.com/oemof/tespy/commit/460dd9f6988213f117ddd41b348e2193405db873">460dd9f</a>, <a class="reference external" href="https://github.com/oemof/tespy/commit/6d10d2d93251b714ec46a6d0aec0a2944d6bea97">6d10d2d</a>).</p></li>
+<li><p>added custom fluid databases, mainly for usage in stoichiometric combustion chamber (<a class="reference external" href="https://github.com/oemof/tespy/commit/45e19aec4f5dd4a1d756dcbae02b51d0ea432f1b">45e19ae</a>, <a class="reference external" href="https://github.com/oemof/tespy/commit/c3da7859df711bc6435220242357adc63c2e363d">c3da785</a>, <a class="reference external" href="https://github.com/oemof/tespy/commit/7cb1144b828e5af2296ca3ca28ea79be488a2664">7cb1144</a>).</p></li>
+<li><p>added val_SI-attribute to datacontainers for setting ambient temperatures at simple heat exchangers (<a class="reference external" href="https://github.com/oemof/tespy/commit/c4ba3496f68b89f80dc780c6ebe03bd9fe375ffe">c4ba349</a>, <a class="reference external" href="https://github.com/oemof/tespy/commit/3c7d94e83c5306520d1d67da7fc255414b80b6bb">3c7d94e</a>).</p></li>
+<li><p>added entropy balance for components (<a class="reference external" href="https://github.com/oemof/tespy/commit/5944eae98c427b745da83590362fe70cad046b5b">5944eae</a>, <a class="reference external" href="https://github.com/oemof/tespy/commit/b0aed986d665c8e9cff49570ac2cd50d47b2fd1c">b0aed98</a>, <a class="reference external" href="https://github.com/oemof/tespy/commit/e0839ab8a21ca2424c2a71e3bcdc4dd35da85a35">e0839ab</a>).</p></li>
+<li><p>added pressure rise vs. flow rate characteristics for component pump (<a class="reference external" href="https://github.com/oemof/tespy/commit/e79a1919611360dd0a2fbc0c417e1b280b003897">e79a191</a>, <a class="reference external" href="https://github.com/oemof/tespy/commit/e3409bfaa314821806ec90b6ba10f5570fc18969">e3409bf</a>, <a class="reference external" href="https://github.com/oemof/tespy/commit/8fe697625f80a4c96a943ef11088924c48feefdb">8fe6976</a>).</p></li>
+<li><p>added hazen-williams equation for pipe pressure loss calculation (<a class="reference external" href="https://github.com/oemof/tespy/commit/bf0b8650b0965c916727ebe10f39f0cefabb71e0">bf0b865</a>, <a class="reference external" href="https://github.com/oemof/tespy/commit/25c32bc4a54e7b89e7fa71a5a44ea476227e2166">25c32bc</a>, <a class="reference external" href="https://github.com/oemof/tespy/commit/cee8cee0656a784727b08e06c9a83064a7642b5a">cee8cee</a>).</p></li>
+<li><p>added TESPy network import/export (<a class="reference external" href="https://github.com/oemof/tespy/commit/7fefc5946a7ff745037bfce83dfb36bac9a58394">7fefc59</a>, <a class="reference external" href="https://github.com/oemof/tespy/commit/70ae9085bb8011196267d7a69bbffd186d0d1866">70ae908</a>, <a class="reference external" href="https://github.com/oemof/tespy/commit/13ef1ad02d0b8a3a043e172872b9eeac89effd1c">13ef1ad</a>, <a class="reference external" href="https://github.com/oemof/tespy/commit/40e906cdc1011004927125f513f7e36ee79b1b1a">40e906c</a>).</p></li>
+<li><p>added data container for grouped component properties (<a class="reference external" href="https://github.com/oemof/tespy/commit/83c9ff4767363886e39c5d65c32fbececab2a4e9">83c9ff4</a>).</p></li>
+</ul>
+</section>
+<section id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>internal adjustments for links in the documentation and API.</p></li>
+<li><p>added a tutorial for the combustion chamber and moved tutorials to the <a class="reference internal" href="../tutorials_examples.html#tespy-tutorial-label"><span class="std std-ref">appropriate section</span></a> (<a class="reference external" href="https://github.com/oemof/tespy/commit/8c0034db07f26d124206f129d5eabe4e214dcf00">8c0034d</a>, <a class="reference external" href="https://github.com/oemof/tespy/commit/fd7a8e7674a52fda6876c50adf03a7d428b4805a">fd7a8e7</a>, <a class="reference external" href="https://github.com/oemof/tespy/commit/e88747860c1eab844ba86598621223adbfe0941c">e887478</a>).</p></li>
+<li><p>added installation guide for <a class="reference internal" href="../installation.html#tespy-installation-windows-label"><span class="std std-ref">windows</span></a> windows (<a class="reference external" href="https://github.com/oemof/tespy/commit/ca5eaa195ccdbbc90308cc1083faddf0888c6e65">ca5eaa1</a>).</p></li>
+</ul>
+</section>
+<section id="testing">
+<h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="bug-fixes">
+<h2>Bug fixes<a class="headerlink" href="#bug-fixes" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>convergence stability improvements for combustion chamber, fixes in the equations and derivatives (<a class="reference external" href="https://github.com/oemof/tespy/commit/2c396f0d3d2511b6b86bce3882f3ed25af209ad8">2c396f0</a>, <a class="reference external" href="https://github.com/oemof/tespy/commit/59e3879ab8a1dd13e95015ec170ec2519263c112">59e3879</a>, <a class="reference external" href="https://github.com/oemof/tespy/commit/10b2887ac0f03e3270906693325b4a5fbd3ca303">10b2887</a>).</p></li>
+<li><p>fixes/improvements for the convergence control (<a class="reference external" href="https://github.com/oemof/tespy/commit/6e8ea60f6935f44b8ea8092724462c7677f40931">6e8ea60</a>, <a class="reference external" href="https://github.com/oemof/tespy/commit/43e8ee10f37eade599d91c084776c44905368bcd">43e8ee1</a>).</p></li>
+<li><p>fixed vapour quality specification (<a class="reference external" href="https://github.com/oemof/tespy/commit/ec3865dbcb075163427cdcb0bead23bfcda6b83e">ec3865d</a>).</p></li>
+<li><p>added missing get_attr method for class characteristics (<a class="reference external" href="https://github.com/oemof/tespy/commit/13cf730493a9472a67a1453cc35098fa43f7d247">13cf730</a>).</p></li>
+<li><p>added bus functions to every component (<a class="reference external" href="https://github.com/oemof/tespy/commit/41e9f2bfc98070a4e6fbf507dd26614517df0d8e">41e9f2b</a>, <a class="reference external" href="https://github.com/oemof/tespy/commit/7fefc5946a7ff745037bfce83dfb36bac9a58394">7fefc59</a>).</p></li>
+</ul>
+</section>
+<section id="other-changes">
+<h2>Other changes<a class="headerlink" href="#other-changes" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="contributors">
+<h2>Contributors<a class="headerlink" href="#contributors" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Francesco Witte</p></li>
+<li><p>Shuang Chen</p></li>
+</ul>
+<p>Thanks to Shuang and Haibing from the UFZ for implementing the hazen-williams equation!</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2020, Francesco Witte.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

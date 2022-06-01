@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tespy.components.heat_exchangers.parabolic_trough &mdash; tespy 0.6.0 - Colored Chemicals documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../../index.html" class="icon icon-home"> tespy
+            <img src="../../../../_static/logo_tespy_mid.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.6.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../introduction.html">Thermal Engineering Systems in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installation and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../first_steps.html">First steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials_examples.html">Examples and Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tespy_modules.html">TESPy modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tespy_analyses.html">Thermodynamic analyses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../developing_tespy.html">Developing TESPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../zliterature.html">Literature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">tespy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+      <li>tespy.components.heat_exchangers.parabolic_trough</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for tespy.components.heat_exchangers.parabolic_trough</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8</span>
+
+<span class="sd">&quot;&quot;&quot;Module of class ParabolicTrough.</span>
+
+
+<span class="sd">This file is part of project TESPy (github.com/oemof/tespy). It&#39;s copyrighted</span>
+<span class="sd">by the contributors recorded in the version control history of the file,</span>
+<span class="sd">available from its original location</span>
+<span class="sd">tespy/components/heat_exchangers/parabolic_trough.py</span>
+
+<span class="sd">SPDX-License-Identifier: MIT</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">tespy.components.heat_exchangers.simple</span> <span class="kn">import</span> <span class="n">HeatExchangerSimple</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.data_containers</span> <span class="kn">import</span> <span class="n">ComponentProperties</span> <span class="k">as</span> <span class="n">dc_cp</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.data_containers</span> <span class="kn">import</span> <span class="n">DataContainerSimple</span> <span class="k">as</span> <span class="n">dc_simple</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.data_containers</span> <span class="kn">import</span> <span class="n">GroupedComponentProperties</span> <span class="k">as</span> <span class="n">dc_gcp</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.document_models</span> <span class="kn">import</span> <span class="n">generate_latex_eq</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.fluid_properties</span> <span class="kn">import</span> <span class="n">T_mix_ph</span>
+
+
+<div class="viewcode-block" id="ParabolicTrough"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.parabolic_trough.ParabolicTrough">[docs]</a><span class="k">class</span> <span class="nc">ParabolicTrough</span><span class="p">(</span><span class="n">HeatExchangerSimple</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The ParabolicTrough calculates heat output from irradiance.</span>
+
+<span class="sd">    **Mandatory Equations**</span>
+
+<span class="sd">    - :py:meth:`tespy.components.component.Component.fluid_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.component.Component.mass_flow_func`</span>
+
+<span class="sd">    **Optional Equations**</span>
+
+<span class="sd">    - :py:meth:`tespy.components.component.Component.pr_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.component.Component.zeta_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.heat_exchangers.simple.HeatExchangerSimple.energy_balance_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.heat_exchangers.simple.HeatExchangerSimple.hydro_group_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.heat_exchangers.parabolic_trough.ParabolicTrough.energy_group_func`</span>
+
+<span class="sd">    Inlets/Outlets</span>
+
+<span class="sd">    - in1</span>
+<span class="sd">    - out1</span>
+
+<span class="sd">    Image</span>
+
+<span class="sd">    .. image:: _images/ParabolicTrough.svg</span>
+<span class="sd">       :alt: alternative text</span>
+<span class="sd">       :align: center</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    label : str</span>
+<span class="sd">        The label of the component.</span>
+
+<span class="sd">    design : list</span>
+<span class="sd">        List containing design parameters (stated as String).</span>
+
+<span class="sd">    offdesign : list</span>
+<span class="sd">        List containing offdesign parameters (stated as String).</span>
+
+<span class="sd">    design_path : str</span>
+<span class="sd">        Path to the components design case.</span>
+
+<span class="sd">    local_offdesign : boolean</span>
+<span class="sd">        Treat this component in offdesign mode in a design calculation.</span>
+
+<span class="sd">    local_design : boolean</span>
+<span class="sd">        Treat this component in design mode in an offdesign calculation.</span>
+
+<span class="sd">    char_warnings : boolean</span>
+<span class="sd">        Ignore warnings on default characteristics usage for this component.</span>
+
+<span class="sd">    printout : boolean</span>
+<span class="sd">        Include this component in the network&#39;s results printout.</span>
+
+<span class="sd">    Q : float, dict, :code:`&quot;var&quot;`</span>
+<span class="sd">        Heat transfer, :math:`Q/\text{W}`.</span>
+
+<span class="sd">    pr : float, dict, :code:`&quot;var&quot;`</span>
+<span class="sd">        Outlet to inlet pressure ratio, :math:`pr/1`.</span>
+
+<span class="sd">    zeta : float, dict, :code:`&quot;var&quot;`</span>
+<span class="sd">        Geometry independent friction coefficient,</span>
+<span class="sd">        :math:`\frac{\zeta}{D^4}/\frac{1}{\text{m}^4}`.</span>
+
+<span class="sd">    D : float, dict, :code:`&quot;var&quot;`</span>
+<span class="sd">        Diameter of the absorber tube, :math:`D/\text{m}`.</span>
+
+<span class="sd">    L : float, dict, :code:`&quot;var&quot;`</span>
+<span class="sd">        Length of the absorber tube, :math:`L/\text{m}`.</span>
+
+<span class="sd">    ks : float, dict, :code:`&quot;var&quot;`</span>
+<span class="sd">        Tube&#39;s roughness, :math:`ks/\text{m}` for darcy friction,</span>
+<span class="sd">        :math:`ks/\text{1}` for hazen-williams equation.</span>
+
+<span class="sd">    hydro_group : str, dict</span>
+<span class="sd">        Parametergroup for pressure drop calculation based on pipes dimensions.</span>
+<span class="sd">        Choose &#39;HW&#39; for hazen-williams equation, else darcy friction factor is</span>
+<span class="sd">        used.</span>
+
+<span class="sd">    E : float, dict, :code:`&quot;var&quot;`</span>
+<span class="sd">        Direct irradiance to tilted collector,</span>
+<span class="sd">        :math:`E/\frac{\text{W}}{\text{m}^2}`.</span>
+
+<span class="sd">    aoi : float, dict, :code:`&quot;var&quot;`</span>
+<span class="sd">        Angle of incidience, :math:`aoi/^\circ`.</span>
+
+<span class="sd">    doc : float, dict, :code:`&quot;var&quot;`</span>
+<span class="sd">        Degree of cleanliness (1: full absorption, 0: no absorption),</span>
+<span class="sd">        :math:`X`.</span>
+
+<span class="sd">    eta_opt : float, dict, :code:`&quot;var&quot;`</span>
+<span class="sd">        (constant) optical losses due to surface reflection,</span>
+<span class="sd">        :math:`\eta_{opt}`.</span>
+
+<span class="sd">    c_1 : float, dict, :code:`&quot;var&quot;`</span>
+<span class="sd">        Linear thermal loss key figure,</span>
+<span class="sd">        :math:`c_1/\frac{\text{W}}{\text{K} \cdot \text{m}^2}`.</span>
+
+<span class="sd">    c_2 : float, dict, :code:`&quot;var&quot;`</span>
+<span class="sd">        Quadratic thermal loss key figure,</span>
+<span class="sd">        :math:`c_2/\frac{\text{W}}{\text{K}^2 \cdot \text{m}^2}`.</span>
+
+<span class="sd">    iam_1 : float, dict, :code:`&quot;var&quot;`</span>
+<span class="sd">        Linear incidence angle modifier,</span>
+<span class="sd">        :math:`iam_1/\frac{1}{^\circ}`.</span>
+
+<span class="sd">    iam_2 : float, dict, :code:`&quot;var&quot;`</span>
+<span class="sd">        Quadratic incidence angle modifier,</span>
+<span class="sd">        :math:`iam_2/\left(\frac{1}{^\circ}\right)^2`.</span>
+
+<span class="sd">    A : float, dict, :code:`&quot;var&quot;`</span>
+<span class="sd">        Collector aperture surface area :math:`A/\text{m}^2`.</span>
+
+<span class="sd">    Tamb : float, dict</span>
+<span class="sd">        Ambient temperature, provide parameter in network&#39;s temperature unit.</span>
+
+<span class="sd">    energy_group : str, dict</span>
+<span class="sd">        Parametergroup for energy balance of solarthermal collector.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    A parabolic trough is installed using S800 as thermo-fluid.</span>
+<span class="sd">    First, the operation conditions from :cite:`Janotte2014` are reproduced.</span>
+<span class="sd">    Therefore, the direct normal irradiance :math:`\dot{E}_\mathrm{DNI}` is at</span>
+<span class="sd">    1000 :math:`\frac{\text{W}}{\text{m}^2}` at an angle of incidence</span>
+<span class="sd">    :math:`aoi` at 20 °. This means, the direct irradiance to the parabolic</span>
+<span class="sd">    trough :math:`E` is at</span>
+<span class="sd">    :math:`\dot{E}_{DNI} \cdot cos\left(20^\circ\right)`.</span>
+
+<span class="sd">    &gt;&gt;&gt; from tespy.components import Sink, Source, ParabolicTrough</span>
+<span class="sd">    &gt;&gt;&gt; from tespy.connections import Connection</span>
+<span class="sd">    &gt;&gt;&gt; from tespy.networks import Network</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; import shutil</span>
+<span class="sd">    &gt;&gt;&gt; fluids = [&#39;INCOMP::S800&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; nw = Network(fluids=fluids)</span>
+<span class="sd">    &gt;&gt;&gt; nw.set_attr(p_unit=&#39;bar&#39;, T_unit=&#39;C&#39;, h_unit=&#39;kJ / kg&#39;, iterinfo=False)</span>
+<span class="sd">    &gt;&gt;&gt; so = Source(&#39;source&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; si = Sink(&#39;sink&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; pt = ParabolicTrough(&#39;parabolic trough collector&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; pt.component()</span>
+<span class="sd">    &#39;parabolic trough&#39;</span>
+<span class="sd">    &gt;&gt;&gt; inc = Connection(so, &#39;out1&#39;, pt, &#39;in1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; outg = Connection(pt, &#39;out1&#39;, si, &#39;in1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; nw.add_conns(inc, outg)</span>
+
+<span class="sd">    The pressure ratio is at a constant level of 1. However, it is possible to</span>
+<span class="sd">    specify the pressure losses from the absorber tube length, roughness and</span>
+<span class="sd">    diameter, too. The aperture surface :math:`A` is specified to 1</span>
+<span class="sd">    :math:`\text{m}^2` for simplicity reasons.</span>
+
+<span class="sd">    &gt;&gt;&gt; aoi = 20</span>
+<span class="sd">    &gt;&gt;&gt; E = 1000 * np.cos(aoi / 180 * np.pi)</span>
+<span class="sd">    &gt;&gt;&gt; pt.set_attr(pr=1, aoi=aoi, doc=1,</span>
+<span class="sd">    ... Tamb=20, A=1, eta_opt=0.816, c_1=0.0622, c_2=0.00023, E=E,</span>
+<span class="sd">    ... iam_1=-1.59e-3, iam_2=9.77e-5)</span>
+<span class="sd">    &gt;&gt;&gt; inc.set_attr(fluid={&#39;S800&#39;: 1}, T=220, p=2)</span>
+<span class="sd">    &gt;&gt;&gt; outg.set_attr(T=260)</span>
+<span class="sd">    &gt;&gt;&gt; nw.solve(&#39;design&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; round(pt.Q.val, 0)</span>
+<span class="sd">    736.0</span>
+
+<span class="sd">    For example, it is possible to calculate the aperture area of the parabolic</span>
+<span class="sd">    trough given the total heat production, outflow temperature and mass flow.</span>
+
+<span class="sd">    &gt;&gt;&gt; pt.set_attr(A=&#39;var&#39;, Q=5e6, Tamb=25)</span>
+<span class="sd">    &gt;&gt;&gt; inc.set_attr(T=None)</span>
+<span class="sd">    &gt;&gt;&gt; outg.set_attr(T=350, m=20)</span>
+<span class="sd">    &gt;&gt;&gt; nw.solve(&#39;design&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; round(inc.T.val, 0)</span>
+<span class="sd">    229.0</span>
+<span class="sd">    &gt;&gt;&gt; round(pt.A.val, 0)</span>
+<span class="sd">    6862.0</span>
+
+<span class="sd">    Given this design, it is possible to calculate the outlet temperature as</span>
+<span class="sd">    well as the heat transfer at different operating points.</span>
+
+<span class="sd">    &gt;&gt;&gt; aoi = 30</span>
+<span class="sd">    &gt;&gt;&gt; E = 800 * np.cos(aoi / 180 * np.pi)</span>
+<span class="sd">    &gt;&gt;&gt; pt.set_attr(A=pt.A.val, aoi=aoi, Q=None, E=E)</span>
+<span class="sd">    &gt;&gt;&gt; inc.set_attr(T=150)</span>
+<span class="sd">    &gt;&gt;&gt; outg.set_attr(T=None)</span>
+<span class="sd">    &gt;&gt;&gt; nw.solve(&#39;design&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; round(outg.T.val, 0)</span>
+<span class="sd">    244.0</span>
+<span class="sd">    &gt;&gt;&gt; round(pt.Q.val, 0)</span>
+<span class="sd">    3603027.0</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ParabolicTrough.component"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.parabolic_trough.ParabolicTrough.component">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">component</span><span class="p">():</span>
+        <span class="k">return</span> <span class="s1">&#39;parabolic trough&#39;</span></div>
+
+<div class="viewcode-block" id="ParabolicTrough.get_variables"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.parabolic_trough.ParabolicTrough.get_variables">[docs]</a>    <span class="k">def</span> <span class="nf">get_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;Q&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(</span>
+                <span class="n">deriv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">energy_balance_deriv</span><span class="p">,</span>
+                <span class="n">latex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">energy_balance_func_doc</span><span class="p">,</span> <span class="n">num_eq</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">energy_balance_func</span><span class="p">),</span>
+            <span class="s1">&#39;pr&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(</span>
+                <span class="n">min_val</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">max_val</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_eq</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">deriv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pr_deriv</span><span class="p">,</span> <span class="n">latex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pr_func_doc</span><span class="p">,</span>
+                <span class="n">func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pr_func</span><span class="p">,</span> <span class="n">func_params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;pr&#39;</span><span class="p">:</span> <span class="s1">&#39;pr&#39;</span><span class="p">}),</span>
+            <span class="s1">&#39;zeta&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(</span>
+                <span class="n">min_val</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_val</span><span class="o">=</span><span class="mf">1e15</span><span class="p">,</span> <span class="n">num_eq</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">deriv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">zeta_deriv</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">zeta_func</span><span class="p">,</span>
+                <span class="n">latex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">zeta_func_doc</span><span class="p">,</span>
+                <span class="n">func_params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;zeta&#39;</span><span class="p">:</span> <span class="s1">&#39;zeta&#39;</span><span class="p">}),</span>
+            <span class="s1">&#39;D&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(</span><span class="n">min_val</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span> <span class="n">max_val</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">),</span>
+            <span class="s1">&#39;L&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(</span><span class="n">min_val</span><span class="o">=</span><span class="mf">1e-1</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">),</span>
+            <span class="s1">&#39;ks&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(</span><span class="n">val</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">min_val</span><span class="o">=</span><span class="mf">1e-7</span><span class="p">,</span> <span class="n">max_val</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">),</span>
+            <span class="s1">&#39;E&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(</span><span class="n">min_val</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;A&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(</span><span class="n">min_val</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+            <span class="s1">&#39;eta_opt&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(</span><span class="n">min_val</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_val</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+            <span class="s1">&#39;c_1&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(</span><span class="n">min_val</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;c_2&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(</span><span class="n">min_val</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+            <span class="s1">&#39;iam_1&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(),</span> <span class="s1">&#39;iam_2&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(),</span>
+            <span class="s1">&#39;aoi&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(</span><span class="n">min_val</span><span class="o">=-</span><span class="mi">90</span><span class="p">,</span> <span class="n">max_val</span><span class="o">=</span><span class="mi">90</span><span class="p">),</span>
+            <span class="s1">&#39;doc&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(</span><span class="n">min_val</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_val</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+            <span class="s1">&#39;Tamb&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(),</span>
+            <span class="s1">&#39;Q_loss&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(</span><span class="n">max_val</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+            <span class="s1">&#39;dissipative&#39;</span><span class="p">:</span> <span class="n">dc_simple</span><span class="p">(</span><span class="n">val</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="s1">&#39;hydro_group&#39;</span><span class="p">:</span> <span class="n">dc_gcp</span><span class="p">(</span>
+                <span class="n">elements</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;L&#39;</span><span class="p">,</span> <span class="s1">&#39;ks&#39;</span><span class="p">,</span> <span class="s1">&#39;D&#39;</span><span class="p">],</span> <span class="n">num_eq</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">latex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hydro_group_func_doc</span><span class="p">,</span>
+                <span class="n">func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hydro_group_func</span><span class="p">,</span> <span class="n">deriv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hydro_group_deriv</span><span class="p">),</span>
+            <span class="s1">&#39;energy_group&#39;</span><span class="p">:</span> <span class="n">dc_gcp</span><span class="p">(</span>
+                <span class="n">elements</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;E&#39;</span><span class="p">,</span> <span class="s1">&#39;eta_opt&#39;</span><span class="p">,</span> <span class="s1">&#39;aoi&#39;</span><span class="p">,</span> <span class="s1">&#39;doc&#39;</span><span class="p">,</span> <span class="s1">&#39;c_1&#39;</span><span class="p">,</span> <span class="s1">&#39;c_2&#39;</span><span class="p">,</span> <span class="s1">&#39;iam_1&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;iam_2&#39;</span><span class="p">,</span> <span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;Tamb&#39;</span><span class="p">],</span> <span class="n">num_eq</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">latex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">energy_group_func_doc</span><span class="p">,</span>
+                <span class="n">func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">energy_group_func</span><span class="p">,</span> <span class="n">deriv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">energy_group_deriv</span><span class="p">)</span>
+        <span class="p">}</span></div>
+
+<div class="viewcode-block" id="ParabolicTrough.energy_group_func"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.parabolic_trough.ParabolicTrough.energy_group_func">[docs]</a>    <span class="k">def</span> <span class="nf">energy_group_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Equation for solar collector energy balance.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        residual : float</span>
+<span class="sd">            Residual value of equation.</span>
+
+<span class="sd">            .. math::</span>
+
+<span class="sd">                \begin{split}</span>
+<span class="sd">                T_m = &amp; \frac{T_{out} + T_{in}}{2}\\</span>
+<span class="sd">                iam = &amp; 1 - iam_1 \cdot |aoi| - iam_2 \cdot aoi^2\\</span>
+<span class="sd">                0 = &amp; \dot{m} \cdot \left( h_{out} - h_{in} \right)\\</span>
+<span class="sd">                &amp; - A \cdot \left[E \cdot \eta_{opt} \cdot doc^{1.5} \cdot</span>
+<span class="sd">                iam \right. \\</span>
+<span class="sd">                &amp; \left. - c_1 \cdot \left(T_m - T_{amb} \right) -</span>
+<span class="sd">                c_2 \cdot \left(T_m - T_{amb}\right)^2</span>
+<span class="sd">                \vphantom{ \eta_{opt} \cdot doc^{1.5}} \right]</span>
+<span class="sd">                \end{split}</span>
+
+<span class="sd">            Reference: :cite:`Janotte2014`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_flow</span><span class="p">()</span>
+        <span class="n">o</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_flow</span><span class="p">()</span>
+
+        <span class="n">T_m</span> <span class="o">=</span> <span class="p">(</span><span class="n">T_mix_ph</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">T0</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span> <span class="o">+</span>
+               <span class="n">T_mix_ph</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">T0</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span><span class="p">))</span> <span class="o">/</span> <span class="mi">2</span>
+
+        <span class="n">iam</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">iam_1</span><span class="o">.</span><span class="n">val</span> <span class="o">*</span> <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aoi</span><span class="o">.</span><span class="n">val</span><span class="p">)</span> <span class="o">-</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">iam_2</span><span class="o">.</span><span class="n">val</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">aoi</span><span class="o">.</span><span class="n">val</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">i</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">val</span> <span class="o">*</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">E</span><span class="o">.</span><span class="n">val</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta_opt</span><span class="o">.</span><span class="n">val</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">doc</span><span class="o">.</span><span class="n">val</span> <span class="o">**</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="n">iam</span> <span class="o">-</span>
+                <span class="p">(</span><span class="n">T_m</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">Tamb</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">c_1</span><span class="o">.</span><span class="n">val</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">c_2</span><span class="o">.</span><span class="n">val</span> <span class="o">*</span>
+                <span class="p">(</span><span class="n">T_m</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">Tamb</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="ParabolicTrough.energy_group_func_doc"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.parabolic_trough.ParabolicTrough.energy_group_func_doc">[docs]</a>    <span class="k">def</span> <span class="nf">energy_group_func_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Equation for solar collector energy balance.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        label : str</span>
+<span class="sd">            Label for equation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        latex : str</span>
+<span class="sd">            LaTeX code of equations applied.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">latex</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;\begin</span><span class="si">{split}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;0 = &amp; \dot</span><span class="si">{m}</span><span class="s1">_\mathrm</span><span class="si">{in}</span><span class="s1"> \cdot \left( h_\mathrm</span><span class="si">{out}</span><span class="s1"> - &#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;h_\mathrm</span><span class="si">{in}</span><span class="s1"> \right)</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;&amp; - A \cdot \left[E \cdot \eta_\mathrm</span><span class="si">{opt}</span><span class="s1"> \cdot doc^</span><span class="si">{1.5}</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\cdot iam \right. </span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;&amp;\left. -c_1\cdot\left(T_\mathrm</span><span class="si">{m}</span><span class="s1">-T_\mathrm</span><span class="si">{amb}</span><span class="s1">\right) -&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;c_2 \cdot \left(T_\mathrm</span><span class="si">{m}</span><span class="s1"> - T_\mathrm</span><span class="si">{amb}</span><span class="s1">\right)^2&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\vphantom{\eta_\mathrm</span><span class="si">{opt}</span><span class="s1">\cdot doc^</span><span class="si">{1.5}</span><span class="s1">}\right]</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;T_\mathrm</span><span class="si">{m}</span><span class="s1">=&amp;\frac{T_\mathrm</span><span class="si">{out}</span><span class="s1">+T_\mathrm</span><span class="si">{in}</span><span class="s1">}</span><span class="si">{2}</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span>
+            <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;iam = &amp; 1 - iam_1 \cdot |aoi| - iam_2 \cdot aoi^2</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\end</span><span class="si">{split}</span><span class="s1">&#39;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">generate_latex_eq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latex</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ParabolicTrough.energy_group_deriv"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.parabolic_trough.ParabolicTrough.energy_group_deriv">[docs]</a>    <span class="k">def</span> <span class="nf">energy_group_deriv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">increment_filter</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate partial derivatives of energy group function.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        increment_filter : ndarray</span>
+<span class="sd">            Matrix for filtering non-changing variables.</span>
+
+<span class="sd">        k : int</span>
+<span class="sd">            Position of derivatives in Jacobian matrix (k-th equation).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_group_func</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">increment_filter</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">increment_filter</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">increment_filter</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">increment_filter</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># custom variables for the energy-group</span>
+        <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_group</span><span class="o">.</span><span class="n">elements</span><span class="p">:</span>
+            <span class="n">var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_attr</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">var</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">Tamb</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">var</span><span class="o">.</span><span class="n">is_var</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">var</span><span class="o">.</span><span class="n">var_pos</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">[</span><span class="n">var</span><span class="p">],</span> <span class="mi">2</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="ParabolicTrough.calc_parameters"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.parabolic_trough.ParabolicTrough.calc_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">calc_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Postprocessing parameter calculation.&quot;&quot;&quot;</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_flow</span><span class="p">()</span>
+        <span class="n">o</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_flow</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">i</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pr</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="n">o</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">zeta</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="p">((</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">o</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="p">(</span>
+            <span class="mi">4</span> <span class="o">*</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">vol</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">vol</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span>
+            <span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_group</span><span class="o">.</span><span class="n">is_set</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Q_loss</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">E</span><span class="o">.</span><span class="n">val</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">val</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="o">.</span><span class="n">val</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Q_loss</span><span class="o">.</span><span class="n">is_result</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Q_loss</span><span class="o">.</span><span class="n">is_result</span> <span class="o">=</span> <span class="kc">False</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2020, Francesco Witte.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

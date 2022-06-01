@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Developing TESPy &mdash; tespy 0.6.0 - Colored Chemicals documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="What’s New" href="whats_new.html" />
+    <link rel="prev" title="Thermodynamic analyses" href="tespy_analyses.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> tespy
+            <img src="_static/logo_tespy_mid.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.6.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Thermal Engineering Systems in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="first_steps.html">First steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials_examples.html">Examples and Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tespy_modules.html">TESPy modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tespy_analyses.html">Thermodynamic analyses</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Developing TESPy</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#install-the-developer-version">Install the developer version</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#your-contribution">Your contribution</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#contribute-to-the-documentation">Contribute to the documentation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#improve-or-add-new-equations">Improve or add new equations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#share-your-subsystems">Share your subsystems</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#add-component-characteristics">Add component characteristics</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#collaboration-with-pull-requests">Collaboration with pull requests</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#how-to-create-a-pull-request">How to create a pull request</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#generally-the-following-steps-are-required-when-changing-adding-or-removing-code">Generally the following steps are required when changing, adding or removing code</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#tests">Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#issue-management">Issue-Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#style-guidelines">Style guidelines</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#docstrings">Docstrings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#code-commenting">Code commenting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pep8-python-style-guide">PEP8 (Python Style Guide)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#naming-conventions">Naming Conventions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-git">Using git</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#branching-model">Branching model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#commit-message">Commit message</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#documentation">Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="zliterature.html">Literature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">tespy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Developing TESPy</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/developing_tespy.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="developing-tespy">
+<span id="developing-tespy-label"></span><h1>Developing TESPy<a class="headerlink" href="#developing-tespy" title="Permalink to this headline">¶</a></h1>
+<p>TESPy has been developed mainly by Francesco Witte at the University of Applied
+Sciences Flensburg. We hope that many people can make use of this project and
+that it will be a community driven project in the future, as users might demand
+special components or flexible implementations of characteristics, custom
+equations, basically what ever you can think of.</p>
+<p>We want to invite you to join the developing process and share your ideas. Your
+solutions may help other users as well. Contributing to the development of
+TESPy may help other people and it improves the quality of your code as it will
+be reviewed by other developers.</p>
+<p>The easiest way of joining the developing process is by improving the
+documentation. If you spot mistakes or think, the documentation could be more
+precise or clear in some sections, feel free to fix it and create a pull
+request on the github repository.</p>
+<p>Another simple first step is to program your own custom subsystems and share
+them in the community. For a good start just look into our tutorial
+<a class="reference internal" href="tespy_modules/subsystems.html#tespy-subsystems-label"><span class="std std-ref">How do I create custom subsystems</span></a>.</p>
+<p>A third, highly appreciated way for you to contribute is the provision of new
+and/or improved equations, maybe even whole characteristics for single
+components, such as compressor maps, characteristics for turbine efficiency or
+heat transfer coefficients etc..</p>
+<p>You will find the most important information concerning the development process
+in the following sections. If you have any further questions feel free to
+contact us, we are looking forward to hearing
+from you!</p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#install-the-developer-version" id="id1">Install the developer version</a></p></li>
+<li><p><a class="reference internal" href="#your-contribution" id="id2">Your contribution</a></p></li>
+<li><p><a class="reference internal" href="#collaboration-with-pull-requests" id="id3">Collaboration with pull requests</a></p></li>
+<li><p><a class="reference internal" href="#tests" id="id4">Tests</a></p></li>
+<li><p><a class="reference internal" href="#issue-management" id="id5">Issue-Management</a></p></li>
+<li><p><a class="reference internal" href="#style-guidelines" id="id6">Style guidelines</a></p></li>
+<li><p><a class="reference internal" href="#naming-conventions" id="id7">Naming Conventions</a></p></li>
+<li><p><a class="reference internal" href="#using-git" id="id8">Using git</a></p></li>
+<li><p><a class="reference internal" href="#documentation" id="id9">Documentation</a></p></li>
+</ul>
+</div>
+<section id="install-the-developer-version">
+<h2><a class="toc-backref" href="#contents">Install the developer version</a><a class="headerlink" href="#install-the-developer-version" title="Permalink to this headline">¶</a></h2>
+<p>It is recommenden to use
+<a class="reference external" href="https://docs.python.org/3/tutorial/venv.html">virtual environments</a> for
+the development process. Fork the repository and clone your forked tespy github
+repository and install development requirements with pip.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>    git clone https://github.com/YOUR_GITHUB_USERNAME/tespy.git
+<span class="nb">cd</span> tespy
+pip install -e .<span class="o">[</span>dev<span class="o">]</span>
+</pre></div>
+</div>
+<p>In order to stay in sync with the oemof/tespy base repository, add the link to
+the oemof/tespy repository as remote to your local copy of tespy. We will call
+the link “upstream”. Fetch branches available and after that, you can pull
+changes from a specific branch of the oemof/tespy repository (branch “dev” in
+the example below).</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git remote add upstream https://github.com/oemof/tespy.git
+git fetch upstream
+git pull upstream dev --rebase
+</pre></div>
+</div>
+<p>Use the <code class="code docutils literal notranslate"><span class="pre">--rebase</span></code> comand to avoid merge commits fo every upstream pull.
+If you want to make changes to tespy, checkout a new branch from your local dev
+branch. Make your changes, commit them and create a PR on the oemof/tespy dev
+branch.</p>
+</section>
+<section id="your-contribution">
+<h2><a class="toc-backref" href="#contents">Your contribution</a><a class="headerlink" href="#your-contribution" title="Permalink to this headline">¶</a></h2>
+<p>There are different ways you can contribute</p>
+<section id="contribute-to-the-documentation">
+<h3>Contribute to the documentation<a class="headerlink" href="#contribute-to-the-documentation" title="Permalink to this headline">¶</a></h3>
+<p>If you come across typos or grammatical mistakes or want to improve
+comprehensibility of the documentation, make your adjustments or suggestions
+and create a pull request for the dev branch. We appreciate your contribution!</p>
+</section>
+<section id="improve-or-add-new-equations">
+<h3>Improve or add new equations<a class="headerlink" href="#improve-or-add-new-equations" title="Permalink to this headline">¶</a></h3>
+<p>The components equations represent the behavior of each component. Are we
+missing any equations? Or do you see possibilities to improve the formulation?
+Add them to your code and create a pull request on the dev branch.</p>
+</section>
+<section id="share-your-subsystems">
+<h3>Share your subsystems<a class="headerlink" href="#share-your-subsystems" title="Permalink to this headline">¶</a></h3>
+<p>You have encountered component groups that are frequently required? Create a
+subsystem to simplify your own work and share your subsystem by adding it to
+the tespy.components.subsystems file.</p>
+<p>For both, <strong>the equations and the subsystems</strong>, please provide the docstring
+and maybe inline comments, if you want to make the code more comprehensible. In
+general, your code should fit to the <a class="reference internal" href="#style-guidlines-label"><span class="std std-ref">Issue-Management</span></a>, a complete
+documentation is only required, if the code will be added to TESPy permanently.</p>
+</section>
+<section id="add-component-characteristics">
+<h3>Add component characteristics<a class="headerlink" href="#add-component-characteristics" title="Permalink to this headline">¶</a></h3>
+<p>The component characteristics represent large added value for your calculation.
+If you have detailed information on components offdesign behavior - even for
+specific cases - it will improve the results. Every user can benefit from this
+knowlegde and thus we are very happy to discuss about the implementation of new
+characteristics.</p>
+</section>
+</section>
+<section id="collaboration-with-pull-requests">
+<h2><a class="toc-backref" href="#contents">Collaboration with pull requests</a><a class="headerlink" href="#collaboration-with-pull-requests" title="Permalink to this headline">¶</a></h2>
+<p>To collaborate use the pull request functionality of github as described here:
+<a class="reference external" href="https://guides.github.com/activities/hello-world/">https://guides.github.com/activities/hello-world/</a></p>
+<section id="how-to-create-a-pull-request">
+<h3>How to create a pull request<a class="headerlink" href="#how-to-create-a-pull-request" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Fork the oemof repository to your own github account.</p></li>
+<li><p>Change, add or remove code.</p></li>
+<li><p>Commit your changes.</p></li>
+<li><p>Create a pull request and describe what you will do and why. Please use the
+pull request template we offer. It will be shown to you when you click on
+“New pull request”.</p></li>
+<li><p>Wait for approval.</p></li>
+</ul>
+</section>
+<section id="generally-the-following-steps-are-required-when-changing-adding-or-removing-code">
+<span id="coding-requirements-label"></span><h3>Generally the following steps are required when changing, adding or removing code<a class="headerlink" href="#generally-the-following-steps-are-required-when-changing-adding-or-removing-code" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Read the <a class="reference internal" href="#style-guidlines-label"><span class="std std-ref">Issue-Management</span></a> and <a class="reference internal" href="#naming-conventions-label"><span class="std std-ref">Naming Conventions</span></a> and
+follow them</p></li>
+<li><p>Add new tests according to what you have done</p></li>
+<li><p>Add/change the documentation (new feature, API changes …)</p></li>
+<li><p>Add a What’s New entry and your name to the list of contributors</p></li>
+<li><p>Check if all <a class="reference internal" href="#tests-label"><span class="std std-ref">Tests</span></a> still work.</p></li>
+</ul>
+</section>
+</section>
+<section id="tests">
+<span id="tests-label"></span><h2><a class="toc-backref" href="#contents">Tests</a><a class="headerlink" href="#tests" title="Permalink to this headline">¶</a></h2>
+<p>The tests in TESPy are split up in two different parts:</p>
+<ul class="simple">
+<li><p>doc-tests (also used as examples for classes and methods/functions)</p></li>
+<li><p>software tests (defined in the tests folder).</p></li>
+</ul>
+<p>The tests contain code examples that expect a certain outcome. If the outcome
+is as expected a test will pass, if the outcome is different, the test will
+fail. You can run the tests locally by navigating into your local github clone.
+The command <code class="code docutils literal notranslate"><span class="pre">check</span></code> tests PEP guidelines, the command <code class="code docutils literal notranslate"><span class="pre">docs</span></code>
+tests building the documentation, and the command <code class="code docutils literal notranslate"><span class="pre">py3X</span></code> runs the
+software tests in the selected Python version.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python -m tox -e docs
+python -m tox -e check
+python -m tox -e py36
+python -m tox -e py37
+python -m tox -e py38
+</pre></div>
+</div>
+<p>If you want to have a look at the documentation build on your local machine use
+the following command from the local tespy clone:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python -m sphinx docs/ path/to/html_output
+</pre></div>
+</div>
+<p>Additionally, all tests will run automatically when you push changes to a
+branch that has a pull request opened.</p>
+<p>If you have further questions regarding the tests, we are looking forward to
+your inquiry.</p>
+</section>
+<section id="issue-management">
+<span id="style-guidlines-label"></span><h2><a class="toc-backref" href="#contents">Issue-Management</a><a class="headerlink" href="#issue-management" title="Permalink to this headline">¶</a></h2>
+<p>A good way for communication with the developer group are issues. If you
+find a bug, want to contribute an enhancement or have a question on a specific
+problem in development you want to discuss, please create an issue:</p>
+<ul class="simple">
+<li><p>describing your point accurately</p></li>
+<li><p>using the list of category tags</p></li>
+<li><p>addressing other developers</p></li>
+</ul>
+<p>If you want to address other developers you can use &#64;name-of-developer, or
+use e.g. &#64;tespy to address a team. <a class="reference external" href="https://github.com/orgs/oemof/teams">Here</a>
+you can find an overview over existing teams on different subjects and their members.</p>
+<p>Look at the existing issues to get an idea on the usage of issues.</p>
+</section>
+<section id="style-guidelines">
+<h2><a class="toc-backref" href="#contents">Style guidelines</a><a class="headerlink" href="#style-guidelines" title="Permalink to this headline">¶</a></h2>
+<p>We mostly follow standard guidelines instead of developing own rules. So if
+anything is not defined in this section, search for a
+<a class="reference external" href="https://www.python.org/dev/peps/">PEP rule</a> and follow it.</p>
+<section id="docstrings">
+<h3>Docstrings<a class="headerlink" href="#docstrings" title="Permalink to this headline">¶</a></h3>
+<p>We decided to use the style of the numpydoc docstrings. See the following
+link for an
+<a class="reference external" href="https://github.com/numpy/numpy/blob/main/doc/example.py">example</a>.</p>
+</section>
+<section id="code-commenting">
+<h3>Code commenting<a class="headerlink" href="#code-commenting" title="Permalink to this headline">¶</a></h3>
+<p>Code comments are block and inline comments in the source code. They can help
+to understand he code and should be utilized “as much as necessary, as little
+as possible”. When writing comments follow the
+<a class="reference external" href="https://www.python.org/dev/peps/pep-0008/#comments">PEP 0008 style guide</a>.</p>
+</section>
+<section id="pep8-python-style-guide">
+<h3>PEP8 (Python Style Guide)<a class="headerlink" href="#pep8-python-style-guide" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>We adhere to <a class="reference external" href="https://www.python.org/dev/peps/pep-0008/">PEP8</a> for any code
+produced in the framework.</p></li>
+<li><p>We use pylint to check your code. Pylint is integrated in many IDEs and
+Editors. <a class="reference external" href="https://pylint.pycqa.org/en/latest/">Check here</a> or ask the
+maintainer of your IDE or Editor</p></li>
+<li><p>Some IDEs have pep8 checkers, which are very helpful, especially for python
+beginners.</p></li>
+</ul>
+</section>
+</section>
+<section id="naming-conventions">
+<span id="naming-conventions-label"></span><h2><a class="toc-backref" href="#contents">Naming Conventions</a><a class="headerlink" href="#naming-conventions" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>We use plural in the code for modules if there is possibly more than one
+child class (e.g. <code class="code docutils literal notranslate"><span class="pre">import</span> <span class="pre">heat_exchangers</span></code> AND NOT
+<code class="code docutils literal notranslate"><span class="pre">import</span> <span class="pre">heat_exchanger</span></code>). If there are arrays in the code that contain
+multiple elements they have to be named in plural.</p></li>
+<li><p>Please, follow the naming conventions of
+<a class="reference external" href="http://pylint-messages.wikidot.com/messages:c0103">pylint</a></p></li>
+<li><p>Use talking names</p>
+<ul>
+<li><p>Variables/Objects: Name it after the data they describe
+(power_line, wind_speed)</p></li>
+<li><p>Functions/Method: Name it after what they do: <strong>use verbs</strong>
+(get_wind_speed, set_parameter)</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="using-git">
+<h2><a class="toc-backref" href="#contents">Using git</a><a class="headerlink" href="#using-git" title="Permalink to this headline">¶</a></h2>
+<section id="branching-model">
+<h3>Branching model<a class="headerlink" href="#branching-model" title="Permalink to this headline">¶</a></h3>
+<p>So far we adhere mostly to the git branching model by
+<a class="reference external" href="https://nvie.com/posts/a-successful-git-branching-model/">Vincent Driessen</a>.</p>
+<p>Differences are:</p>
+<ul class="simple">
+<li><p>instead of the name <code class="docutils literal notranslate"><span class="pre">origin/develop</span></code> we call the branch <code class="docutils literal notranslate"><span class="pre">origin/dev</span></code>.</p></li>
+<li><p>feature branches are named like <code class="docutils literal notranslate"><span class="pre">features/*</span></code></p></li>
+<li><p>release branches are named like <code class="docutils literal notranslate"><span class="pre">releases/*</span></code></p></li>
+</ul>
+</section>
+<section id="commit-message">
+<h3>Commit message<a class="headerlink" href="#commit-message" title="Permalink to this headline">¶</a></h3>
+<p>Use this nice little <a class="reference external" href="https://commit.style/">commit tutorial</a> to
+learn how to write a nice commit message.</p>
+</section>
+</section>
+<section id="documentation">
+<h2><a class="toc-backref" href="#contents">Documentation</a><a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<p>The general implementation-independent documentation such as installation
+guide, flow charts, and mathematical models is done via ReStructuredText (rst).
+The files can be found in the folder <em>docs</em>. For further information on
+restructured text see: <a class="reference external" href="https://docutils.sourceforge.io/rst.html">https://docutils.sourceforge.io/rst.html</a>.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="tespy_analyses.html" class="btn btn-neutral float-left" title="Thermodynamic analyses" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="whats_new.html" class="btn btn-neutral float-right" title="What’s New" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2020, Francesco Witte.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

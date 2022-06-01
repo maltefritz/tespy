@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>v0.4.3 - Grassmann’s Graph (April, 29, 2021) &mdash; tespy 0.6.0 - Colored Chemicals documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> tespy
+            <img src="../_static/logo_tespy_mid.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.6.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Thermal Engineering Systems in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../first_steps.html">First steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials_examples.html">Examples and Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tespy_modules.html">TESPy modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tespy_analyses.html">Thermodynamic analyses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developing_tespy.html">Developing TESPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zliterature.html">Literature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">tespy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>v0.4.3 - Grassmann’s Graph (April, 29, 2021)</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/whats_new/v0-4-3.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="v0-4-3-grassmann-s-graph-april-29-2021">
+<h1>v0.4.3 - Grassmann’s Graph (April, 29, 2021)<a class="headerlink" href="#v0-4-3-grassmann-s-graph-april-29-2021" title="Permalink to this headline">¶</a></h1>
+<section id="new-features">
+<h2>New Features<a class="headerlink" href="#new-features" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Automatic provision of input data for the sankey diagram class of the
+<a class="reference external" href="https://plotly.com/python/sankey-diagram/">plotly library</a> to generate
+exergy sankey diagrams. For example, the diagram of the solar thermal power
+plant presented in the thermodynamic analyses section</p>
+<figure class="align-center">
+<img alt="Example of the sankey diagram" src="whats_new/api/_images/SEGS_sankey.png" />
+</figure>
+<p>(<a class="reference external" href="https://github.com/oemof/tespy/pull/251">PR #251</a>).</p>
+</li>
+<li><p>The results of your simulation are much more easy to bulk access: The
+<a class="reference internal" href="../api/tespy.networks.html#tespy.networks.network.Network" title="tespy.networks.network.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">tespy.networks.network.Network</span></code></a> class provides you with a
+results dictionary containing DataFrames with all data necessary. The keys
+of the dictionary are:</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">'Connection'</span></code></p></li>
+<li><p>the class names of the different components used, e.g. <code class="code docutils literal notranslate"><span class="pre">'Turbine'</span></code> or
+<code class="code docutils literal notranslate"><span class="pre">'HeatExchanger'</span></code></p></li>
+<li><p>the labels of the busses, e.g. <code class="code docutils literal notranslate"><span class="pre">'input</span> <span class="pre">power'</span></code></p></li>
+</ul>
+<p>The pandas DataFrame provides you with the SI-values for components and
+busses as well as all fluid property data of the connections in respective
+specified unit. For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mynetwork</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;Connection&#39;</span><span class="p">]</span>
+<span class="n">mynetwork</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;Turbine&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>(<a class="reference external" href="https://github.com/oemof/tespy/pull/255">PR #255</a>).</p>
+</li>
+</ul>
+</section>
+<section id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>An own chapter for the
+<a class="reference internal" href="../tespy_analyses.html#tespy-analyses-exergy-label"><span class="std std-ref">exergy analysis toolbox</span></a> has been added
+(<a class="reference external" href="https://github.com/oemof/tespy/pull/251">PR #251</a>).</p></li>
+<li><p>Fix some typos in the code of heat pump tutorial
+(<a class="reference external" href="https://github.com/oemof/tespy/pull/260">PR #260</a>).</p></li>
+<li><p>Update component parameter data type specifications according to 0.4.x API
+in docs and add missing parameters in HeatExchanger classes
+(<a class="reference external" href="https://github.com/oemof/tespy/pull/260">PR #260</a>).</p></li>
+<li><p>Fix broken links to characteristic map functions of class
+<a class="reference internal" href="../api/tespy.components.html#tespy.components.turbomachinery.compressor.Compressor" title="tespy.components.turbomachinery.compressor.Compressor"><code class="xref py py-class docutils literal notranslate"><span class="pre">tespy.components.turbomachinery.compressor.Compressor</span></code></a>
+(<a class="reference external" href="https://github.com/oemof/tespy/pull/263">PR #263</a>).</p></li>
+</ul>
+</section>
+<section id="bug-fixes">
+<h2>Bug Fixes<a class="headerlink" href="#bug-fixes" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Add missing exergy balance method of class Drum
+(<a class="reference external" href="https://github.com/oemof/tespy/commit/1eb92e3">#1eb92e3</a>).</p></li>
+<li><p>Add missing specified values of temperature difference to boiling point to
+connection report
+(<a class="reference external" href="https://github.com/oemof/tespy/pull/250">PR #250</a>).</p></li>
+<li><p>Fix Reynolds value ranges for Hanakov and Blasius equations in calculation of
+Darcy friction factor
+(<a class="reference external" href="https://github.com/oemof/tespy/commit/ce6bef9">#ce6bef9</a>).</p></li>
+</ul>
+</section>
+<section id="other-changes">
+<h2>Other Changes<a class="headerlink" href="#other-changes" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Add a timestamp for the automatic model documentation feature
+(<a class="reference external" href="https://github.com/oemof/tespy/pull/248">PR #248</a>).</p></li>
+<li><p>Move from travis to GitHub actions
+(<a class="reference external" href="https://github.com/oemof/tespy/pull/249">PR #249</a>).</p></li>
+<li><p>Specified Bus values are now colored in the
+<a class="reference internal" href="../api/tespy.networks.html#tespy.networks.network.Network.print_results" title="tespy.networks.network.Network.print_results"><code class="xref py py-meth docutils literal notranslate"><span class="pre">tespy.networks.network.Network.print_results()</span></code></a> method
+(<a class="reference external" href="https://github.com/oemof/tespy/pull/255">PR #255</a>).</p></li>
+<li><p>Remove building figures for characteristics from docs generation
+(<a class="reference external" href="https://github.com/oemof/tespy/pull/251">PR #251</a>).</p></li>
+</ul>
+</section>
+<section id="contributors">
+<h2>Contributors<a class="headerlink" href="#contributors" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Francesco Witte (<a class="reference external" href="https://github.com/fwitte">&#64;fwitte</a>)</p></li>
+<li><p><a class="reference external" href="https://github.com/juliusmeier">&#64;juliusmeier</a></p></li>
+<li><p><a class="reference external" href="https://github.com/jfreissmann">&#64;jfreissmann</a></p></li>
+<li><p><a class="reference external" href="https://github.com/anmartens">&#64;anmartens</a></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2020, Francesco Witte.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

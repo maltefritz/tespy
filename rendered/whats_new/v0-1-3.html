@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>v0.1.3 (November, 6, 2019) &mdash; tespy 0.6.0 - Colored Chemicals documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> tespy
+            <img src="../_static/logo_tespy_mid.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.6.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Thermal Engineering Systems in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../first_steps.html">First steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials_examples.html">Examples and Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tespy_modules.html">TESPy modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tespy_analyses.html">Thermodynamic analyses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developing_tespy.html">Developing TESPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zliterature.html">Literature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">tespy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>v0.1.3 (November, 6, 2019)</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/whats_new/v0-1-3.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="v0-1-3-november-6-2019">
+<h1>v0.1.3 (November, 6, 2019)<a class="headerlink" href="#v0-1-3-november-6-2019" title="Permalink to this headline">¶</a></h1>
+<section id="new-features">
+<h2>New Features<a class="headerlink" href="#new-features" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Individual design path specification is available: Specify the design_path individually for single connections or a components in your network, if
+you want the individual design parameters be loaded from a different design case than the network’s design case given in the network’s
+design path (<a class="reference external" href="https://github.com/oemof/tespy/pull/84">PR #84</a>).</p></li>
+<li><p>Implement local design and local offdesign features: It is possible to design a plant while some parts of the plant are in offdesign mode. This is useful,
+e.g. when designing an extraction turbine, where the district heating condenser is designed for maximum extraction and the backpressure turbine is designed
+for minimum extraction (<a class="reference external" href="https://github.com/oemof/tespy/pull/92">PR #92</a>).</p></li>
+<li><p>Implement warning messages for all components, if the component’s properties are out of physical bounds. The bounds can be customized when specifying a property
+by data containers (read more at <a class="reference internal" href="../tespy_modules/components.html#using-tespy-components-parametrisation-label"><span class="std std-ref">component parameter specification</span></a>), (<a class="reference external" href="https://github.com/oemof/tespy/pull/85">PR #85</a>).</p></li>
+</ul>
+</section>
+<section id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Change license from GPLv3 to MIT (<a class="reference external" href="https://github.com/oemof/tespy/pull/93">PR #93</a>).</p></li>
+<li><p>Fix unit error in component documentation for the zeta-value (<a class="reference external" href="https://github.com/oemof/tespy/pull/93">PR #93</a>).</p></li>
+<li><p>Improve documentation of the functions <code class="xref py py-func docutils literal notranslate"><span class="pre">tespy.components.components.component.zeta_func()</span></code> and <code class="xref py py-func docutils literal notranslate"><span class="pre">tespy.components.components.component.zeta2_func()</span></code>
+(<a class="reference external" href="https://github.com/oemof/tespy/commit/4291bd7f32a89a90851c53ae2d7987cfb8381930">4291bd</a>).</p></li>
+</ul>
+</section>
+<section id="parameter-renaming">
+<h2>Parameter renaming<a class="headerlink" href="#parameter-renaming" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="testing">
+<h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Added tests for the new design path feature (<a class="reference external" href="https://github.com/oemof/tespy/pull/84">PR #84</a>).</p></li>
+<li><p>Implemented additional network and component tests, (<a class="reference external" href="https://github.com/oemof/tespy/pull/86">PR #86</a>).</p></li>
+</ul>
+</section>
+<section id="bug-fixes">
+<h2>Bug fixes<a class="headerlink" href="#bug-fixes" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Offdesign values for connections are specified from the design case files (<a class="reference external" href="https://github.com/oemof/tespy/pull/84">PR #84</a>). Before, the offdesign values
+were the actual values of the fluid property in the last calculation (which is not necessarily the design case).</p></li>
+<li><p>Add debug logging message, if the enthalpy is adjusted on connections with the keyword <code class="code docutils literal notranslate"><span class="pre">state</span></code> specified (<a class="reference external" href="https://github.com/oemof/tespy/pull/85">PR #85</a>).</p></li>
+</ul>
+</section>
+<section id="other-changes">
+<h2>Other changes<a class="headerlink" href="#other-changes" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Improved calculation speed for fluid mixture properties with the parameter T0 as starting value for root finding (<a class="reference external" href="https://github.com/oemof/tespy/pull/84">PR #84</a>).</p></li>
+</ul>
+</section>
+<section id="contributors">
+<h2>Contributors<a class="headerlink" href="#contributors" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Francesco Witte</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2020, Francesco Witte.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

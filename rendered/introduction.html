@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thermal Engineering Systems in Python &mdash; tespy 0.6.0 - Colored Chemicals documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation and setup" href="installation.html" />
+    <link rel="prev" title="Thermal Engineering Systems in Python" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> tespy
+            <img src="_static/logo_tespy_mid.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.6.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Thermal Engineering Systems in Python</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#key-features">Key Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#quick-installation">Quick installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#getting-into-tespy">Getting into TESPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#citation">Citation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#license">License</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="first_steps.html">First steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials_examples.html">Examples and Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tespy_modules.html">TESPy modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tespy_analyses.html">Thermodynamic analyses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developing_tespy.html">Developing TESPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="zliterature.html">Literature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">tespy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Thermal Engineering Systems in Python</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/introduction.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="thermal-engineering-systems-in-python">
+<h1>Thermal Engineering Systems in Python<a class="headerlink" href="#thermal-engineering-systems-in-python" title="Permalink to this headline">¶</a></h1>
+<p>TESPy stands for “Thermal Engineering Systems in Python” and provides a
+powerful simulation toolkit for thermal engineering plants such as power
+plants, district heating systems or heat pumps. It is an external extension
+module within the <a class="reference external" href="https://oemof.org/">Open Energy Modeling Framework</a> and
+can be used as a standalone package.</p>
+<figure class="align-center">
+<img alt="_images/logo_tespy_big.svg" src="_images/logo_tespy_big.svg" /></figure>
+<p>With the TESPy package you are able to calculate stationary operation in order
+to design the process of your plant. From that point it is possible to
+predict the offdesign behavior of your plant using underlying characteristics
+for each of the plants components. For now, the package includes basic
+components, such as turbines, pumps, compressors, heat exchangers, pipes,
+mixers and splitters as well as some advanced components
+(derivatives of heat exchangers, drum).</p>
+<p>Everybody is welcome to use and/or develop TESPy. Contribution is already
+possible on a low level by simply fixing typos in TESPy’s documentation or
+rephrasing sections which are unclear. If you want to support us that way
+please fork the TESPy repository to your own github account and make
+changes as described in the github guidelines:
+<a class="reference external" href="https://guides.github.com/activities/hello-world/">https://guides.github.com/activities/hello-world/</a></p>
+<section id="key-features">
+<h2>Key Features<a class="headerlink" href="#key-features" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><strong>Open</strong> Source</p></li>
+<li><p><strong>Generic</strong> thermal engineering applications</p></li>
+<li><p><strong>Automatic</strong> model documentation in LaTeX for high transparency and
+reproducibility</p></li>
+<li><p><strong>Extendable</strong> framework for the implementation of custom components and
+component groups</p></li>
+<li><p><strong>Postprocessing</strong> features like exergy analysis and fluid property plotting</p></li>
+</ul>
+</section>
+<section id="quick-installation">
+<h2>Quick installation<a class="headerlink" href="#quick-installation" title="Permalink to this headline">¶</a></h2>
+<p>If you have a working Python3 environment, use pypi to install the latest
+tespy version.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install tespy
+</pre></div>
+</div>
+<p>We provide more detailed
+<a class="reference internal" href="installation.html#installation-and-setup-label"><span class="std std-ref">installation instructions</span></a>, too.</p>
+<p>If you want to use the latest features, you might want to install the
+<strong>developer version</strong>. See section
+<a class="reference internal" href="developing_tespy.html#developing-tespy-label"><span class="std std-ref">Developing TESPy</span></a> for more information.</p>
+</section>
+<section id="getting-into-tespy">
+<h2>Getting into TESPy<a class="headerlink" href="#getting-into-tespy" title="Permalink to this headline">¶</a></h2>
+<p>For a good start on how TESPy works and how you can use it, we provide some
+examples at the <a class="reference internal" href="tutorials_examples.html#tespy-examples-label"><span class="std std-ref">examples section</span></a>. On top of that,
+there is a step-by-step <a class="reference internal" href="tutorials_examples.html#heat-pump-tutorial-label"><span class="std std-ref">tutorial</span></a> on how to
+model a heat pump in TESPy.</p>
+<p>The <a class="reference internal" href="tespy_modules.html#tespy-modules-label"><span class="std std-ref">TESPy modules section</span></a> provides you
+with all important information on the different modules of TESPy.</p>
+</section>
+<section id="citation">
+<h2>Citation<a class="headerlink" href="#citation" title="Permalink to this headline">¶</a></h2>
+<p>The scope and functionalities of TESPy have been documented in a paper
+published in the Journal of Open Source Software with an OpenAccess license.
+Download the paper from <a class="reference external" href="https://doi.org/10.21105/joss.02178">https://doi.org/10.21105/joss.02178</a> <span id="id1">[<a class="reference internal" href="zliterature.html#id16" title="Francesco Witte and Ilja Tuschy. TESPy: Thermal Engineering Systems in Python. Journal of Open Source Software, 5(49):2178, 2020. doi:10.21105/joss.02178.">WT20</a>]</span>.
+As TESPy is a free software, we kindly ask that you add a reference to TESPy
+if you use the software for your scientific work. Please cite the article with
+the BibTeX citation below.</p>
+<p>BibTeX citation:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@article</span><span class="p">{</span><span class="n">Witte2020</span><span class="p">,</span>
+    <span class="n">doi</span> <span class="o">=</span> <span class="p">{</span><span class="mf">10.21105</span><span class="o">/</span><span class="n">joss</span><span class="mf">.02178</span><span class="p">},</span>
+    <span class="n">year</span> <span class="o">=</span> <span class="p">{</span><span class="mi">2020</span><span class="p">},</span>
+    <span class="n">publisher</span> <span class="o">=</span> <span class="p">{</span><span class="n">The</span> <span class="n">Open</span> <span class="n">Journal</span><span class="p">},</span>
+    <span class="n">volume</span> <span class="o">=</span> <span class="p">{</span><span class="mi">5</span><span class="p">},</span>
+    <span class="n">number</span> <span class="o">=</span> <span class="p">{</span><span class="mi">49</span><span class="p">},</span>
+    <span class="n">pages</span> <span class="o">=</span> <span class="p">{</span><span class="mi">2178</span><span class="p">},</span>
+    <span class="n">author</span> <span class="o">=</span> <span class="p">{</span><span class="n">Francesco</span> <span class="n">Witte</span> <span class="ow">and</span> <span class="n">Ilja</span> <span class="n">Tuschy</span><span class="p">},</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="p">{{</span><span class="n">TESPy</span><span class="p">}:</span> <span class="p">{</span><span class="n">T</span><span class="p">}</span><span class="n">hermal</span> <span class="p">{</span><span class="n">E</span><span class="p">}</span><span class="n">ngineering</span> <span class="p">{</span><span class="n">S</span><span class="p">}</span><span class="n">ystems</span> <span class="ow">in</span> <span class="p">{</span><span class="n">P</span><span class="p">}</span><span class="n">ython</span><span class="p">},</span>
+    <span class="n">journal</span> <span class="o">=</span> <span class="p">{</span><span class="n">Journal</span> <span class="n">of</span> <span class="n">Open</span> <span class="n">Source</span> <span class="n">Software</span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Additionally, you have the possibility to cite a specific version of TESPy to
+make your work reproducible. The source code of every version is published on
+zenodo. Find your version here: <a class="reference external" href="https://doi.org/10.5281/zenodo.2555866">https://doi.org/10.5281/zenodo.2555866</a>.</p>
+</section>
+<section id="license">
+<h2>License<a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h2>
+<p>Copyright (c) 2017-2021 oemof developer group</p>
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the “Software”), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:</p>
+<p>The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.</p>
+<p>THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Thermal Engineering Systems in Python" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="installation.html" class="btn btn-neutral float-right" title="Installation and setup" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2020, Francesco Witte.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

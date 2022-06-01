@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Starting value tutorial &mdash; tespy 0.6.0 - Colored Chemicals documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> tespy
+            <img src="../_static/logo_tespy_mid.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.6.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Thermal Engineering Systems in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../first_steps.html">First steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials_examples.html">Examples and Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tespy_modules.html">TESPy modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tespy_analyses.html">Thermodynamic analyses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developing_tespy.html">Developing TESPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zliterature.html">Literature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">tespy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Starting value tutorial</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tutorials_examples/tutorial_starting_values.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="starting-value-tutorial">
+<h1>Starting value tutorial<a class="headerlink" href="#starting-value-tutorial" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#subjekt" id="id3">Subjekt</a></p></li>
+<li><p><a class="reference internal" href="#task" id="id4">Task</a></p></li>
+<li><p><a class="reference internal" href="#application" id="id5">Application</a></p></li>
+</ul>
+</div>
+<section id="subjekt">
+<h2><a class="toc-backref" href="#contents">Subjekt</a><a class="headerlink" href="#subjekt" title="Permalink to this headline">¶</a></h2>
+<p>In numerical and iterative methods, a start value is a certain value of a
+variable with which a calculation is started. With more complex TESPy models
+it can happen that the simulation does not convert. The numerics of the solver
+is vulnerable if the specified variables are not primary variables. These are
+variables that can be solved after one iteration. For example, pressures,
+temperatures and enthalpies are among to them. Because of that it is
+recommended to give these parameter for your simulation.</p>
+</section>
+<section id="task">
+<h2><a class="toc-backref" href="#contents">Task</a><a class="headerlink" href="#task" title="Permalink to this headline">¶</a></h2>
+<p>After learning to create simple heat pump with TESPy, the goal is to model
+more complex systems. After the successful creation of the network,
+components, connections and parameterization, it is often the problem that the
+simulation does not convert.</p>
+<div class="admonition error">
+<p class="admonition-title">Error</p>
+<p>Singularity in jacobian matrix, calculation aborted! Make sure
+your network does not have any linear dependencies in the parametrisation.
+Other reasons might be</p>
+<p>-&gt; given temperature with given pressure in two phase region, try setting
+enthalpy instead or provide accurate starting value for pressure.</p>
+<p>-&gt; given logarithmic temperature differences or kA-values for heat
+exchangers.</p>
+<p>-&gt; support better starting values.</p>
+<p>-&gt; bad starting value for fuel mass flow of combustion chamber, provide
+small (near to zero, but not zero) starting value.</p>
+</div>
+<p>To fix this error, it is recommended to create a stable calculation first.
+This is used to have suitable starting values for the actual calculation.</p>
+</section>
+<section id="application">
+<h2><a class="toc-backref" href="#contents">Application</a><a class="headerlink" href="#application" title="Permalink to this headline">¶</a></h2>
+<p>Following the first tutorial a heat pumps with internal heat exchangers is
+considered. You can see the plant topology in the figure.</p>
+<figure class="align-center" id="id1">
+<img alt="tutorials_examples/api/_images/tutorial_sv_heat_pump_intheatex.svg" src="tutorials_examples/api/_images/tutorial_sv_heat_pump_intheatex.svg" /><figcaption>
+<p><span class="caption-text">Figure: Topology of heat pump with internal heat exchanger</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>It consists of a consumer system, a valve, an evaporator system, a compressor
+and additionally of an internal heat exchanger.
+In order to simulate this heat pump, the TESPy model has to be built up.
+First, the network has to be initialized and the refrigerants used have to be
+specified. In this example the heat pump work with ammonia (NH<sub>3</sub>) and
+water (H<sub>2</sub>O). Furthermore, it is recommended to define the unit
+system not to work with variables set to SI-Units.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tespy.networks</span> <span class="kn">import</span> <span class="n">Network</span>
+
+<span class="c1"># network</span>
+<span class="n">nw</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span>
+    <span class="n">fluids</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;water&#39;</span><span class="p">,</span> <span class="s1">&#39;NH3&#39;</span><span class="p">],</span>
+    <span class="n">T_unit</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="n">p_unit</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="n">h_unit</span><span class="o">=</span><span class="s1">&#39;kJ / kg&#39;</span><span class="p">,</span> <span class="n">m_unit</span><span class="o">=</span><span class="s1">&#39;kg / s&#39;</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<p>After that the required components have to be created.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Condenser</span><span class="p">,</span> <span class="n">Compressor</span><span class="p">,</span> <span class="n">CycleCloser</span><span class="p">,</span>  <span class="n">HeatExchanger</span><span class="p">,</span>
+    <span class="n">HeatExchangerSimple</span><span class="p">,</span> <span class="n">Pump</span><span class="p">,</span> <span class="n">Sink</span><span class="p">,</span> <span class="n">Source</span><span class="p">,</span> <span class="n">Valve</span>
+    <span class="p">)</span>
+
+<span class="c1"># components</span>
+<span class="n">cycle_closer</span> <span class="o">=</span> <span class="n">CycleCloser</span><span class="p">(</span><span class="s1">&#39;Refrigerant Cycle Closer&#39;</span><span class="p">)</span>
+
+<span class="c1"># heat source</span>
+<span class="n">heatsource_feedflow</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span><span class="s1">&#39;Heat Source Feed Flow&#39;</span><span class="p">)</span>
+<span class="n">heatsource_pump</span> <span class="o">=</span> <span class="n">Pump</span><span class="p">(</span><span class="s1">&#39;Heat Source Recirculation Pump&#39;</span><span class="p">)</span>
+<span class="n">heatsource_evaporator</span> <span class="o">=</span> <span class="n">HeatExchanger</span><span class="p">(</span><span class="s1">&#39;Heat Source Evaporator&#39;</span><span class="p">)</span>
+<span class="n">heatsource_backflow</span> <span class="o">=</span> <span class="n">Sink</span><span class="p">(</span><span class="s1">&#39;Heat Source Back Flow&#39;</span><span class="p">)</span>
+
+<span class="c1"># compression</span>
+<span class="n">compressor</span> <span class="o">=</span> <span class="n">Compressor</span><span class="p">(</span><span class="s1">&#39;Compressor&#39;</span><span class="p">)</span>
+
+<span class="c1"># heat sink</span>
+<span class="n">cons_pump</span> <span class="o">=</span> <span class="n">Pump</span><span class="p">(</span><span class="s1">&#39;Heat Sink Recirculation Pump&#39;</span><span class="p">)</span>
+<span class="n">condenser</span> <span class="o">=</span> <span class="n">Condenser</span><span class="p">(</span><span class="s1">&#39;Heat Sink Condenser&#39;</span><span class="p">)</span>
+<span class="n">cons_heatsink</span> <span class="o">=</span> <span class="n">HeatExchangerSimple</span><span class="p">(</span><span class="s1">&#39;Heat Consumer&#39;</span><span class="p">)</span>
+<span class="n">cons_cycle_closer</span> <span class="o">=</span> <span class="n">CycleCloser</span><span class="p">(</span><span class="s1">&#39;Consumer Feed Flow&#39;</span><span class="p">)</span>
+
+<span class="c1"># internal heat exchange</span>
+<span class="n">int_heatex</span> <span class="o">=</span> <span class="n">HeatExchanger</span><span class="p">(</span><span class="s1">&#39;Internal Heat Exchanger&#39;</span><span class="p">)</span>
+
+<span class="c1"># expansion</span>
+<span class="n">valve</span> <span class="o">=</span> <span class="n">Valve</span><span class="p">(</span><span class="s1">&#39;Expansion Valve&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the heat pump operates in a supercritical range, the condenser has to
+be replaced with a heat exchanger.</p>
+</div>
+<p>Now the connections according to the topology have to be linked. For a better
+overview of the results it is recommended to label the connections.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tespy.connections</span> <span class="kn">import</span> <span class="n">Connection</span>
+
+<span class="c1"># connections</span>
+<span class="c1"># heat source</span>
+<span class="n">cc2hs_eva</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">cycle_closer</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">heatsource_evaporator</span><span class="p">,</span> <span class="s1">&#39;in2&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;cc2hs_eva&#39;</span><span class="p">)</span>
+<span class="n">hs_feed2hs_pump</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">heatsource_feedflow</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">heatsource_pump</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;hs_feed2hs_pump&#39;</span><span class="p">)</span>
+<span class="n">hs_pump2hs_eva</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">heatsource_pump</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">heatsource_evaporator</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;hs_pump2hs_eva&#39;</span><span class="p">)</span>
+<span class="n">hs_eva2hs_back</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span>
+    <span class="n">heatsource_evaporator</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">heatsource_backflow</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;hs_eva2hs_back&#39;</span>
+    <span class="p">)</span>
+
+<span class="n">nw</span><span class="o">.</span><span class="n">add_conns</span><span class="p">(</span><span class="n">cc2hs_eva</span><span class="p">,</span> <span class="n">hs_feed2hs_pump</span><span class="p">,</span> <span class="n">hs_pump2hs_eva</span><span class="p">,</span> <span class="n">hs_eva2hs_back</span><span class="p">)</span>
+
+<span class="c1"># internal heat exchange cold side</span>
+<span class="n">hs_eva2int_heatex</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span>
+    <span class="n">heatsource_evaporator</span><span class="p">,</span> <span class="s1">&#39;out2&#39;</span><span class="p">,</span> <span class="n">int_heatex</span><span class="p">,</span> <span class="s1">&#39;in2&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;hs_eva2int_heatex&#39;</span>
+    <span class="p">)</span>
+
+<span class="n">nw</span><span class="o">.</span><span class="n">add_conns</span><span class="p">(</span><span class="n">hs_eva2int_heatex</span><span class="p">)</span>
+
+<span class="c1"># compression</span>
+<span class="n">int_heatex2comp</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">int_heatex</span><span class="p">,</span> <span class="s1">&#39;out2&#39;</span><span class="p">,</span> <span class="n">compressor</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;int_heatex2comp&#39;</span><span class="p">)</span>
+<span class="n">comp2cond</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">compressor</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">condenser</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;comp2cond&#39;</span><span class="p">)</span>
+
+<span class="n">nw</span><span class="o">.</span><span class="n">add_conns</span><span class="p">(</span><span class="n">int_heatex2comp</span><span class="p">,</span> <span class="n">comp2cond</span><span class="p">)</span>
+
+<span class="c1"># heat sink</span>
+<span class="n">cons_back2cons_pump</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span>
+<span class="n">cons_cycle_closer</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">cons_pump</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;cons_back2cons_pump&#39;</span>
+    <span class="p">)</span>
+<span class="n">cons_pump2cond</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">cons_pump</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">condenser</span><span class="p">,</span> <span class="s1">&#39;in2&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;cons_pump2cond&#39;</span><span class="p">)</span>
+<span class="n">cond2cons_hs</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">condenser</span><span class="p">,</span> <span class="s1">&#39;out2&#39;</span><span class="p">,</span> <span class="n">cons_heatsink</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;cond2cons_hs&#39;</span><span class="p">)</span>
+<span class="n">cons_hs2cons_feed</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span>
+    <span class="n">cons_heatsink</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">cons_cycle_closer</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;cons_hs2cons_feed&#39;</span>
+    <span class="p">)</span>
+
+<span class="n">nw</span><span class="o">.</span><span class="n">add_conns</span><span class="p">(</span><span class="n">cons_back2cons_pump</span><span class="p">,</span> <span class="n">cons_pump2cond</span><span class="p">,</span> <span class="n">cond2cons_hs</span><span class="p">,</span> <span class="n">cons_hs2cons_feed</span><span class="p">)</span>
+
+<span class="c1"># internal heat exchange hot side</span>
+<span class="n">cond2int_heatex</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">condenser</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">int_heatex</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;cond2int_heatex&#39;</span><span class="p">)</span>
+
+<span class="n">nw</span><span class="o">.</span><span class="n">add_conns</span><span class="p">(</span><span class="n">cond2int_heatex</span><span class="p">)</span>
+
+<span class="c1"># expansion</span>
+<span class="n">int_heatex2valve</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">int_heatex</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">valve</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;int_heatex2valve&#39;</span><span class="p">)</span>
+<span class="n">valve2cc</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">valve</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">cycle_closer</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;valve2cc&#39;</span><span class="p">)</span>
+
+<span class="n">nw</span><span class="o">.</span><span class="n">add_conns</span><span class="p">(</span><span class="n">int_heatex2valve</span><span class="p">,</span> <span class="n">valve2cc</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>After the initialization of the network and the creation of the components and
+connections, a stable parameterization is built up to have suitable initial
+values for the actual simulation.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To create a stable simulation, it is recommended to set pressure and
+enthalpie values instead of temperature values. In this example, fixed
+points can be identified with the help of the logph diagram which you can
+see in the figure.</p>
+<p>On the one hand the point behind the evaporator is fixed. At this point
+the vapor content of the ammonia is at 100% (x=1). Furthermore, it is
+recommended to specify the pressure in order to clearly determine the
+point. On the other hand the point behind the condenser is fixed, too.
+At these point the ammonia has a vapor content of 0% (x=0). As before, the
+pressure value has also to be set.</p>
+</div>
+<figure class="align-center" id="id2">
+<img alt="tutorials_examples/api/_images/tutorial_sv_logph.svg" src="tutorials_examples/api/_images/tutorial_sv_logph.svg" /><figcaption>
+<p><span class="caption-text">Figure: Logph diagram of ammonia</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>In addition to the fixed evaporation and condensation points, the fluids to be
+used, the feedflow and backflow temperatures of the consumer and heat source
+as well as the enthalpy between internal heat exchanger and valve have to be
+defined.</p>
+<p>To correctly determine the enthalpies and pressures, CoolProp is to be
+imported. It is important to note that the PropertySI function (PropsSI) works
+with SI unit. These may differ from the units defined in the network.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">CoolProp.CoolProp</span> <span class="k">as</span> <span class="nn">CP</span>
+
+<span class="c1"># parametrization connections</span>
+<span class="c1"># set feedflow and backflow temperature of heat source and consumer</span>
+<span class="n">T_hs_bf</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">T_hs_ff</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">T_cons_bf</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="n">T_cons_ff</span> <span class="o">=</span> <span class="mi">90</span>
+
+<span class="c1"># evaporation point</span>
+<span class="n">h_eva</span> <span class="o">=</span> <span class="n">CP</span><span class="o">.</span><span class="n">PropsSI</span><span class="p">(</span><span class="s1">&#39;H&#39;</span><span class="p">,</span> <span class="s1">&#39;Q&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="n">T_hs_bf</span> <span class="o">-</span> <span class="mi">5</span> <span class="o">+</span> <span class="mi">273</span><span class="p">,</span> <span class="s1">&#39;NH3&#39;</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e-3</span>
+<span class="n">p_eva</span> <span class="o">=</span> <span class="n">CP</span><span class="o">.</span><span class="n">PropsSI</span><span class="p">(</span><span class="s1">&#39;P&#39;</span><span class="p">,</span> <span class="s1">&#39;Q&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="n">T_hs_bf</span> <span class="o">-</span> <span class="mi">5</span> <span class="o">+</span> <span class="mi">273</span><span class="p">,</span> <span class="s1">&#39;NH3&#39;</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e-5</span>
+<span class="n">hs_eva2int_heatex</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">p_eva</span><span class="p">)</span>
+
+<span class="c1"># condensation point</span>
+<span class="n">h_cond</span> <span class="o">=</span> <span class="n">CP</span><span class="o">.</span><span class="n">PropsSI</span><span class="p">(</span><span class="s1">&#39;H&#39;</span><span class="p">,</span> <span class="s1">&#39;Q&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="n">T_cons_ff</span> <span class="o">+</span> <span class="mi">5</span> <span class="o">+</span> <span class="mi">273</span><span class="p">,</span> <span class="s1">&#39;NH3&#39;</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e-3</span>
+<span class="n">p_cond</span> <span class="o">=</span> <span class="n">CP</span><span class="o">.</span><span class="n">PropsSI</span><span class="p">(</span><span class="s1">&#39;P&#39;</span><span class="p">,</span> <span class="s1">&#39;Q&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="n">T_cons_ff</span> <span class="o">+</span> <span class="mi">5</span> <span class="o">+</span> <span class="mi">273</span><span class="p">,</span> <span class="s1">&#39;NH3&#39;</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e-5</span>
+<span class="n">cond2int_heatex</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="n">p_cond</span><span class="p">)</span>
+
+<span class="c1"># internal heat exchanger to valve</span>
+<span class="n">int_heatex2valve</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">h</span><span class="o">=</span><span class="n">h_cond</span> <span class="o">*</span> <span class="mf">0.99</span><span class="p">,</span> <span class="n">fluid</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;water&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;NH3&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+
+<span class="c1"># consumer cycle</span>
+<span class="n">cond2cons_hs</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">T</span><span class="o">=</span><span class="n">T_cons_ff</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">fluid</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;water&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;NH3&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
+<span class="n">cons_hs2cons_feed</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">T</span><span class="o">=</span><span class="n">T_cons_bf</span><span class="p">)</span>
+
+<span class="c1"># heat source cycle</span>
+<span class="n">hs_feed2hs_pump</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">T</span><span class="o">=</span><span class="n">T_hs_ff</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">fluid</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;water&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;NH3&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
+<span class="n">hs_eva2hs_back</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">T</span><span class="o">=</span><span class="n">T_hs_bf</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Some components have to be parameterized. For the heat source and heat sink
+recirculation pump as well as the conedenser the isentropic efficiency is to
+be set. Further we set the pressure ratios on hot and cold side for the
+condenser, evaporator and internal heat exchanger. The consumer will have
+pressure losses, too.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># parametrization components</span>
+<span class="c1"># isentropic efficiency</span>
+<span class="n">cons_pump</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">eta_s</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+<span class="n">heatsource_pump</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">eta_s</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+<span class="n">compressor</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">eta_s</span><span class="o">=</span><span class="mf">0.85</span><span class="p">)</span>
+
+<span class="c1"># pressure ratios</span>
+<span class="n">condenser</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">pr1</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span> <span class="n">pr2</span><span class="o">=</span><span class="mf">0.99</span><span class="p">)</span>
+<span class="n">heatsource_evaporator</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">pr1</span><span class="o">=</span><span class="mf">0.98</span><span class="p">,</span> <span class="n">pr2</span><span class="o">=</span><span class="mf">0.98</span><span class="p">)</span>
+<span class="n">cons_heatsink</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">pr</span><span class="o">=</span><span class="mf">0.99</span><span class="p">)</span>
+<span class="n">int_heatex</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">pr1</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span> <span class="n">pr2</span><span class="o">=</span><span class="mf">0.99</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The most important parameter is the consumers heat demand setting as
+“key parameter”. After that the network can be solved and a stable simulation
+can be used for further simulations.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># key parameter</span>
+<span class="n">cons_heatsink</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">val</span><span class="o">=-</span><span class="mf">1e6</span><span class="p">)</span>
+
+<span class="c1"># solve the network</span>
+<span class="n">nw</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="s1">&#39;design&#39;</span><span class="p">)</span>
+<span class="n">nw</span><span class="o">.</span><span class="n">print_results</span><span class="p">()</span>
+
+<span class="c1"># calculate and print COP</span>
+<span class="n">cop</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span>
+    <span class="n">cons_heatsink</span><span class="o">.</span><span class="n">P</span><span class="o">.</span><span class="n">val</span>
+    <span class="o">/</span> <span class="p">(</span><span class="n">cons_pump</span><span class="o">.</span><span class="n">P</span><span class="o">.</span><span class="n">val</span> <span class="o">+</span> <span class="n">heatsource_pump</span><span class="o">.</span><span class="n">P</span><span class="o">.</span><span class="n">val</span> <span class="o">+</span> <span class="n">compressor</span><span class="o">.</span><span class="n">P</span><span class="o">.</span><span class="n">val</span><span class="p">)</span>
+    <span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;COP = </span><span class="si">{</span><span class="n">cop</span><span class="si">:</span><span class="s1">.4</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>After that, enthalpies and pressures can be set as “None” and the desired
+values for the upper or lower terminal temperature differences, references or
+other unstable values can be set for the actual simulation.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2020, Francesco Witte.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

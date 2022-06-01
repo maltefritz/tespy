@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fluid properties &mdash; tespy 0.6.0 - Colored Chemicals documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> tespy
+            <img src="../_static/logo_tespy_mid.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.6.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Thermal Engineering Systems in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../first_steps.html">First steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials_examples.html">Examples and Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tespy_modules.html">TESPy modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tespy_analyses.html">Thermodynamic analyses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developing_tespy.html">Developing TESPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zliterature.html">Literature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">tespy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Fluid properties</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tespy_modules/fluid_properties.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="fluid-properties">
+<h1>Fluid properties<a class="headerlink" href="#fluid-properties" title="Permalink to this headline">¶</a></h1>
+<p>The basic fluid properties are handled by
+<a class="reference external" href="http://www.coolprop.org/">CoolProp</a>. All available fluids can be found on
+their homepage. Also see <span id="id1">[<a class="reference internal" href="../zliterature.html#id3" title="Ian H. Bell, Jorrit Wronski, Sylvain Quoilin, and Vincent Lemort. Pure and pseudo-pure fluid thermophysical property evaluation and the open-source thermophysical property library coolprop. Industrial &amp; Engineering Chemistry Research, 53(6):2498-2508, 2014. doi:10.1021/ie4033999.">BWQL14</a>]</span>.</p>
+<section id="coolprop-back-ends">
+<h2>CoolProp back ends<a class="headerlink" href="#coolprop-back-ends" title="Permalink to this headline">¶</a></h2>
+<p>CoolProp provides multiple back ends for fluid property calculation. The
+back ends vary in calculation speed and calculation accuracy. It is possible
+to choose from the following back ends:</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">HEOS</span></code>: Helmhotz Equation Of State with highest accuracy and lowest
+calculation speed. <strong>This is the default back end!</strong></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">BICUBIC</span></code>: Tabular back end with high accuracy and very high
+calculation speed.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">TTSE</span></code>: Tabular back end with lowest accuracy and very high calculation
+speed.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">INCOMP</span></code>: Back end for incompressible fluids.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">IF97</span></code>: Back end for the IAPWS-IF97 of water, very accurate and much
+higher calculation speed than <code class="code docutils literal notranslate"><span class="pre">HEOS</span></code>. Due to a bug in the CoolProp
+back end this option is available with a fix (not the original
+implementation), for more information see the
+<a class="reference external" href="https://github.com/CoolProp/CoolProp/issues/1918/">CoolProp issue #1918</a>.</p></li>
+</ul>
+<p>For more information on the Back ends please visit the CoolProp online
+documentation.</p>
+</section>
+<section id="pure-and-pseudo-pure-fluids">
+<h2>Pure and pseudo-pure fluids<a class="headerlink" href="#pure-and-pseudo-pure-fluids" title="Permalink to this headline">¶</a></h2>
+<p>If you use pure fluids, TESPy directly uses CoolProp functions to gather all
+fluid properties. CoolProp covers the most important fluids such as water, air
+as a pseudo-pure fluid as well as its components, several fuels and
+refrigerants etc.. Look for the aliases in the list of
+<a class="reference external" href="http://www.coolprop.org/fluid_properties/PurePseudoPure.html">fluids</a>.
+All fluids provided in this list cover liquid and gaseous state and the
+two-phase region.</p>
+</section>
+<section id="incompressible-fluids">
+<h2>Incompressible fluids<a class="headerlink" href="#incompressible-fluids" title="Permalink to this headline">¶</a></h2>
+<p>If you are looking for heat transfer fluids, the list of incompressible
+<a class="reference external" href="http://www.coolprop.org/fluid_properties/Incompressibles.html">fluids</a>
+might be interesting for you. In contrast to the pure fluids, the properties
+cover liquid state only.</p>
+</section>
+<section id="fluid-mixtures">
+<h2>Fluid mixtures<a class="headerlink" href="#fluid-mixtures" title="Permalink to this headline">¶</a></h2>
+<p>CoolProp provides fluid properties for two component mixtures. BUT: These are
+NOT integrated in TESPy! Nevertheless, you can use fluid mixtures for gases.</p>
+<section id="ideal-mixtures-of-gaseous-fluids">
+<h3>Ideal mixtures of gaseous fluids<a class="headerlink" href="#ideal-mixtures-of-gaseous-fluids" title="Permalink to this headline">¶</a></h3>
+<p>TESPy can handle mixtures of gaseous fluids, by using the single fluid
+properties from CoolProp together with corresponding equations for mixtures.
+The equations can be found in the
+<a class="reference internal" href="../api/tespy.tools.html#module-tespy.tools.fluid_properties" title="tespy.tools.fluid_properties"><code class="xref py py-mod docutils literal notranslate"><span class="pre">fluid_properties</span></code></a> module and are
+applied automatically to the fluid vector.</p>
+</section>
+<section id="other-mixtures">
+<h3>Other mixtures<a class="headerlink" href="#other-mixtures" title="Permalink to this headline">¶</a></h3>
+<p>Apart from partially liquid water in flue gases it is <strong>not possible</strong> to use
+mixtures of liquids and other liquids or gaseous fluids <strong>at the moment</strong>! If
+you try to use a mixture of two liquid or gaseous fluids and liquid fluids,
+e.g. water and methanol, the equations will still be applied, but obviously
+return wrong values. If you have ideas for the implementation of new kinds of
+mixtures we appreciate you contacting us.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2020, Francesco Witte.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

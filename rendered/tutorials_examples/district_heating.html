@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Distric heating system &mdash; tespy 0.6.0 - Colored Chemicals documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> tespy
+            <img src="../_static/logo_tespy_mid.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.6.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Thermal Engineering Systems in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../first_steps.html">First steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials_examples.html">Examples and Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tespy_modules.html">TESPy modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tespy_analyses.html">Thermodynamic analyses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developing_tespy.html">Developing TESPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zliterature.html">Literature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">tespy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Distric heating system</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tutorials_examples/district_heating.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="distric-heating-system">
+<h1>Distric heating system<a class="headerlink" href="#distric-heating-system" title="Permalink to this headline">¶</a></h1>
+<p>The district heating system is a great example for the usage of flexible
+user-defined subsystems. The example system and data are based on the district
+heating system Hamburg Wilhelmsburg <span id="id1">[<a class="reference internal" href="../zliterature.html#id17" title="Peter Lorenzen. Das Wärmenetz als Speicher im Smart Grid: Betriebsführung eines Wärmenetzesin Kombination mit einem stromgeführten Heizkraftwerk. Hochschule für angewandte Wissenschaften Hamburg, 2014. doi:20.500.12738/6561.">Lor14</a>]</span>. The source code for
+this example can be found
+<a class="reference external" href="https://github.com/oemof/oemof-examples/tree/master/oemof_examples/tespy/district_heating">here</a>.
+Although the structure of the system (see the Figure below) does not seem very
+complex, it has more than 120 components. But we can easily determine repeating
+structures for the consumers and this is, where the subsystems come in place.</p>
+<figure class="align-center" id="id2">
+<img alt="tutorials_examples/api/_images/dhs.svg" src="tutorials_examples/api/_images/dhs.svg" /><figcaption>
+<p><span class="caption-text">Figure: Topology of the heating system.</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>The single consumers are connected to the main grid with a control valve at
+the outlet and each fork is connected with a pipe to the next fork. Also, the
+main grid may have a dead end (e.g. in the housing areas, see subsystem
+closed) or is open to connect to another part of the grid (industrial area,
+see subsystem open). Additionally, each branch of the main grid is connected to
+the upstream part with the fork subsystem (Ki, see subsystem fork).</p>
+<figure class="align-center" id="id3">
+<img alt="tutorials_examples/api/_images/dhs_closed.svg" src="tutorials_examples/api/_images/dhs_closed.svg" /><figcaption>
+<p><span class="caption-text">Figure: Generic topology of the dead end subsystem.</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id4">
+<img alt="tutorials_examples/api/_images/dhs_open.svg" src="tutorials_examples/api/_images/dhs_open.svg" /><figcaption>
+<p><span class="caption-text">Figure: Generic topology of the open subsystem.</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id5">
+<img alt="tutorials_examples/api/_images/dhs_forks.svg" src="tutorials_examples/api/_images/dhs_forks.svg" /><figcaption>
+<p><span class="caption-text">Figure: Generic topology of the forks (variable number of branches).</span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>After the system has been set up, we designed the pipes’ insulation in a way,
+that the feed flow the temperature gradient is at 1 K / 100 m and the back flow
+gradient is at 0.5 K / 100 m. Having designed the system, heat losses at
+different ambient temperatures can be calculated, as the heat transfer
+coefficient for the pipes has been calculated in the design case. By this way,
+it is for example possible to apply load profiles for the consumers as well as
+a profile for the ambient temperature to investigate the network heat losses
+over a specific period of time.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2020, Francesco Witte.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>v0.2.2 - Rankine’s Realm (March, 6, 2020) &mdash; tespy 0.6.0 - Colored Chemicals documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> tespy
+            <img src="../_static/logo_tespy_mid.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.6.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Thermal Engineering Systems in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../first_steps.html">First steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials_examples.html">Examples and Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tespy_modules.html">TESPy modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tespy_analyses.html">Thermodynamic analyses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developing_tespy.html">Developing TESPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zliterature.html">Literature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">tespy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>v0.2.2 - Rankine’s Realm (March, 6, 2020)</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/whats_new/v0-2-2.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="v0-2-2-rankine-s-realm-march-6-2020">
+<h1>v0.2.2 - Rankine’s Realm (March, 6, 2020)<a class="headerlink" href="#v0-2-2-rankine-s-realm-march-6-2020" title="Permalink to this headline">¶</a></h1>
+<section id="new-features">
+<h2>New Features<a class="headerlink" href="#new-features" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Allow initialisation for the primary variables from previous calculation.
+Until now, the user needed to save the network’s state and reload that state
+for his next simulation. This feature is enabled as default. If you want to
+disable this feature, you need to state
+<code class="code docutils literal notranslate"><span class="pre">mynetwork.solve(...,</span> <span class="pre">init_previous=False)</span></code>
+(<a class="reference external" href="https://github.com/oemof/tespy/pull/156">PR #156</a>).</p></li>
+<li><p>Extrapolation for characteristic lines is available. In default state, the
+upper or lower value range limit is used when a characteristic line is
+evaluated outside of the available x-value range. The <code class="code docutils literal notranslate"><span class="pre">extrapolate</span></code>
+parameter allows linear extrapolation, for an example see the corresponding
+sections in the online documentation:
+<a class="reference internal" href="../tespy_modules/components.html#component-characteristic-specification-label"><span class="std std-ref">component characteristics</span></a>,
+<a class="reference internal" href="../tespy_modules.html#using-tespy-characteristics-label"><span class="std std-ref">tespy characteristics</span></a>
+(<a class="reference external" href="https://github.com/oemof/tespy/pull/159">PR #159</a>).</p></li>
+<li><p>Add a new component evaporator for geothermal organic rankine cycle. The
+component has inlets for geothermal steam brine. On the cold side, the orc
+working fluid is evaporated. Read more about this component in the API
+documentation: <a class="reference internal" href="../api/tespy.components.html#module-tespy.components.customs.orc_evaporator" title="tespy.components.customs.orc_evaporator"><code class="xref py py-class docutils literal notranslate"><span class="pre">tespy.components.customs.orc_evaporator</span></code></a>
+(<a class="reference external" href="https://github.com/oemof/tespy/pull/148">PR #148</a>).</p></li>
+</ul>
+</section>
+<section id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Add method for automatic citations and references
+(<a class="reference external" href="https://github.com/oemof/tespy/pull/163">PR #163</a>).</p></li>
+</ul>
+</section>
+<section id="parameter-renaming">
+<h2>Parameter renaming<a class="headerlink" href="#parameter-renaming" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="testing">
+<h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Add convergence checks for all component tests. Some tests did not fail, even
+if the calculation did not converge
+(<a class="reference external" href="https://github.com/oemof/tespy/pull/153">PR #153</a>).</p></li>
+<li><p>Improve coverage of the networks module
+(<a class="reference external" href="https://github.com/oemof/tespy/pull/153">PR #153</a>).</p></li>
+<li><p>Add tests for characteristic line and map evaluation
+(<a class="reference external" href="https://github.com/oemof/tespy/pull/159">PR #159</a>).</p></li>
+</ul>
+</section>
+<section id="bug-fixes">
+<h2>Bug fixes<a class="headerlink" href="#bug-fixes" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Fix the bugged tests for compressor characteristic maps
+(<code class="xref py py-meth docutils literal notranslate"><span class="pre">tespy.components.turbomachinery.compressor.char_map_func()</span></code>). The
+pressure ratio factor of the lowest speedline available in the default data
+ranges from about 0.2 to 0.5. Therefore the design pressure ratio should be
+higher than 5 (<a class="reference external" href="https://github.com/oemof/tespy/pull/156">PR #156</a>).</p></li>
+</ul>
+</section>
+<section id="other-changes">
+<h2>Other changes<a class="headerlink" href="#other-changes" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Use the method <code class="xref py py-meth docutils literal notranslate"><span class="pre">tespy.components.components.component.fluid_deriv()</span></code>
+for all components, that do not change composition between an inlet and the
+respective outlet (<a class="reference external" href="https://github.com/oemof/tespy/pull/153">PR #153</a>).</p></li>
+<li><p>Adjust the method <code class="xref py py-meth docutils literal notranslate"><span class="pre">tespy.components.components.component.zeta_func()</span></code>
+to work with all zeta value specifications
+(<a class="reference external" href="https://github.com/oemof/tespy/pull/153">PR #153</a>).</p></li>
+</ul>
+</section>
+<section id="contributors">
+<h2>Contributors<a class="headerlink" href="#contributors" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Francesco Witte (<a class="reference external" href="https://github.com/fwitte">&#64;fwitte</a>)</p></li>
+<li><p><a class="reference external" href="https://github.com/maltefritz">&#64;maltefritz</a></p></li>
+<li><p><a class="reference external" href="https://github.com/ChaofanChen">&#64;ChaofanChen</a></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2020, Francesco Witte.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tespy.tools.data_containers &mdash; tespy 0.6.0 - Colored Chemicals documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> tespy
+            <img src="../../../_static/logo_tespy_mid.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.6.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../introduction.html">Thermal Engineering Systems in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../first_steps.html">First steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials_examples.html">Examples and Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tespy_modules.html">TESPy modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tespy_analyses.html">Thermodynamic analyses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developing_tespy.html">Developing TESPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../zliterature.html">Literature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">tespy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>tespy.tools.data_containers</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for tespy.tools.data_containers</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8</span>
+
+<span class="sd">&quot;&quot;&quot;Module for data container classes.</span>
+
+<span class="sd">The DataContainer class and its subclasses are used to store component or</span>
+<span class="sd">connection properties.</span>
+
+
+<span class="sd">This file is part of project TESPy (github.com/oemof/tespy). It&#39;s copyrighted</span>
+<span class="sd">by the contributors recorded in the version control history of the file,</span>
+<span class="sd">available from its original location tespy/tools/data_containers.py</span>
+
+<span class="sd">SPDX-License-Identifier: MIT</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1"># %%</span>
+
+
+<div class="viewcode-block" id="DataContainer"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.data_containers.DataContainer">[docs]</a><span class="k">class</span> <span class="nc">DataContainer</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The DataContainer is parent class for all data containers.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    **kwargs :</span>
+<span class="sd">        See the class documentation of desired DataContainer for available</span>
+<span class="sd">        keywords.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    The initialisation method (:code:`__init__`), setter method</span>
+<span class="sd">    (:code:`set_attr`) and getter method (:code:`get_attr`) are used for</span>
+<span class="sd">    instances of class DataContainer and its children. TESPy uses different</span>
+<span class="sd">    :code:`DataContainer` classes for specific objectives:</span>
+
+<span class="sd">    - component characteristics</span>
+<span class="sd">      :py:class:`tespy.tools.data_containers.ComponentCharacteristics`</span>
+<span class="sd">    - component characteristic maps</span>
+<span class="sd">      :py:class:`tespy.tools.data_containers.ComponentCharacteristicMaps`</span>
+<span class="sd">    - component properties</span>
+<span class="sd">      :py:class:`tespy.tools.data_containers.ComponentProperties`</span>
+<span class="sd">    - grouped component properites</span>
+<span class="sd">      :py:class:`tespy.tools.data_containers.GroupedComponentProperties`</span>
+<span class="sd">    - fluid composition</span>
+<span class="sd">      :py:class:`tespy.tools.data_containers.FluidComposition`</span>
+<span class="sd">    - fluid properties</span>
+<span class="sd">      :py:class:`tespy.tools.data_containers.FluidProperties`</span>
+
+<span class="sd">    Grouped component properties are used, if more than one component property</span>
+<span class="sd">    has to be specified in order to apply one equation, e.g. pressure drop in</span>
+<span class="sd">    pipes by specified length, diameter and roughness. If you specify all three</span>
+<span class="sd">    of these properties, the DataContainer for the group will be created</span>
+<span class="sd">    automatically!</span>
+
+<span class="sd">    For the full list of available parameters for each data container, see its</span>
+<span class="sd">    documentation.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    The examples below show the different (sub-)classes of DataContainers</span>
+<span class="sd">    available.</span>
+
+<span class="sd">    &gt;&gt;&gt; from tespy.tools.data_containers import (</span>
+<span class="sd">    ... ComponentCharacteristics, ComponentCharacteristicMaps,</span>
+<span class="sd">    ... ComponentProperties, FluidComposition, GroupedComponentProperties,</span>
+<span class="sd">    ... FluidProperties, DataContainerSimple)</span>
+<span class="sd">    &gt;&gt;&gt; from tespy.components import Pipe</span>
+<span class="sd">    &gt;&gt;&gt; type(ComponentCharacteristicMaps(is_set=True))</span>
+<span class="sd">    &lt;class &#39;tespy.tools.data_containers.ComponentCharacteristicMaps&#39;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; type(ComponentCharacteristics(is_set=True, param=&#39;m&#39;))</span>
+<span class="sd">    &lt;class &#39;tespy.tools.data_containers.ComponentCharacteristics&#39;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; type(ComponentProperties(val=100, is_set=True, is_var=True,</span>
+<span class="sd">    ...      max_val=1000, min_val=1))</span>
+<span class="sd">    &lt;class &#39;tespy.tools.data_containers.ComponentProperties&#39;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; pi = Pipe(&#39;testpipe&#39;, L=100, D=0.5, ks=5e-5)</span>
+<span class="sd">    &gt;&gt;&gt; type(GroupedComponentProperties(is_set=True,</span>
+<span class="sd">    ...      elements=[pi.L, pi.D, pi.ks], method=&#39;default&#39;))</span>
+<span class="sd">    &lt;class &#39;tespy.tools.data_containers.GroupedComponentProperties&#39;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; type(FluidComposition(</span>
+<span class="sd">    ... val={&#39;CO2&#39;: 0.1, &#39;H2O&#39;: 0.11, &#39;N2&#39;: 0.75, &#39;O2&#39;: 0.03},</span>
+<span class="sd">    ... val_set={&#39;CO2&#39;: False, &#39;H2O&#39;: False, &#39;N2&#39;: False, &#39;O2&#39;: True},</span>
+<span class="sd">    ... balance=False))</span>
+<span class="sd">    &lt;class &#39;tespy.tools.data_containers.FluidComposition&#39;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; type(FluidProperties(val=5, val_SI=500000, val_set=True, unit=&#39;bar&#39;,</span>
+<span class="sd">    ...      ref=None, ref_set=False))</span>
+<span class="sd">    &lt;class &#39;tespy.tools.data_containers.FluidProperties&#39;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; type(DataContainerSimple(val=5, is_set=False))</span>
+<span class="sd">    &lt;class &#39;tespy.tools.data_containers.DataContainerSimple&#39;&gt;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attr</span><span class="p">()</span>
+
+        <span class="c1"># default values</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">var</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">key</span><span class="p">:</span> <span class="n">var</span><span class="p">[</span><span class="n">key</span><span class="p">]})</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DataContainer.set_attr"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.data_containers.DataContainer.set_attr">[docs]</a>    <span class="k">def</span> <span class="nf">set_attr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets, resets or unsets attributes of a DataContainer type object.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        **kwargs :</span>
+<span class="sd">            See the class documentation of desired DataContainer for available</span>
+<span class="sd">            keywords.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attr</span><span class="p">()</span>
+        <span class="c1"># specify values</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">var</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">key</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]})</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Data container of type &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span>
+                       <span class="s1">&#39; has no attribute &#39;</span> <span class="o">+</span> <span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataContainer.get_attr"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.data_containers.DataContainer.get_attr">[docs]</a>    <span class="k">def</span> <span class="nf">get_attr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the value of a DataContainer&#39;s attribute.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : str</span>
+<span class="sd">            The attribute you want to retrieve.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        out :</span>
+<span class="sd">            Specified attribute.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Datacontainer of type &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span>
+                   <span class="s1">&#39; has no attribute </span><span class="se">\&quot;</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\&quot;</span><span class="s1">.&#39;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataContainer.attr"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.data_containers.DataContainer.attr">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">attr</span><span class="p">():</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the available attributes for a DataContainer type object.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        out : dict</span>
+<span class="sd">            Dictionary of available attributes (dictionary keys) with default</span>
+<span class="sd">            values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{}</span></div></div>
+
+
+<div class="viewcode-block" id="ComponentCharacteristics"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.data_containers.ComponentCharacteristics">[docs]</a><span class="k">class</span> <span class="nc">ComponentCharacteristics</span><span class="p">(</span><span class="n">DataContainer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Data container for component characteristics.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    func : tespy.components.characteristics.characteristics</span>
+<span class="sd">        Function to be applied for this characteristics, default: None.</span>
+
+<span class="sd">    is_set : boolean</span>
+<span class="sd">        Should this equation be applied?, default: is_set=False.</span>
+
+<span class="sd">    param : str</span>
+<span class="sd">        Which parameter should be applied as the x value?</span>
+<span class="sd">        default: method=&#39;default&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ComponentCharacteristics.attr"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.data_containers.ComponentCharacteristics.attr">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">attr</span><span class="p">():</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the available attributes for a ComponentCharacteristics</span>
+<span class="sd">        type object.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        out : dict</span>
+<span class="sd">            Dictionary of available attributes (dictionary keys) with default</span>
+<span class="sd">            values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;char_func&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;is_set&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;param&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s1">&#39;func_params&#39;</span><span class="p">:</span> <span class="p">{},</span> <span class="s1">&#39;func&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;deriv&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;latex&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s1">&#39;char_params&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;rel&#39;</span><span class="p">,</span> <span class="s1">&#39;inconn&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;outconn&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+            <span class="s1">&#39;num_eq&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span></div></div>
+
+
+<div class="viewcode-block" id="ComponentCharacteristicMaps"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.data_containers.ComponentCharacteristicMaps">[docs]</a><span class="k">class</span> <span class="nc">ComponentCharacteristicMaps</span><span class="p">(</span><span class="n">DataContainer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Data container for characteristic maps.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    func : tespy.components.characteristics.characteristics</span>
+<span class="sd">        Function to be applied for this characteristic map, default: None.</span>
+
+<span class="sd">    is_set : boolean</span>
+<span class="sd">        Should this equation be applied?, default: is_set=False.</span>
+
+<span class="sd">    param : str</span>
+<span class="sd">        Which parameter should be applied as the x value?</span>
+<span class="sd">        default: method=&#39;default&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ComponentCharacteristicMaps.attr"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.data_containers.ComponentCharacteristicMaps.attr">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">attr</span><span class="p">():</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the available attributes for a ComponentCharacteristicMaps type</span>
+<span class="sd">        object.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        out : dict</span>
+<span class="sd">            Dictionary of available attributes (dictionary keys) with default</span>
+<span class="sd">            values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;char_func&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;is_set&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;param&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;latex&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s1">&#39;func_params&#39;</span><span class="p">:</span> <span class="p">{},</span> <span class="s1">&#39;func&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;deriv&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s1">&#39;num_eq&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span></div></div>
+
+
+<div class="viewcode-block" id="ComponentProperties"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.data_containers.ComponentProperties">[docs]</a><span class="k">class</span> <span class="nc">ComponentProperties</span><span class="p">(</span><span class="n">DataContainer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Data container for component properties.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    val : float</span>
+<span class="sd">        Value for this component attribute, default: val=1.</span>
+
+<span class="sd">    val_SI : float</span>
+<span class="sd">        Value in SI_unit (available for temperatures only, unit transformation</span>
+<span class="sd">        according to network&#39;s temperature unit), default: val_SI=0.</span>
+
+<span class="sd">    is_set : boolean</span>
+<span class="sd">        Has the value for this attribute been set?, default: is_set=False.</span>
+
+<span class="sd">    is_var : boolean</span>
+<span class="sd">        Is this attribute part of the system variables?, default: is_var=False.</span>
+
+<span class="sd">    d : float</span>
+<span class="sd">        Interval width for numerical calculation of partial derivative towards</span>
+<span class="sd">        this attribute, it is part of the system variables, default d=1e-4.</span>
+
+<span class="sd">    min_val : float</span>
+<span class="sd">        Minimum value for this attribute, used if attribute is part of the</span>
+<span class="sd">        system variables, default: min_val=1.1e-4.</span>
+
+<span class="sd">    max_val : float</span>
+<span class="sd">        Maximum value for this attribute, used if attribute is part of the</span>
+<span class="sd">        system variables, default: max_val=1e12.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ComponentProperties.attr"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.data_containers.ComponentProperties.attr">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">attr</span><span class="p">():</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the available attributes for a ComponentProperties type object.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        out : dict</span>
+<span class="sd">            Dictionary of available attributes (dictionary keys) with default</span>
+<span class="sd">            values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;val&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;val_SI&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;is_set&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">:</span> <span class="mf">1e-4</span><span class="p">,</span>
+            <span class="s1">&#39;min_val&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mf">1e12</span><span class="p">,</span> <span class="s1">&#39;max_val&#39;</span><span class="p">:</span> <span class="mf">1e12</span><span class="p">,</span> <span class="s1">&#39;is_var&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s1">&#39;val_ref&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;design&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="s1">&#39;is_result&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s1">&#39;num_eq&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;func_params&#39;</span><span class="p">:</span> <span class="p">{},</span> <span class="s1">&#39;func&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;deriv&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s1">&#39;latex&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span></div></div>
+
+
+<div class="viewcode-block" id="FluidComposition"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.data_containers.FluidComposition">[docs]</a><span class="k">class</span> <span class="nc">FluidComposition</span><span class="p">(</span><span class="n">DataContainer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Data container for fluid composition.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    val : dict</span>
+<span class="sd">        Mass fractions of the fluids in a mixture, default: val={}.</span>
+<span class="sd">        Pattern for dictionary: keys are fluid name, values are mass fractions.</span>
+
+<span class="sd">    val0 : dict</span>
+<span class="sd">        Starting values for mass fractions of the fluids in a mixture,</span>
+<span class="sd">        default: val0={}. Pattern for dictionary: keys are fluid name, values</span>
+<span class="sd">        are mass fractions.</span>
+
+<span class="sd">    val_set : dict</span>
+<span class="sd">        Which fluid mass fractions have been set, default val_set={}.</span>
+<span class="sd">        Pattern for dictionary: keys are fluid name, values are True or False.</span>
+
+<span class="sd">    balance : boolean</span>
+<span class="sd">        Should the fluid balance equation be applied for this mixture?</span>
+<span class="sd">        default: False.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="FluidComposition.attr"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.data_containers.FluidComposition.attr">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">attr</span><span class="p">():</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the available attributes for a FluidComposition type object.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        out : dict</span>
+<span class="sd">            Dictionary of available attributes (dictionary keys) with default</span>
+<span class="sd">            values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;val&#39;</span><span class="p">:</span> <span class="p">{},</span> <span class="s1">&#39;val0&#39;</span><span class="p">:</span> <span class="p">{},</span> <span class="s1">&#39;val_set&#39;</span><span class="p">:</span> <span class="p">{},</span>
+                <span class="s1">&#39;design&#39;</span><span class="p">:</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">(),</span> <span class="s1">&#39;balance&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span></div></div>
+
+
+<div class="viewcode-block" id="GroupedComponentProperties"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.data_containers.GroupedComponentProperties">[docs]</a><span class="k">class</span> <span class="nc">GroupedComponentProperties</span><span class="p">(</span><span class="n">DataContainer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Data container for grouped component parameters.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    is_set : boolean</span>
+<span class="sd">        Should the equation for this parameter group be applied?</span>
+<span class="sd">        default: is_set=False.</span>
+
+<span class="sd">    method : str</span>
+<span class="sd">        Which calculation method for this parameter group should be used?</span>
+<span class="sd">        default: method=&#39;default&#39;.</span>
+
+<span class="sd">    elements : list</span>
+<span class="sd">        Which component properties are part of this component group?</span>
+<span class="sd">        default elements=[].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="GroupedComponentProperties.attr"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.data_containers.GroupedComponentProperties.attr">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">attr</span><span class="p">():</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the available attributes for a GroupedComponentProperties type</span>
+<span class="sd">        object.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        out : dict</span>
+<span class="sd">            Dictionary of available attributes (dictionary keys) with default</span>
+<span class="sd">            values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;is_set&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;method&#39;</span><span class="p">:</span> <span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="s1">&#39;elements&#39;</span><span class="p">:</span> <span class="p">[],</span>
+                <span class="s1">&#39;func&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;deriv&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;num_eq&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;latex&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="s1">&#39;func_params&#39;</span><span class="p">:</span> <span class="p">{}}</span></div></div>
+
+
+<div class="viewcode-block" id="GroupedComponentCharacteristics"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.data_containers.GroupedComponentCharacteristics">[docs]</a><span class="k">class</span> <span class="nc">GroupedComponentCharacteristics</span><span class="p">(</span><span class="n">DataContainer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Data container for grouped component characteristics.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    is_set : boolean</span>
+<span class="sd">        Should the equation for this parameter group be applied?</span>
+<span class="sd">        default: is_set=False.</span>
+
+<span class="sd">    elements : list</span>
+<span class="sd">        Which component properties are part of this component group?</span>
+<span class="sd">        default elements=[].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="GroupedComponentCharacteristics.attr"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.data_containers.GroupedComponentCharacteristics.attr">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">attr</span><span class="p">():</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the available attributes for a GroupedComponentCharacteristics</span>
+<span class="sd">        type object.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        out : dict</span>
+<span class="sd">            Dictionary of available attributes (dictionary keys) with default</span>
+<span class="sd">            values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;is_set&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;elements&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;func&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;deriv&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="s1">&#39;num_eq&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;latex&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;func_params&#39;</span><span class="p">:</span> <span class="p">{}}</span></div></div>
+
+
+<div class="viewcode-block" id="FluidProperties"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.data_containers.FluidProperties">[docs]</a><span class="k">class</span> <span class="nc">FluidProperties</span><span class="p">(</span><span class="n">DataContainer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Data container for fluid properties.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    val : float</span>
+<span class="sd">        Value in user specified unit (or network unit) if unit is unspecified,</span>
+<span class="sd">        default: val=np.nan.</span>
+
+<span class="sd">    val0 : float</span>
+<span class="sd">        Starting value in user specified unit (or network unit) if unit is</span>
+<span class="sd">        unspecified, default: val0=np.nan.</span>
+
+<span class="sd">    val_SI : float</span>
+<span class="sd">        Value in SI_unit, default: val_SI=0.</span>
+
+<span class="sd">    val_set : boolean</span>
+<span class="sd">        Has the value for this property been set? default: val_set=False.</span>
+
+<span class="sd">    ref : tespy.connections.ref</span>
+<span class="sd">        Reference object, default: ref=None.</span>
+
+<span class="sd">    ref_set : boolean</span>
+<span class="sd">        Has a value for this property been referenced to another connection?</span>
+<span class="sd">        default: ref_set=False.</span>
+
+<span class="sd">    unit : str</span>
+<span class="sd">        Unit for this property, default: ref=None.</span>
+
+<span class="sd">    unit : boolean</span>
+<span class="sd">        Has the unit for this property been specified manually by the user?</span>
+<span class="sd">        default: unit_set=False.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="FluidProperties.attr"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.data_containers.FluidProperties.attr">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">attr</span><span class="p">():</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the available attributes for a FluidProperties type object.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        out : dict</span>
+<span class="sd">            Dictionary of available attributes (dictionary keys) with default</span>
+<span class="sd">            values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;val&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="s1">&#39;val0&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="s1">&#39;val_SI&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;val_set&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s1">&#39;ref&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;ref_set&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;unit&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;design&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">}</span></div></div>
+
+
+<div class="viewcode-block" id="DataContainerSimple"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.data_containers.DataContainerSimple">[docs]</a><span class="k">class</span> <span class="nc">DataContainerSimple</span><span class="p">(</span><span class="n">DataContainer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Simple data container without data type restrictions to val field.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    val : no specific datatype</span>
+<span class="sd">        Value for the property, no predefined datatype.</span>
+
+<span class="sd">    is_set : boolean</span>
+<span class="sd">        Has the value for this property been set? default: val_set=False.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="DataContainerSimple.attr"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.data_containers.DataContainerSimple.attr">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">attr</span><span class="p">():</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the available attributes for a DataContainerSimple type object.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        out : dict</span>
+<span class="sd">            Dictionary of available attributes (dictionary keys) with default</span>
+<span class="sd">            values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;val&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="s1">&#39;is_set&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s1">&#39;func_params&#39;</span><span class="p">:</span> <span class="p">{},</span> <span class="s1">&#39;func&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;deriv&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;latex&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s1">&#39;num_eq&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2020, Francesco Witte.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

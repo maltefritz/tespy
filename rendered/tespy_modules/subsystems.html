@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Subsystems and component groups &mdash; tespy 0.6.0 - Colored Chemicals documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> tespy
+            <img src="../_static/logo_tespy_mid.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.6.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Thermal Engineering Systems in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../first_steps.html">First steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials_examples.html">Examples and Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tespy_modules.html">TESPy modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tespy_analyses.html">Thermodynamic analyses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developing_tespy.html">Developing TESPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zliterature.html">Literature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">tespy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Subsystems and component groups</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tespy_modules/subsystems.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="subsystems-and-component-groups">
+<span id="tespy-subsystems-label"></span><h1>Subsystems and component groups<a class="headerlink" href="#subsystems-and-component-groups" title="Permalink to this headline">¶</a></h1>
+<p>Subsystems are an easy way to add frequently used component groups such as a
+drum with evaporator or a preheater with desuperheater to your system. In this
+section you will learn how to create a subsystem and implement it in your work.
+The subsystems are highly customizable and thus a very powerful tool, if you
+require to use specific component groups frequently. We provide an example, of
+how to create a simple subsystem and use it in a simulation.</p>
+<section id="custom-subsystems">
+<h2>Custom subsystems<a class="headerlink" href="#custom-subsystems" title="Permalink to this headline">¶</a></h2>
+<p>Create a <code class="code docutils literal notranslate"><span class="pre">.py</span></code> file in your working-directory. This file contains the
+class definition of your subsystem and at minimum two methods:</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">create_comps</span></code>: Method to create the components of your subsystem and
+save them in the <code class="code docutils literal notranslate"><span class="pre">Subsystem.comps</span></code> attribute (dictionary).</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">create_conns</span></code>: Method to create the connections of your subsystem and
+save them in the <code class="code docutils literal notranslate"><span class="pre">Subsystem.conns</span></code> attribute (dictionary).</p></li>
+</ul>
+<p>All other functionalities are inherited by the parent class of the
+<a class="reference internal" href="../api/tespy.components.html#tespy.components.subsystem.Subsystem" title="tespy.components.subsystem.Subsystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">subsystem</span></code></a> object.</p>
+</section>
+<section id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<section id="create-the-subsystem">
+<h3>Create the subsystem<a class="headerlink" href="#create-the-subsystem" title="Permalink to this headline">¶</a></h3>
+<p>We create a subsystem for the usage of a waste heat steam generator. The
+subsystem is built up of a superheater, an evaporator, a drum and an economizer
+as seen in the figure below.</p>
+<figure class="align-center" id="id1">
+<img alt="tespy_modules/api/_images/subsystem_waste_heat_generator.svg" src="tespy_modules/api/_images/subsystem_waste_heat_generator.svg" /><figcaption>
+<p><span class="caption-text">Figure: Topology of the waste heat steam generator.</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>Create a file, e.g. <code class="code docutils literal notranslate"><span class="pre">mysubsystems.py</span></code> and add the following lines:</p>
+<ul class="simple">
+<li><p>Imports of the necessary classes from tespy.</p></li>
+<li><p>Class definition of the subsystem (inheriting from subsystem class).</p></li>
+<li><p>Methods for component and connection creation. Both, components and
+connections, are stored in a dictionary for easy access by their respective
+label.</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="n">Subsystem</span><span class="p">,</span> <span class="n">HeatExchanger</span><span class="p">,</span> <span class="n">Drum</span>
+<span class="kn">from</span> <span class="nn">tespy.connections</span> <span class="kn">import</span> <span class="n">Connection</span>
+
+
+<span class="k">class</span> <span class="nc">WasteHeatSteamGenerator</span><span class="p">(</span><span class="n">Subsystem</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Class documentation&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">create_comps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create the subsystem&#39;s components.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">comps</span><span class="p">[</span><span class="s1">&#39;eco&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">HeatExchanger</span><span class="p">(</span><span class="s1">&#39;economizer&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">comps</span><span class="p">[</span><span class="s1">&#39;eva&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">HeatExchanger</span><span class="p">(</span><span class="s1">&#39;evaporator&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">comps</span><span class="p">[</span><span class="s1">&#39;sup&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">HeatExchanger</span><span class="p">(</span><span class="s1">&#39;superheater&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">comps</span><span class="p">[</span><span class="s1">&#39;drum&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Drum</span><span class="p">(</span><span class="s1">&#39;drum&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">create_conns</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Define the subsystem&#39;s connections.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conns</span><span class="p">[</span><span class="s1">&#39;eco_dr&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">comps</span><span class="p">[</span><span class="s1">&#39;eco&#39;</span><span class="p">],</span> <span class="s1">&#39;out2&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">comps</span><span class="p">[</span><span class="s1">&#39;drum&#39;</span><span class="p">],</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conns</span><span class="p">[</span><span class="s1">&#39;dr_eva&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">comps</span><span class="p">[</span><span class="s1">&#39;drum&#39;</span><span class="p">],</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">comps</span><span class="p">[</span><span class="s1">&#39;eva&#39;</span><span class="p">],</span> <span class="s1">&#39;in2&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conns</span><span class="p">[</span><span class="s1">&#39;eva_dr&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">comps</span><span class="p">[</span><span class="s1">&#39;eva&#39;</span><span class="p">],</span> <span class="s1">&#39;out2&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">comps</span><span class="p">[</span><span class="s1">&#39;drum&#39;</span><span class="p">],</span> <span class="s1">&#39;in2&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conns</span><span class="p">[</span><span class="s1">&#39;dr_sup&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">comps</span><span class="p">[</span><span class="s1">&#39;drum&#39;</span><span class="p">],</span> <span class="s1">&#39;out2&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">comps</span><span class="p">[</span><span class="s1">&#39;sup&#39;</span><span class="p">],</span> <span class="s1">&#39;in2&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conns</span><span class="p">[</span><span class="s1">&#39;sup_eva&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">comps</span><span class="p">[</span><span class="s1">&#39;sup&#39;</span><span class="p">],</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">comps</span><span class="p">[</span><span class="s1">&#39;eva&#39;</span><span class="p">],</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conns</span><span class="p">[</span><span class="s1">&#39;eva_eco&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">comps</span><span class="p">[</span><span class="s1">&#39;eva&#39;</span><span class="p">],</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">comps</span><span class="p">[</span><span class="s1">&#39;eco&#39;</span><span class="p">],</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="import-your-subsystem">
+<h3>Import your subsystem<a class="headerlink" href="#import-your-subsystem" title="Permalink to this headline">¶</a></h3>
+<p>In a different script, we create a network and import the subsystem we just
+created along with the different tespy classes required. The location of the
+<code class="code docutils literal notranslate"><span class="pre">mysubsystems.py</span></code> file must be known by your python installation or lie
+within the same folder as your script.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tespy.networks</span> <span class="kn">import</span> <span class="n">Network</span>
+<span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="n">Source</span><span class="p">,</span> <span class="n">Sink</span>
+<span class="kn">from</span> <span class="nn">tespy.connections</span> <span class="kn">import</span> <span class="n">Connection</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">mysubsystems</span> <span class="kn">import</span> <span class="n">WasteHeatSteamGenerator</span> <span class="k">as</span> <span class="n">WHSG</span>
+
+<span class="c1"># %% network definition</span>
+
+<span class="n">fluid_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;air&#39;</span><span class="p">,</span> <span class="s1">&#39;water&#39;</span><span class="p">]</span>
+<span class="n">nw</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span><span class="n">fluid_list</span><span class="p">,</span> <span class="n">p_unit</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="n">T_unit</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">)</span>
+
+<span class="c1"># %% component definition</span>
+
+<span class="n">feed_water</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span><span class="s1">&#39;feed water inlet&#39;</span><span class="p">)</span>
+<span class="n">steam</span> <span class="o">=</span> <span class="n">Sink</span><span class="p">(</span><span class="s1">&#39;live steam outlet&#39;</span><span class="p">)</span>
+
+<span class="n">waste_heat</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span><span class="s1">&#39;waste heat inlet&#39;</span><span class="p">)</span>
+<span class="n">chimney</span> <span class="o">=</span> <span class="n">Sink</span><span class="p">(</span><span class="s1">&#39;waste heat chimney&#39;</span><span class="p">)</span>
+
+<span class="n">sg</span> <span class="o">=</span> <span class="n">WHSG</span><span class="p">(</span><span class="s1">&#39;waste heat steam generator&#39;</span><span class="p">)</span>
+
+<span class="c1"># %% connection definition</span>
+
+<span class="n">fw_sg</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">feed_water</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">sg</span><span class="o">.</span><span class="n">comps</span><span class="p">[</span><span class="s1">&#39;eco&#39;</span><span class="p">],</span> <span class="s1">&#39;in2&#39;</span><span class="p">)</span>
+<span class="n">sg_ls</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">sg</span><span class="o">.</span><span class="n">comps</span><span class="p">[</span><span class="s1">&#39;sup&#39;</span><span class="p">],</span> <span class="s1">&#39;out2&#39;</span><span class="p">,</span> <span class="n">steam</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+<span class="n">fg_sg</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">waste_heat</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">sg</span><span class="o">.</span><span class="n">comps</span><span class="p">[</span><span class="s1">&#39;sup&#39;</span><span class="p">],</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+<span class="n">sg_ch</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">sg</span><span class="o">.</span><span class="n">comps</span><span class="p">[</span><span class="s1">&#39;eco&#39;</span><span class="p">],</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">chimney</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+
+<span class="n">nw</span><span class="o">.</span><span class="n">add_conns</span><span class="p">(</span><span class="n">fw_sg</span><span class="p">,</span> <span class="n">sg_ls</span><span class="p">,</span> <span class="n">fg_sg</span><span class="p">,</span> <span class="n">sg_ch</span><span class="p">)</span>
+<span class="n">nw</span><span class="o">.</span><span class="n">add_subsys</span><span class="p">(</span><span class="n">sg</span><span class="p">)</span>
+
+<span class="c1"># %% connection parameters</span>
+
+<span class="n">fw_sg</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">fluid</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;air&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;water&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span> <span class="n">T</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+<span class="n">fg_sg</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">fluid</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;air&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;water&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span> <span class="n">T</span><span class="o">=</span><span class="mi">650</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+
+<span class="n">sg_ls</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mi">130</span><span class="p">)</span>
+<span class="n">sg_ch</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">sg</span><span class="o">.</span><span class="n">conns</span><span class="p">[</span><span class="s1">&#39;eva_dr&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
+
+<span class="c1"># %% component parameters</span>
+
+<span class="n">sg</span><span class="o">.</span><span class="n">comps</span><span class="p">[</span><span class="s1">&#39;eco&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">pr1</span><span class="o">=</span><span class="mf">0.999</span><span class="p">,</span>  <span class="n">pr2</span><span class="o">=</span><span class="mf">0.97</span><span class="p">,</span>
+                         <span class="n">design</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;pr1&#39;</span><span class="p">,</span> <span class="s1">&#39;pr2&#39;</span><span class="p">,</span> <span class="s1">&#39;ttd_u&#39;</span><span class="p">],</span>
+                         <span class="n">offdesign</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;zeta1&#39;</span><span class="p">,</span> <span class="s1">&#39;zeta2&#39;</span><span class="p">,</span> <span class="s1">&#39;kA_char&#39;</span><span class="p">])</span>
+
+<span class="n">sg</span><span class="o">.</span><span class="n">comps</span><span class="p">[</span><span class="s1">&#39;eva&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">pr1</span><span class="o">=</span><span class="mf">0.999</span><span class="p">,</span> <span class="n">ttd_l</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">design</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;pr1&#39;</span><span class="p">,</span> <span class="s1">&#39;ttd_l&#39;</span><span class="p">],</span>
+                         <span class="n">offdesign</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;zeta1&#39;</span><span class="p">,</span> <span class="s1">&#39;kA_char&#39;</span><span class="p">])</span>
+
+<span class="n">sg</span><span class="o">.</span><span class="n">comps</span><span class="p">[</span><span class="s1">&#39;sup&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">pr1</span><span class="o">=</span><span class="mf">0.999</span><span class="p">,</span>  <span class="n">pr2</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span> <span class="n">ttd_u</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+                         <span class="n">design</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;pr1&#39;</span><span class="p">,</span> <span class="s1">&#39;pr2&#39;</span><span class="p">,</span> <span class="s1">&#39;ttd_u&#39;</span><span class="p">],</span>
+                         <span class="n">offdesign</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;zeta1&#39;</span><span class="p">,</span> <span class="s1">&#39;zeta2&#39;</span><span class="p">,</span> <span class="s1">&#39;kA_char&#39;</span><span class="p">])</span>
+
+<span class="n">sg</span><span class="o">.</span><span class="n">conns</span><span class="p">[</span><span class="s1">&#39;eco_dr&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">Td_bp</span><span class="o">=-</span><span class="mi">5</span><span class="p">,</span> <span class="n">design</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Td_bp&#39;</span><span class="p">])</span>
+
+<span class="c1"># %% solve</span>
+
+<span class="c1"># solve design case</span>
+<span class="n">nw</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="s1">&#39;design&#39;</span><span class="p">)</span>
+<span class="n">nw</span><span class="o">.</span><span class="n">print_results</span><span class="p">()</span>
+<span class="n">nw</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;tmp&#39;</span><span class="p">)</span>
+
+<span class="c1"># offdesign test</span>
+<span class="n">nw</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="s1">&#39;offdesign&#39;</span><span class="p">,</span> <span class="n">design_path</span><span class="o">=</span><span class="s1">&#39;tmp&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="add-more-flexibility">
+<h2>Add more flexibility<a class="headerlink" href="#add-more-flexibility" title="Permalink to this headline">¶</a></h2>
+<p>If you want to add even more flexibility, you might need to manipulate the
+<code class="code docutils literal notranslate"><span class="pre">__init__</span></code> method of your custom subsystem class. Usually, you do not
+need to override this method. However, if you need additional parameters, e.g.
+in order to alter the subsystem’s topology or specify additional information,
+take a look at the <a class="reference internal" href="../api/tespy.components.html#tespy.components.subsystem.Subsystem" title="tespy.components.subsystem.Subsystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">tespy.components.subsystem.Subsystem</span></code></a> class and
+add your code between the label declaration and the components and connection
+creation in the <code class="code docutils literal notranslate"><span class="pre">__init__</span></code> method.</p>
+<p>For example, if you want a variable number of inlets and outlets because you
+have a variable number of components groups within your subsystem, you may
+introduce an attribute which is set on initialisation and lets you create and
+parameterize components and connections generically. This might be very
+interesting for district heating systems, turbines with several sections of
+equal topology, etc.. For a good start, you can have a look at the
+<code class="code docutils literal notranslate"><span class="pre">sub_consumer.py</span></code> of the district heating network in the
+<a class="reference external" href="https://github.com/oemof/oemof-examples/tree/master/oemof_examples/tespy/district_heating">oemof_examples</a>
+repository.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2020, Francesco Witte.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

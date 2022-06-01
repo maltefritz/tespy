@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tespy.components.reactors.water_electrolyzer &mdash; tespy 0.6.0 - Colored Chemicals documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../../index.html" class="icon icon-home"> tespy
+            <img src="../../../../_static/logo_tespy_mid.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.6.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../introduction.html">Thermal Engineering Systems in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installation and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../first_steps.html">First steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials_examples.html">Examples and Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tespy_modules.html">TESPy modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tespy_analyses.html">Thermodynamic analyses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../developing_tespy.html">Developing TESPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../zliterature.html">Literature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">tespy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+      <li>tespy.components.reactors.water_electrolyzer</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for tespy.components.reactors.water_electrolyzer</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8</span>
+
+<span class="sd">&quot;&quot;&quot;Module of class WaterElectrolyzer.</span>
+
+
+<span class="sd">This file is part of project TESPy (github.com/oemof/tespy). It&#39;s copyrighted</span>
+<span class="sd">by the contributors recorded in the version control history of the file,</span>
+<span class="sd">available from its original location</span>
+<span class="sd">tespy/components/reactors/water_electrolyzer.py</span>
+
+<span class="sd">SPDX-License-Identifier: MIT</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">import</span> <span class="nn">CoolProp.CoolProp</span> <span class="k">as</span> <span class="nn">CP</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">tespy.components.component</span> <span class="kn">import</span> <span class="n">Component</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.data_containers</span> <span class="kn">import</span> <span class="n">ComponentCharacteristics</span> <span class="k">as</span> <span class="n">dc_cc</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.data_containers</span> <span class="kn">import</span> <span class="n">ComponentProperties</span> <span class="k">as</span> <span class="n">dc_cp</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.document_models</span> <span class="kn">import</span> <span class="n">generate_latex_eq</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.fluid_properties</span> <span class="kn">import</span> <span class="n">T_mix_ph</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.fluid_properties</span> <span class="kn">import</span> <span class="n">dT_mix_dph</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.fluid_properties</span> <span class="kn">import</span> <span class="n">dT_mix_pdh</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.fluid_properties</span> <span class="kn">import</span> <span class="n">h_mix_pT</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.global_vars</span> <span class="kn">import</span> <span class="n">molar_masses</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.helpers</span> <span class="kn">import</span> <span class="n">TESPyComponentError</span>
+
+<span class="c1"># %%</span>
+
+
+<div class="viewcode-block" id="WaterElectrolyzer"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer">[docs]</a><span class="k">class</span> <span class="nc">WaterElectrolyzer</span><span class="p">(</span><span class="n">Component</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The water electrolyzer produces hydrogen and oxygen from water and power.</span>
+
+<span class="sd">    **Mandatory Equations**</span>
+
+<span class="sd">    - :py:meth:`tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.fluid_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.mass_flow_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.reactor_pressure_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.energy_balance_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.gas_temperature_func`</span>
+
+<span class="sd">    **Optional Equations**</span>
+
+<span class="sd">    - cooling loop:</span>
+
+<span class="sd">      - :py:meth:`tespy.components.component.Component.zeta_func`</span>
+<span class="sd">      - :py:meth:`tespy.components.component.Component.pr_func`</span>
+
+<span class="sd">    - :py:meth:`tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.eta_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.eta_char_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.heat_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.specific_energy_consumption_func`</span>
+
+<span class="sd">    Inlets/Outlets</span>
+
+<span class="sd">    - in1 (cooling inlet), in2 (feed water inlet)</span>
+<span class="sd">    - out1 (cooling outlet), out2 (hydrogen outlet), out3 (oxigen outlet)</span>
+
+<span class="sd">    Image</span>
+
+<span class="sd">    .. image:: _images/WaterElectrolyzer.svg</span>
+<span class="sd">       :alt: alternative text</span>
+<span class="sd">       :align: center</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    label : str</span>
+<span class="sd">        The label of the component.</span>
+
+<span class="sd">    design : list</span>
+<span class="sd">        List containing design parameters (stated as String).</span>
+
+<span class="sd">    offdesign : list</span>
+<span class="sd">        List containing offdesign parameters (stated as String).</span>
+
+<span class="sd">    design_path : str</span>
+<span class="sd">        Path to the components design case.</span>
+
+<span class="sd">    local_offdesign : boolean</span>
+<span class="sd">        Treat this component in offdesign mode in a design calculation.</span>
+
+<span class="sd">    local_design : boolean</span>
+<span class="sd">        Treat this component in design mode in an offdesign calculation.</span>
+
+<span class="sd">    char_warnings : boolean</span>
+<span class="sd">        Ignore warnings on default characteristics usage for this component.</span>
+
+<span class="sd">    printout : boolean</span>
+<span class="sd">        Include this component in the network&#39;s results printout.</span>
+
+<span class="sd">    P : float, dict, :code:`&quot;var&quot;`</span>
+<span class="sd">        Power input, :math:`P/\text{W}`.</span>
+
+<span class="sd">    Q : float, dict</span>
+<span class="sd">        Heat output of cooling, :math:`Q/\text{W}`</span>
+
+<span class="sd">    e : float, dict, :code:`&quot;var&quot;`</span>
+<span class="sd">        Electrolysis specific energy consumption,</span>
+<span class="sd">        :math:`e/(\text{J}/\text{m}^3)`.</span>
+
+<span class="sd">    eta : float, dict</span>
+<span class="sd">        Electrolysis efficiency, :math:`\eta/1`.</span>
+
+<span class="sd">    eta_char : tespy.tools.characteristics.CharLine, dict</span>
+<span class="sd">        Electrolysis efficiency characteristic line.</span>
+
+<span class="sd">    pr : float, dict, :code:`&quot;var&quot;`</span>
+<span class="sd">        Cooling loop pressure ratio, :math:`pr/1`.</span>
+
+<span class="sd">    zeta : float, dict, :code:`&quot;var&quot;`</span>
+<span class="sd">        Geometry independent friction coefficient for cooling loop pressure</span>
+<span class="sd">        drop, :math:`\frac{\zeta}{D^4}/\frac{1}{\text{m}^4}`.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    Other than usual components, the water electrolyzer has the fluid</span>
+<span class="sd">    composition built into its equations for the feed water inlet and the</span>
+<span class="sd">    hydrogen and oxygen outlet. Thus, the user must not specify the fluid</span>
+<span class="sd">    composition at these connections!</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    Create a water electrolyzer and compress the hydrogen, e.g. for a hydrogen</span>
+<span class="sd">    storage.</span>
+
+<span class="sd">    &gt;&gt;&gt; from tespy.components import (Sink, Source, Compressor,</span>
+<span class="sd">    ... WaterElectrolyzer)</span>
+<span class="sd">    &gt;&gt;&gt; from tespy.connections import Connection</span>
+<span class="sd">    &gt;&gt;&gt; from tespy.networks import Network</span>
+<span class="sd">    &gt;&gt;&gt; from tespy.tools import ComponentCharacteristics as dc_cc</span>
+<span class="sd">    &gt;&gt;&gt; import shutil</span>
+<span class="sd">    &gt;&gt;&gt; fluid_list = [&#39;O2&#39;, &#39;H2O&#39;, &#39;H2&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; nw = Network(fluids=fluid_list, T_unit=&#39;C&#39;, p_unit=&#39;bar&#39;,</span>
+<span class="sd">    ... v_unit=&#39;l / s&#39;, iterinfo=False)</span>
+<span class="sd">    &gt;&gt;&gt; fw = Source(&#39;feed water&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; oxy = Sink(&#39;oxygen sink&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; hydro = Sink(&#39;hydrogen sink&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; cw_cold = Source(&#39;cooling water source&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; cw_hot = Sink(&#39;cooling water sink&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; comp = Compressor(&#39;compressor&#39;, eta_s=0.9)</span>
+<span class="sd">    &gt;&gt;&gt; el = WaterElectrolyzer(&#39;electrolyzer&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; el.component()</span>
+<span class="sd">    &#39;water electrolyzer&#39;</span>
+
+<span class="sd">    The electrolyzer should produce 100 l/s of hydrogen at an operating</span>
+<span class="sd">    pressure of 10 bars and an outlet temperature of 50 °C. The fluid</span>
+<span class="sd">    composition needs to be specified for the cooling liquid only. The storage</span>
+<span class="sd">    pressure is 25 bars. The electrolysis efficiency is at 80 % and the</span>
+<span class="sd">    compressor isentropic efficiency at 85 %. After designing the plant the</span>
+<span class="sd">    offdesign electrolysis efficiency is predicted by the characteristic line.</span>
+<span class="sd">    The default characteristic line can be found here: :py:mod:`tespy.data`.</span>
+
+<span class="sd">    &gt;&gt;&gt; fw_el = Connection(fw, &#39;out1&#39;, el, &#39;in2&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; el_o = Connection(el, &#39;out2&#39;, oxy, &#39;in1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; el_cmp = Connection(el, &#39;out3&#39;, comp, &#39;in1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; cmp_h = Connection(comp, &#39;out1&#39;, hydro, &#39;in1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; cw_el = Connection(cw_cold, &#39;out1&#39;, el, &#39;in1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; el_cw = Connection(el, &#39;out1&#39;, cw_hot, &#39;in1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; nw.add_conns(fw_el, el_o, el_cmp, cmp_h, cw_el, el_cw)</span>
+<span class="sd">    &gt;&gt;&gt; fw_el.set_attr(p=10, T=15)</span>
+<span class="sd">    &gt;&gt;&gt; cw_el.set_attr(p=5, T=15, fluid={&#39;H2O&#39;: 1, &#39;H2&#39;: 0, &#39;O2&#39;: 0})</span>
+<span class="sd">    &gt;&gt;&gt; el_cw.set_attr(T=45)</span>
+<span class="sd">    &gt;&gt;&gt; cmp_h.set_attr(p=25)</span>
+<span class="sd">    &gt;&gt;&gt; el_cmp.set_attr(v=100, T=50)</span>
+<span class="sd">    &gt;&gt;&gt; el.set_attr(eta=0.8, pr=0.99, design=[&#39;eta&#39;, &#39;pr&#39;],</span>
+<span class="sd">    ... offdesign=[&#39;eta_char&#39;, &#39;zeta&#39;])</span>
+<span class="sd">    &gt;&gt;&gt; comp.set_attr(eta_s=0.85)</span>
+<span class="sd">    &gt;&gt;&gt; nw.solve(&#39;design&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; nw.save(&#39;tmp&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; round(el.e0 / el.P.val * el_cmp.m.val_SI, 1)</span>
+<span class="sd">    0.8</span>
+<span class="sd">    &gt;&gt;&gt; P_design = el.P.val / 1e6</span>
+<span class="sd">    &gt;&gt;&gt; round(P_design, 1)</span>
+<span class="sd">    13.2</span>
+<span class="sd">    &gt;&gt;&gt; nw.solve(&#39;offdesign&#39;, design_path=&#39;tmp&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; round(el.eta.val, 1)</span>
+<span class="sd">    0.8</span>
+<span class="sd">    &gt;&gt;&gt; el_cmp.set_attr(v=np.nan)</span>
+<span class="sd">    &gt;&gt;&gt; el.set_attr(P=P_design * 0.66)</span>
+<span class="sd">    &gt;&gt;&gt; nw.solve(&#39;offdesign&#39;, design_path=&#39;tmp&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; round(el.eta.val, 2)</span>
+<span class="sd">    0.88</span>
+<span class="sd">    &gt;&gt;&gt; shutil.rmtree(&#39;./tmp&#39;, ignore_errors=True)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="WaterElectrolyzer.component"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.component">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">component</span><span class="p">():</span>
+        <span class="k">return</span> <span class="s1">&#39;water electrolyzer&#39;</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.get_variables"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.get_variables">[docs]</a>    <span class="k">def</span> <span class="nf">get_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;P&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(</span><span class="n">min_val</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+            <span class="s1">&#39;Q&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(</span>
+                <span class="n">max_val</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_eq</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">deriv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">heat_deriv</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">heat_func</span><span class="p">,</span>
+                <span class="n">latex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">heat_func_doc</span><span class="p">),</span>
+            <span class="s1">&#39;pr&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(</span>
+                <span class="n">max_val</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_eq</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">deriv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pr_deriv</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pr_func</span><span class="p">,</span>
+                <span class="n">func_params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;pr&#39;</span><span class="p">:</span> <span class="s1">&#39;pr&#39;</span><span class="p">},</span> <span class="n">latex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pr_func_doc</span><span class="p">),</span>
+            <span class="s1">&#39;zeta&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(</span>
+                <span class="n">min_val</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_eq</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">deriv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">zeta_deriv</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">zeta_func</span><span class="p">,</span>
+                <span class="n">func_params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;zeta&#39;</span><span class="p">:</span> <span class="s1">&#39;zeta&#39;</span><span class="p">},</span> <span class="n">latex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">zeta_func_doc</span><span class="p">),</span>
+            <span class="s1">&#39;eta&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(</span>
+                <span class="n">min_val</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_val</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_eq</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">latex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">eta_func_doc</span><span class="p">,</span>
+                <span class="n">deriv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">eta_deriv</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">eta_func</span><span class="p">),</span>
+            <span class="s1">&#39;eta_char&#39;</span><span class="p">:</span> <span class="n">dc_cc</span><span class="p">(</span>
+                <span class="n">deriv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">eta_char_deriv</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">eta_char_func</span><span class="p">,</span>
+                <span class="n">latex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">eta_char_func_doc</span><span class="p">,</span> <span class="n">num_eq</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">param</span><span class="o">=</span><span class="s1">&#39;m_out&#39;</span><span class="p">,</span> <span class="n">char_params</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;rel&#39;</span><span class="p">,</span> <span class="s1">&#39;outconn&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}),</span>
+            <span class="s1">&#39;e&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(</span>
+                <span class="n">min_val</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_eq</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">deriv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">specific_energy_consumption_deriv</span><span class="p">,</span>
+                <span class="n">func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">specific_energy_consumption_func</span><span class="p">,</span>
+                <span class="n">latex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">specific_energy_consumption_func_doc</span><span class="p">)</span>
+        <span class="p">}</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.get_mandatory_constraints"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.get_mandatory_constraints">[docs]</a>    <span class="k">def</span> <span class="nf">get_mandatory_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;mass_flow_constraints&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;func&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass_flow_func</span><span class="p">,</span> <span class="s1">&#39;deriv&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass_flow_deriv</span><span class="p">,</span>
+                <span class="s1">&#39;constant_deriv&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;latex&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass_flow_func_doc</span><span class="p">,</span>
+                <span class="s1">&#39;num_eq&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">},</span>
+            <span class="s1">&#39;fluid_constraints&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;func&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">fluid_func</span><span class="p">,</span> <span class="s1">&#39;deriv&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">fluid_deriv</span><span class="p">,</span>
+                <span class="s1">&#39;constant_deriv&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;latex&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">fluid_func_doc</span><span class="p">,</span>
+                <span class="s1">&#39;num_eq&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_nw_fluids</span> <span class="o">*</span> <span class="mi">4</span><span class="p">},</span>
+            <span class="s1">&#39;energy_balance_constraints&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;func&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_balance_func</span><span class="p">,</span>
+                <span class="s1">&#39;deriv&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_balance_deriv</span><span class="p">,</span>
+                <span class="s1">&#39;constant_deriv&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;latex&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_balance_func_doc</span><span class="p">,</span>
+                <span class="s1">&#39;num_eq&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+            <span class="s1">&#39;reactor_pressure_constraints&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;func&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">reactor_pressure_func</span><span class="p">,</span>
+                <span class="s1">&#39;deriv&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">reactor_pressure_deriv</span><span class="p">,</span>
+                <span class="s1">&#39;constant_deriv&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="s1">&#39;latex&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">reactor_pressure_func_doc</span><span class="p">,</span>
+                <span class="s1">&#39;num_eq&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+            <span class="s1">&#39;gas_temperature_constraints&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;func&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">gas_temperature_func</span><span class="p">,</span>
+                <span class="s1">&#39;deriv&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">gas_temperature_deriv</span><span class="p">,</span>
+                <span class="s1">&#39;constant_deriv&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s1">&#39;latex&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">gas_temperature_func_doc</span><span class="p">,</span>
+                <span class="s1">&#39;num_eq&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+        <span class="p">}</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.inlets"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.inlets">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">inlets</span><span class="p">():</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;in1&#39;</span><span class="p">,</span> <span class="s1">&#39;in2&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.outlets"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.outlets">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">outlets</span><span class="p">():</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="s1">&#39;out2&#39;</span><span class="p">,</span> <span class="s1">&#39;out3&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.comp_init"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.comp_init">[docs]</a>    <span class="k">def</span> <span class="nf">comp_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nw</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">P</span><span class="o">.</span><span class="n">is_set</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">P</span><span class="o">=</span><span class="s1">&#39;var&#39;</span><span class="p">)</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;The power input of a water electrolyzer must be set! &#39;</span>
+                   <span class="s1">&#39;We are adding the power input of component &#39;</span> <span class="o">+</span>
+                   <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">+</span> <span class="s1">&#39; as custom variable of the system.&#39;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">fluid</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;o2&#39;</span><span class="p">,</span> <span class="s1">&#39;h2o&#39;</span><span class="p">,</span> <span class="s1">&#39;h2&#39;</span><span class="p">]:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="nb">setattr</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="p">,</span> <span class="n">fluid</span><span class="p">,</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">nw</span><span class="o">.</span><span class="n">fluids</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span>
+                        <span class="n">a</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span>
+                        <span class="n">CP</span><span class="o">.</span><span class="n">get_aliases</span><span class="p">(</span><span class="n">fluid</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
+                    <span class="p">]][</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="s1">&#39;The component &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">+</span> <span class="s1">&#39; (class &#39;</span> <span class="o">+</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39;) requires that the fluid &#39;</span>
+                    <span class="s1">&#39;[fluid] is in the network</span><span class="se">\&#39;</span><span class="s1">s list of fluids.&#39;</span><span class="p">)</span>
+                <span class="n">aliases</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">CP</span><span class="o">.</span><span class="n">get_aliases</span><span class="p">(</span><span class="n">fluid</span><span class="o">.</span><span class="n">upper</span><span class="p">()))</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+                    <span class="s1">&#39;[fluid]&#39;</span><span class="p">,</span> <span class="n">fluid</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39; (aliases: &#39;</span> <span class="o">+</span> <span class="n">aliases</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span><span class="p">)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">TESPyComponentError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">e0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_e0</span><span class="p">()</span>
+
+        <span class="n">Component</span><span class="o">.</span><span class="n">comp_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nw</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.calc_e0"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.calc_e0">[docs]</a>    <span class="k">def</span> <span class="nf">calc_e0</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the minimum specific energy required for electrolysis.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        val : float</span>
+<span class="sd">            Minimum specific energy.</span>
+
+<span class="sd">            .. math::</span>
+<span class="sd">                e0 = -\frac{\sum_i {\Delta H_f^0}_i -</span>
+<span class="sd">                \sum_j {\Delta H_f^0}_j }</span>
+<span class="sd">                {M_{H_2}}\\</span>
+<span class="sd">                \forall i \in \text{reation products},\\</span>
+<span class="sd">                \forall j \in \text{reation educts},\\</span>
+<span class="sd">                \Delta H_f^0: \text{molar formation enthalpy}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">hf</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">hf</span><span class="p">[</span><span class="s1">&#39;H2O&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">286000</span>
+        <span class="n">hf</span><span class="p">[</span><span class="s1">&#39;H2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">hf</span><span class="p">[</span><span class="s1">&#39;O2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="n">molar_masses</span><span class="p">[</span><span class="s1">&#39;H2&#39;</span><span class="p">]</span>
+        <span class="n">e0</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">hf</span><span class="p">[</span><span class="s1">&#39;H2O&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">hf</span><span class="p">[</span><span class="s1">&#39;H2&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">hf</span><span class="p">[</span><span class="s1">&#39;O2&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">M</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">e0</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.gas_temperature_func"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.gas_temperature_func">[docs]</a>    <span class="k">def</span> <span class="nf">gas_temperature_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Equation for temperature equality of product gases.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        residual : float</span>
+<span class="sd">            Residual value of equation.</span>
+
+<span class="sd">            .. math::</span>
+
+<span class="sd">                0 = T_\mathrm{out,2} - T_\mathrm{out,3}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">T_mix_ph</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_flow</span><span class="p">())</span> <span class="o">-</span>
+            <span class="n">T_mix_ph</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">get_flow</span><span class="p">()))</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.gas_temperature_func_doc"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.gas_temperature_func_doc">[docs]</a>    <span class="k">def</span> <span class="nf">gas_temperature_func_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Equation for temperature equality of product gases.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        label : str</span>
+<span class="sd">            Label for equation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        latex : str</span>
+<span class="sd">            LaTeX code of equations applied.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">latex</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;0 = T_\mathrm{out,2} - T_\mathrm{out,3}&#39;</span>
+        <span class="k">return</span> <span class="n">generate_latex_eq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latex</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.gas_temperature_deriv"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.gas_temperature_deriv">[docs]</a>    <span class="k">def</span> <span class="nf">gas_temperature_deriv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">increment_filter</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Partial derivatives for product gas temperature function.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        increment_filter : ndarray</span>
+<span class="sd">            Matrix for filtering non-changing variables.</span>
+
+<span class="sd">        k : int</span>
+<span class="sd">            Position of derivatives in Jacobian matrix (k-th equation).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># derivatives for outlet 1</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">increment_filter</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">dT_mix_dph</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_flow</span><span class="p">())</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">increment_filter</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">dT_mix_pdh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_flow</span><span class="p">())</span>
+
+        <span class="c1"># derivatives for outlet 2</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">increment_filter</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">dT_mix_dph</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">get_flow</span><span class="p">())</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">increment_filter</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">dT_mix_pdh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">get_flow</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.eta_func"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.eta_func">[docs]</a>    <span class="k">def</span> <span class="nf">eta_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Equation for electrolysis efficiency.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        residual : float</span>
+<span class="sd">            Residual value of equation.</span>
+
+<span class="sd">            .. math::</span>
+
+<span class="sd">                0 = P \cdot \eta - \dot{m}_{H_2,out,3} \cdot e_0</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">P</span><span class="o">.</span><span class="n">val</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta</span><span class="o">.</span><span class="n">val</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">e0</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.eta_func_doc"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.eta_func_doc">[docs]</a>    <span class="k">def</span> <span class="nf">eta_func_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Equation for electrolysis efficiency.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        label : str</span>
+<span class="sd">            Label for equation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        latex : str</span>
+<span class="sd">            LaTeX code of equations applied.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">latex</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;0 = P \cdot \eta - \dot</span><span class="si">{m}</span><span class="s1">_\mathrm{H_2,out,3} \cdot e_0&#39;</span>
+        <span class="k">return</span> <span class="n">generate_latex_eq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latex</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.eta_deriv"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.eta_deriv">[docs]</a>    <span class="k">def</span> <span class="nf">eta_deriv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">increment_filter</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Partial derivatives for efficiency function.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        increment_filter : ndarray</span>
+<span class="sd">            Matrix for filtering non-changing variables.</span>
+
+<span class="sd">        k : int</span>
+<span class="sd">            Position of derivatives in Jacobian matrix (k-th equation).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">e0</span>
+        <span class="c1"># derivatives for variable P</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">P</span><span class="o">.</span><span class="n">is_var</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">5</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">P</span><span class="o">.</span><span class="n">var_pos</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta</span><span class="o">.</span><span class="n">val</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.heat_func"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.heat_func">[docs]</a>    <span class="k">def</span> <span class="nf">heat_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Equation for heat output.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        residual : float</span>
+<span class="sd">            Residual value of equation.</span>
+
+<span class="sd">            .. math::</span>
+
+<span class="sd">                0 = \dot{Q}-\dot{m}_{in,1}\cdot \left(h_{in,1}-h_{out,1}\right)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="o">.</span><span class="n">val</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.heat_func_doc"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.heat_func_doc">[docs]</a>    <span class="k">def</span> <span class="nf">heat_func_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Equation for heat output.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        label : str</span>
+<span class="sd">            Label for equation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        latex : str</span>
+<span class="sd">            LaTeX code of equations applied.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">latex</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;0=\dot</span><span class="si">{Q}</span><span class="s1">-\dot</span><span class="si">{m}</span><span class="s1">_\mathrm{in,1}\cdot\left(h_\mathrm{in,1}-&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;h_\mathrm{out,1}\right)&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">generate_latex_eq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latex</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.heat_deriv"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.heat_deriv">[docs]</a>    <span class="k">def</span> <span class="nf">heat_deriv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">increment_filter</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Partial derivatives for heat output function.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        increment_filter : ndarray</span>
+<span class="sd">            Matrix for filtering non-changing variables.</span>
+
+<span class="sd">        k : int</span>
+<span class="sd">            Position of derivatives in Jacobian matrix (k-th equation).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.specific_energy_consumption_func"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.specific_energy_consumption_func">[docs]</a>    <span class="k">def</span> <span class="nf">specific_energy_consumption_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Equation for specific energy consumption.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        residual : float</span>
+<span class="sd">            Residual value of equation.</span>
+
+<span class="sd">            .. math::</span>
+
+<span class="sd">                0 = P - \dot{m}_{H_2,out3} \cdot e</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">P</span><span class="o">.</span><span class="n">val</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">e</span><span class="o">.</span><span class="n">val</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.specific_energy_consumption_func_doc"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.specific_energy_consumption_func_doc">[docs]</a>    <span class="k">def</span> <span class="nf">specific_energy_consumption_func_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Equation for specific energy consumption.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        label : str</span>
+<span class="sd">            Label for equation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        latex : str</span>
+<span class="sd">            LaTeX code of equations applied.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">latex</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;0=P - \dot</span><span class="si">{m}</span><span class="s1">_\mathrm{H_2,out3} \cdot e&#39;</span>
+        <span class="k">return</span> <span class="n">generate_latex_eq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latex</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.specific_energy_consumption_deriv"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.specific_energy_consumption_deriv">[docs]</a>    <span class="k">def</span> <span class="nf">specific_energy_consumption_deriv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">increment_filter</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Partial derivatives for specific energy consumption function.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        increment_filter : ndarray</span>
+<span class="sd">            Matrix for filtering non-changing variables.</span>
+
+<span class="sd">        k : int</span>
+<span class="sd">            Position of derivatives in Jacobian matrix (k-th equation).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">e</span><span class="o">.</span><span class="n">val</span>
+        <span class="c1"># derivatives for variable P</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">P</span><span class="o">.</span><span class="n">is_var</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">5</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">P</span><span class="o">.</span><span class="n">var_pos</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="c1"># derivatives for variable e</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">e</span><span class="o">.</span><span class="n">is_var</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">5</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">e</span><span class="o">.</span><span class="n">var_pos</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.energy_balance_func"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.energy_balance_func">[docs]</a>    <span class="k">def</span> <span class="nf">energy_balance_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the residual in energy balance.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        residual : float</span>
+<span class="sd">            Residual value of energy balance equation.</span>
+
+<span class="sd">            .. math::</span>
+
+<span class="sd">                \begin{split}</span>
+<span class="sd">                0=&amp;P + \dot{m}_\mathrm{in,2}\cdot\left(h_\mathrm{in,2}-</span>
+<span class="sd">                h_\mathrm{in,2,ref}\right)\\</span>
+<span class="sd">                &amp;-\dot{m}_\mathrm{in,1}\cdot\left( h_\mathrm{out,1} -</span>
+<span class="sd">                h_\mathrm{in,1} \right)\\</span>
+<span class="sd">                &amp; -\dot{m}_\mathrm{out,2} \cdot \left( h_\mathrm{out,2} -</span>
+<span class="sd">                h_\mathrm{out,2,ref} \right)\\</span>
+<span class="sd">                &amp; +\dot{m}_\mathrm{out,3} \cdot \left( h_\mathrm{out,3} -</span>
+<span class="sd">                h_\mathrm{out,3,ref} + e_0\right)\\</span>
+<span class="sd">                \end{split}</span>
+
+<span class="sd">            - Reference temperature: 298.15 K.</span>
+<span class="sd">            - Reference pressure: 1 bar.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">P</span><span class="o">.</span><span class="n">val</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_P</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.energy_balance_func_doc"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.energy_balance_func_doc">[docs]</a>    <span class="k">def</span> <span class="nf">energy_balance_func_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the residual in energy balance.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        label : str</span>
+<span class="sd">            Label for equation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        latex : str</span>
+<span class="sd">            LaTeX code of equations applied.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">latex</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;\begin</span><span class="si">{split}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;0=&amp;P + \dot</span><span class="si">{m}</span><span class="s1">_\mathrm{in,2}\cdot\left(h_\mathrm{in,2}-&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;h_\mathrm{in,2,ref}\right)</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;&amp;-\dot</span><span class="si">{m}</span><span class="s1">_\mathrm{in,1}\cdot\left( h_\mathrm{out,1} -&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;h_\mathrm{in,1} \right)</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;&amp; - \dot</span><span class="si">{m}</span><span class="s1">_\mathrm{out,2} \cdot \left( h_\mathrm{out,2} -&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;h_\mathrm{out,2,ref} \right)</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;&amp; + \dot</span><span class="si">{m}</span><span class="s1">_\mathrm{out,3} \cdot \left( h_\mathrm{out,3} -&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;h_\mathrm{out,3,ref} + e_0\right)</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;&amp;p_\mathrm</span><span class="si">{ref}</span><span class="s1">=\unit[1]</span><span class="si">{bar}</span><span class="s1">,&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\;T_\mathrm</span><span class="si">{ref}</span><span class="s1">=\unit[25]{^\circ C}</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\end</span><span class="si">{split}</span><span class="s1">&#39;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">generate_latex_eq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latex</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.energy_balance_deriv"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.energy_balance_deriv">[docs]</a>    <span class="k">def</span> <span class="nf">energy_balance_deriv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">increment_filter</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Partial derivatives for reactor energy balance.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        increment_filter : ndarray</span>
+<span class="sd">            Matrix for filtering non-changing variables.</span>
+
+<span class="sd">        k : int</span>
+<span class="sd">            Position of derivatives in Jacobian matrix (k-th equation).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># derivatives determined from calc_P function</span>
+        <span class="n">T_ref</span> <span class="o">=</span> <span class="mf">298.15</span>
+        <span class="n">p_ref</span> <span class="o">=</span> <span class="mf">1e5</span>
+        <span class="n">h_refh2o</span> <span class="o">=</span> <span class="n">h_mix_pT</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="n">p_ref</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">],</span> <span class="n">T_ref</span><span class="p">)</span>
+        <span class="n">h_refh2</span> <span class="o">=</span> <span class="n">h_mix_pT</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="n">p_ref</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">],</span> <span class="n">T_ref</span><span class="p">)</span>
+        <span class="n">h_refo2</span> <span class="o">=</span> <span class="n">h_mix_pT</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="n">p_ref</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">],</span> <span class="n">T_ref</span><span class="p">)</span>
+
+        <span class="c1"># derivatives cooling water inlet</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span>
+
+        <span class="c1"># derivatives feed water inlet</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="n">h_refh2o</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span>
+
+        <span class="c1"># derivative cooling water outlet</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span>
+
+        <span class="c1"># derivatives oxygen outlet</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="n">h_refo2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span>
+
+        <span class="c1"># derivatives hydrogen outlet</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="n">h_refh2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">e0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span>
+
+        <span class="c1"># derivatives for variable P</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">P</span><span class="o">.</span><span class="n">is_var</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">5</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">P</span><span class="o">.</span><span class="n">var_pos</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.eta_char_func"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.eta_char_func">[docs]</a>    <span class="k">def</span> <span class="nf">eta_char_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Equation for given efficiency characteristic of a water electrolyzer.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        residual : float</span>
+<span class="sd">            Residual value of equation.</span>
+
+<span class="sd">            .. math::</span>
+
+<span class="sd">                0 = P - \dot{m}_{H_2,out,3} \cdot \frac{e_0}{\eta_{design}\cdot</span>
+<span class="sd">                f\left(expr \right)}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta_char</span><span class="o">.</span><span class="n">param</span>
+        <span class="n">expr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_char_expr</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">eta_char</span><span class="o">.</span><span class="n">char_params</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">expr</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Please choose a valid parameter, you want to link the &#39;</span>
+                   <span class="s1">&#39;efficiency to at component &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">P</span><span class="o">.</span><span class="n">val</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">e0</span> <span class="o">/</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eta</span><span class="o">.</span><span class="n">design</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta_char</span><span class="o">.</span><span class="n">char_func</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">expr</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.eta_char_func_doc"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.eta_char_func_doc">[docs]</a>    <span class="k">def</span> <span class="nf">eta_char_func_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Equation for given efficiency characteristic of a water electrolyzer.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        label : str</span>
+<span class="sd">            Label for equation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        latex : str</span>
+<span class="sd">            LaTeX code of equations applied.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta_char</span><span class="o">.</span><span class="n">param</span>
+        <span class="n">expr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_char_expr_doc</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">eta_char</span><span class="o">.</span><span class="n">char_params</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">expr</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Please choose a valid parameter, you want to link the &#39;</span>
+                   <span class="s1">&#39;efficiency to at component &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="n">latex</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;0=P-\dot</span><span class="si">{m}</span><span class="s1">_\mathrm{H_2,out,3}\cdot\frac</span><span class="si">{e_0}</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;{\eta_\mathrm</span><span class="si">{design}</span><span class="s1">\cdot f\left(X\right)}&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">generate_latex_eq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latex</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.eta_char_deriv"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.eta_char_deriv">[docs]</a>    <span class="k">def</span> <span class="nf">eta_char_deriv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">increment_filter</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Partial derivatives electrolysis efficiency characteristic.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        increment_filter : ndarray</span>
+<span class="sd">            Matrix for filtering non-changing variables.</span>
+
+<span class="sd">        k : int</span>
+<span class="sd">            Position of derivatives in Jacobian matrix (k-th equation).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eta_char_func</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="c1"># derivatives for variable P</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">P</span><span class="o">.</span><span class="n">is_var</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">5</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">P</span><span class="o">.</span><span class="n">var_pos</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.fluid_func"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.fluid_func">[docs]</a>    <span class="k">def</span> <span class="nf">fluid_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Equations for fluid composition.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        residual : list</span>
+<span class="sd">            Residual values of equation.</span>
+
+<span class="sd">            .. math::</span>
+
+<span class="sd">                0  = x_\mathrm{i,in,1} - x_\mathrm{i,out,1}</span>
+<span class="sd">                \forall i \in \text{network fluids}</span>
+
+<span class="sd">                0 = \begin{cases}</span>
+<span class="sd">                    1 - x_\mathrm{i,in2} &amp; \text{i=}H_{2}O\\</span>
+<span class="sd">                    x_\mathrm{i,in2} &amp; \text{else}</span>
+<span class="sd">                \end{cases} \forall i \in \text{network fluids}</span>
+
+<span class="sd">                0 = \begin{cases}</span>
+<span class="sd">                    1 - x_\mathrm{i,out,2} &amp; \text{i=}O_{2}\\</span>
+<span class="sd">                    x_\mathrm{i,out,2} &amp; \text{else}</span>
+<span class="sd">                \end{cases} \forall i \in \text{network fluids}</span>
+
+<span class="sd">                0 = \begin{cases}</span>
+<span class="sd">                    1 - x_\mathrm{i,out,3} &amp; \text{i=}H_{2}\\</span>
+<span class="sd">                    x_\mathrm{i,out,3} &amp; \text{else}</span>
+<span class="sd">                \end{cases} \forall i \in \text{network fluids}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">residual</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># equations for fluid composition in cooling water</span>
+        <span class="k">for</span> <span class="n">fluid</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">residual</span> <span class="o">+=</span> <span class="p">[</span><span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">fluid</span><span class="p">]]</span>
+
+        <span class="c1"># equations to constrain fluids to inlets/outlets</span>
+        <span class="n">residual</span> <span class="o">+=</span> <span class="p">[</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">h2o</span><span class="p">]]</span>
+        <span class="n">residual</span> <span class="o">+=</span> <span class="p">[</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">o2</span><span class="p">]]</span>
+        <span class="n">residual</span> <span class="o">+=</span> <span class="p">[</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">h2</span><span class="p">]]</span>
+
+        <span class="c1"># equations to ban other fluids off inlets/outlets</span>
+        <span class="k">for</span> <span class="n">fluid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">fluid</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h2o</span><span class="p">:</span>
+                <span class="n">residual</span> <span class="o">+=</span> <span class="p">[</span><span class="mi">0</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">fluid</span><span class="p">]]</span>
+            <span class="k">if</span> <span class="n">fluid</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">o2</span><span class="p">:</span>
+                <span class="n">residual</span> <span class="o">+=</span> <span class="p">[</span><span class="mi">0</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">fluid</span><span class="p">]]</span>
+            <span class="k">if</span> <span class="n">fluid</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h2</span><span class="p">:</span>
+                <span class="n">residual</span> <span class="o">+=</span> <span class="p">[</span><span class="mi">0</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">fluid</span><span class="p">]]</span>
+
+        <span class="k">return</span> <span class="n">residual</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.fluid_func_doc"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.fluid_func_doc">[docs]</a>    <span class="k">def</span> <span class="nf">fluid_func_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Equations for fluid composition.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        label : str</span>
+<span class="sd">            Label for equation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        latex : str</span>
+<span class="sd">            LaTeX code of equations applied.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">latex</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;\begin</span><span class="si">{split}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;0 = &amp;x_\mathrm{i,in,1} - x_\mathrm{i,out,1}</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;0 = &amp;\begin</span><span class="si">{cases}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;1 - x_\mathrm{i,in2} &amp; \text{i=}H_</span><span class="si">{2}</span><span class="s1">O</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;x_\mathrm{i,in2} &amp; \text</span><span class="si">{else}</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\end</span><span class="si">{cases}</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;0 =&amp;\begin</span><span class="si">{cases}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;1 - x_\mathrm{i,out,2} &amp; \text{i=}O_</span><span class="si">{2}</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;x_\mathrm{i,out,2} &amp; \text</span><span class="si">{else}</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\end</span><span class="si">{cases}</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;0 =&amp;\begin</span><span class="si">{cases}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;1 - x_\mathrm{i,out,3} &amp; \text{i=}H_</span><span class="si">{2}</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;x_\mathrm{i,out,3} &amp; \text</span><span class="si">{else}</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\end</span><span class="si">{cases}</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;&amp;\forall i \in \text{network fluids}&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\end</span><span class="si">{split}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">generate_latex_eq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latex</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.fluid_deriv"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.fluid_deriv">[docs]</a>    <span class="k">def</span> <span class="nf">fluid_deriv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the partial derivatives for cooling loop fluid balance.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        deriv : ndarray</span>
+<span class="sd">            Matrix with partial derivatives for the fluid equations.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># derivatives for cooling liquid composition</span>
+        <span class="n">deriv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">num_nw_fluids</span> <span class="o">*</span> <span class="mi">4</span><span class="p">,</span>
+            <span class="mi">5</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_vars</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">num_nw_vars</span><span class="p">))</span>
+
+        <span class="n">k</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">fluid</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">deriv</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span> <span class="o">+</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">deriv</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span> <span class="o">+</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="n">k</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># derivatives to constrain fluids to inlets/outlets</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">fluid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nw_fluids</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">fluid</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">h2o</span><span class="p">:</span>
+                <span class="n">deriv</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="k">elif</span> <span class="n">fluid</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">o2</span><span class="p">:</span>
+                <span class="n">deriv</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="k">elif</span> <span class="n">fluid</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">h2</span><span class="p">:</span>
+                <span class="n">deriv</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">k</span> <span class="o">+=</span> <span class="mi">3</span>
+
+        <span class="c1"># derivatives to ban fluids off inlets/outlets</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">fluid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nw_fluids</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">fluid</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h2o</span><span class="p">:</span>
+                <span class="n">deriv</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+                <span class="n">k</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">fluid</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">o2</span><span class="p">:</span>
+                <span class="n">deriv</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+                <span class="n">k</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">fluid</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h2</span><span class="p">:</span>
+                <span class="n">deriv</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+                <span class="n">k</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="n">deriv</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.mass_flow_func"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.mass_flow_func">[docs]</a>    <span class="k">def</span> <span class="nf">mass_flow_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Equations for mass conservation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        residual : list</span>
+<span class="sd">            Residual values of equation.</span>
+
+<span class="sd">            .. math::</span>
+
+<span class="sd">                O_2 = \frac{M_{O_2}}{M_{O_2} + 2 \cdot M_{H_2}}\\</span>
+<span class="sd">                0 =\dot{m}_\mathrm{in,1}-\dot{m}_\mathrm{out,1}\\</span>
+<span class="sd">                0=O_2\cdot\dot{m}_\mathrm{H_{2}O,in,2}-</span>
+<span class="sd">                \dot{m}_\mathrm{O_2,out,2}\\</span>
+<span class="sd">                0 = \left(1 - O_2\right) \cdot \dot{m}_\mathrm{H_{2}O,in,2} -</span>
+<span class="sd">                \dot{m}_\mathrm{H_2,out,3}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># calculate the ratio of o2 in water</span>
+        <span class="n">o2</span> <span class="o">=</span> <span class="n">molar_masses</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">o2</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span>
+            <span class="n">molar_masses</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">o2</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">molar_masses</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">h2</span><span class="p">])</span>
+        <span class="c1"># equation for mass flow balance cooling water</span>
+        <span class="n">residual</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">residual</span> <span class="o">+=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span><span class="p">]</span>
+        <span class="c1"># equations for mass flow balance electrolyzer</span>
+        <span class="n">residual</span> <span class="o">+=</span> <span class="p">[</span><span class="n">o2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span><span class="p">]</span>
+        <span class="n">residual</span> <span class="o">+=</span> <span class="p">[(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">o2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">residual</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.mass_flow_func_doc"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.mass_flow_func_doc">[docs]</a>    <span class="k">def</span> <span class="nf">mass_flow_func_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Equations for mass conservation.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        label : str</span>
+<span class="sd">            Label for equation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        latex : str</span>
+<span class="sd">            LaTeX code of equations applied.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">latex</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;\begin</span><span class="si">{split}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;O_2 = &amp;\frac{M_</span><span class="si">{O_2}</span><span class="s1">}{M_</span><span class="si">{O_2}</span><span class="s1"> + 2 \cdot M_</span><span class="si">{H_2}</span><span class="s1">}</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;0 =&amp;\dot</span><span class="si">{m}</span><span class="s1">_\mathrm{in,1}-\dot</span><span class="si">{m}</span><span class="s1">_\mathrm{out,1}</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;0=&amp;O_2\cdot\dot</span><span class="si">{m}</span><span class="s1">_\mathrm{H_</span><span class="si">{2}</span><span class="s1">O,in,2}-&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\dot</span><span class="si">{m}</span><span class="s1">_\mathrm{O_2,out,2}</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;0 =&amp;\left(1 - O_2\right) \cdot \dot</span><span class="si">{m}</span><span class="s1">_\mathrm{H_</span><span class="si">{2}</span><span class="s1">O,in,2}-&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\dot</span><span class="si">{m}</span><span class="s1">_\mathrm{H_2,out,3}</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\end</span><span class="si">{split}</span><span class="s1">&#39;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">generate_latex_eq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latex</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.mass_flow_deriv"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.mass_flow_deriv">[docs]</a>    <span class="k">def</span> <span class="nf">mass_flow_deriv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the partial derivatives for all mass flow balance equations.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        deriv : ndarray</span>
+<span class="sd">            Matrix with partial derivatives for the mass flow equations.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># deritatives for mass flow balance in the heat exchanger</span>
+        <span class="n">deriv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_vars</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_nw_vars</span><span class="p">))</span>
+        <span class="n">deriv</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">deriv</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="c1"># derivatives for mass flow balance for oxygen output</span>
+        <span class="n">o2</span> <span class="o">=</span> <span class="n">molar_masses</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">o2</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span>
+            <span class="n">molar_masses</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">o2</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">molar_masses</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">h2</span><span class="p">])</span>
+        <span class="n">deriv</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">o2</span>
+        <span class="n">deriv</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="c1"># derivatives for mass flow balance for hydrogen output</span>
+        <span class="n">deriv</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">o2</span><span class="p">)</span>
+        <span class="n">deriv</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="k">return</span> <span class="n">deriv</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.reactor_pressure_func"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.reactor_pressure_func">[docs]</a>    <span class="k">def</span> <span class="nf">reactor_pressure_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Equations for reactor pressure balance.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        residual : list</span>
+<span class="sd">            Residual values of equation.</span>
+
+<span class="sd">            .. math::</span>
+
+<span class="sd">                0 = p_\mathrm{in,2} - p_\mathrm{out,2}\\</span>
+<span class="sd">                0 = p_\mathrm{in,2} - p_\mathrm{out,3}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">val_SI</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">val_SI</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.reactor_pressure_func_doc"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.reactor_pressure_func_doc">[docs]</a>    <span class="k">def</span> <span class="nf">reactor_pressure_func_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Equations for reactor pressure balance.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        label : str</span>
+<span class="sd">            Label for equation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        latex : str</span>
+<span class="sd">            LaTeX code of equations applied.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">latex</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;\begin</span><span class="si">{split}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;0 = &amp; p_\mathrm{in,2} - p_\mathrm{out,2}</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;0 = &amp; p_\mathrm{in,2} - p_\mathrm{out,3}</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\end</span><span class="si">{split}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">generate_latex_eq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latex</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.reactor_pressure_deriv"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.reactor_pressure_deriv">[docs]</a>    <span class="k">def</span> <span class="nf">reactor_pressure_deriv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the partial derivatives for combustion pressure equations.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        deriv : ndarray</span>
+<span class="sd">            Matrix with partial derivatives for the pressure equations.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">deriv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_vars</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_nw_vars</span><span class="p">))</span>
+        <span class="c1"># derivatives for pressure oxygen outlet</span>
+        <span class="n">deriv</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">deriv</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="c1"># derivatives for pressure hydrogen outlet</span>
+        <span class="n">deriv</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">deriv</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="k">return</span> <span class="n">deriv</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.calc_P"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.calc_P">[docs]</a>    <span class="k">def</span> <span class="nf">calc_P</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate water electrolyzer power input.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        P : float</span>
+<span class="sd">            Value of power input.</span>
+
+<span class="sd">            .. math::</span>
+
+<span class="sd">                \begin{split}</span>
+<span class="sd">                P = &amp; -\dot{m}_{in,2} \cdot \left( h_{in,2} - h_{in,2,ref}</span>
+<span class="sd">                \right)\\</span>
+<span class="sd">                &amp; + \dot{m}_{in,1} \cdot \left( h_{out,1} - h_{in,1} \right)\\</span>
+<span class="sd">                &amp; + \dot{m}_{out,2} \cdot \left( h_{out,2} - h_{out,2,ref}</span>
+<span class="sd">                \right)\\</span>
+<span class="sd">                &amp; - \dot{m}_{out,3} \cdot \left( h_{out,3} - h_{out,3,ref}</span>
+<span class="sd">                + e_0\right)\\</span>
+<span class="sd">                \end{split}</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        The temperature for the reference state is set to 25 °C, thus</span>
+<span class="sd">        the feed water must be liquid as proposed in the calculation of</span>
+<span class="sd">        the minimum specific energy consumption for electrolysis:</span>
+<span class="sd">        :py:meth:`tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.calc_e0`.</span>
+<span class="sd">        The part of the equation regarding the cooling water is implemented</span>
+<span class="sd">        with negative sign as the energy for cooling is extracted from the</span>
+<span class="sd">        reactor.</span>
+
+<span class="sd">        - Reference temperature: 298.15 K.</span>
+<span class="sd">        - Reference pressure: 1 bar.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">T_ref</span> <span class="o">=</span> <span class="mf">298.15</span>
+        <span class="n">p_ref</span> <span class="o">=</span> <span class="mf">1e5</span>
+
+        <span class="c1"># equations to set a reference point for each h2o, h2 and o2</span>
+        <span class="n">h_refh2o</span> <span class="o">=</span> <span class="n">h_mix_pT</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="n">p_ref</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">],</span> <span class="n">T_ref</span><span class="p">)</span>
+        <span class="n">h_refh2</span> <span class="o">=</span> <span class="n">h_mix_pT</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="n">p_ref</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">],</span> <span class="n">T_ref</span><span class="p">)</span>
+        <span class="n">h_refo2</span> <span class="o">=</span> <span class="n">h_mix_pT</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="n">p_ref</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">],</span> <span class="n">T_ref</span><span class="p">)</span>
+
+        <span class="n">val</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="n">h_refh2o</span><span class="p">)</span> <span class="o">+</span>
+               <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="p">(</span>
+                   <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span> <span class="o">+</span>
+               <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="n">h_refo2</span><span class="p">)</span> <span class="o">+</span>
+               <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="p">(</span>
+                   <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="n">h_refh2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">e0</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">val</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.bus_func"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.bus_func">[docs]</a>    <span class="k">def</span> <span class="nf">bus_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bus</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the value of the bus function.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        bus : tespy.connections.bus.Bus</span>
+<span class="sd">            TESPy bus object.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        val : float</span>
+<span class="sd">            Value of energy transfer :math:`\dot{E}`. This value is passed to</span>
+<span class="sd">            :py:meth:`tespy.components.component.Component.calc_bus_value`</span>
+<span class="sd">            for value manipulation according to the specified characteristic</span>
+<span class="sd">            line of the bus.</span>
+
+<span class="sd">            .. math::</span>
+
+<span class="sd">                \dot{E} = \begin{cases}</span>
+<span class="sd">                P &amp; \text{key = &#39;P&#39;}\\</span>
+<span class="sd">                - \dot{m}_{in,1} \cdot \left(h_{out,1} - h_{in,1} \right) &amp;</span>
+<span class="sd">                \text{key = &#39;Q&#39;}\\</span>
+<span class="sd">                \end{cases}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">######################################################################</span>
+        <span class="c1"># equations for power on bus</span>
+        <span class="k">if</span> <span class="n">bus</span><span class="p">[</span><span class="s1">&#39;param&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;P&#39;</span><span class="p">:</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_P</span><span class="p">()</span>
+
+        <span class="c1">######################################################################</span>
+        <span class="c1"># equations for heat on bus</span>
+
+        <span class="k">elif</span> <span class="n">bus</span><span class="p">[</span><span class="s1">&#39;param&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Q&#39;</span><span class="p">:</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span>
+
+        <span class="c1">######################################################################</span>
+        <span class="c1"># missing/invalid bus parameter</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;The parameter &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">bus</span><span class="p">[</span><span class="s1">&#39;param&#39;</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39; is not a valid &#39;</span>
+                   <span class="s1">&#39;parameter for a component of type &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">component</span><span class="p">()</span> <span class="o">+</span>
+                   <span class="s1">&#39;. Please specify a bus parameter (P/Q) for component &#39;</span> <span class="o">+</span>
+                   <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">val</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.bus_func_doc"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.bus_func_doc">[docs]</a>    <span class="k">def</span> <span class="nf">bus_func_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bus</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return LaTeX string of the bus function.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        bus : tespy.connections.bus.Bus</span>
+<span class="sd">            TESPy bus object.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        latex : str</span>
+<span class="sd">            LaTeX string of bus function.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">bus</span><span class="p">[</span><span class="s1">&#39;param&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;P&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">r</span><span class="s1">&#39;P_\mathrm</span><span class="si">{el}</span><span class="s1">&#39;</span>
+        <span class="k">elif</span> <span class="n">bus</span><span class="p">[</span><span class="s1">&#39;param&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Q&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="sa">r</span><span class="s1">&#39;-\dot</span><span class="si">{m}</span><span class="s1">_\mathrm{in,1} \cdot \left(h_\mathrm{out,1} - &#39;</span>
+                <span class="sa">r</span><span class="s1">&#39;h_\mathrm{in,1} \right)&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.bus_deriv"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.bus_deriv">[docs]</a>    <span class="k">def</span> <span class="nf">bus_deriv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bus</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate partial derivatives of the bus function.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        bus : tespy.connections.bus.Bus</span>
+<span class="sd">            TESPy bus object.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        deriv : ndarray</span>
+<span class="sd">            Matrix of partial derivatives.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">deriv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_vars</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_nw_vars</span><span class="p">))</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_bus_value</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">bus</span><span class="o">.</span><span class="n">comps</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="bp">self</span><span class="p">]</span>
+
+        <span class="c1">######################################################################</span>
+        <span class="c1"># derivatives for power on bus</span>
+        <span class="k">if</span> <span class="n">b</span><span class="p">[</span><span class="s1">&#39;param&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;P&#39;</span><span class="p">:</span>
+            <span class="n">deriv</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">bus</span><span class="o">=</span><span class="n">bus</span><span class="p">)</span>
+            <span class="n">deriv</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">bus</span><span class="o">=</span><span class="n">bus</span><span class="p">)</span>
+
+            <span class="n">deriv</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">bus</span><span class="o">=</span><span class="n">bus</span><span class="p">)</span>
+            <span class="n">deriv</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">bus</span><span class="o">=</span><span class="n">bus</span><span class="p">)</span>
+
+            <span class="n">deriv</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">bus</span><span class="o">=</span><span class="n">bus</span><span class="p">)</span>
+
+            <span class="n">deriv</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">bus</span><span class="o">=</span><span class="n">bus</span><span class="p">)</span>
+            <span class="n">deriv</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">bus</span><span class="o">=</span><span class="n">bus</span><span class="p">)</span>
+
+            <span class="n">deriv</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">bus</span><span class="o">=</span><span class="n">bus</span><span class="p">)</span>
+            <span class="n">deriv</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">bus</span><span class="o">=</span><span class="n">bus</span><span class="p">)</span>
+            <span class="c1"># variable power</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">P</span><span class="o">.</span><span class="n">is_var</span><span class="p">:</span>
+                <span class="n">deriv</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">P</span><span class="o">.</span><span class="n">var_pos</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;P&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">bus</span><span class="o">=</span><span class="n">bus</span><span class="p">))</span>
+
+        <span class="c1">######################################################################</span>
+        <span class="c1"># derivatives for heat on bus</span>
+        <span class="k">elif</span> <span class="n">b</span><span class="p">[</span><span class="s1">&#39;param&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Q&#39;</span><span class="p">:</span>
+
+            <span class="n">deriv</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">bus</span><span class="o">=</span><span class="n">bus</span><span class="p">)</span>
+            <span class="n">deriv</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">bus</span><span class="o">=</span><span class="n">bus</span><span class="p">)</span>
+            <span class="n">deriv</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">bus</span><span class="o">=</span><span class="n">bus</span><span class="p">)</span>
+
+        <span class="c1">######################################################################</span>
+        <span class="c1"># missing/invalid bus parameter</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;The parameter &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="s1">&#39;param&#39;</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39; is not a valid &#39;</span>
+                   <span class="s1">&#39;parameter for a component of type &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">component</span><span class="p">()</span> <span class="o">+</span>
+                   <span class="s1">&#39;. Please specify a bus parameter (P/Q) for component &#39;</span> <span class="o">+</span>
+                   <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">deriv</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.initialise_fluids"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.initialise_fluids">[docs]</a>    <span class="k">def</span> <span class="nf">initialise_fluids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set values to pure fluid on water inlet and gas outlets.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">o2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">h2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">h2o</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="n">c</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">propagate_fluid_to_target</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">target</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">propagate_fluid_to_source</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">source</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.initialise_source"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.initialise_source">[docs]</a>    <span class="k">def</span> <span class="nf">initialise_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a starting value for pressure and enthalpy at outlet.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        c : tespy.connections.connection.Connection</span>
+<span class="sd">            Connection to perform initialisation on.</span>
+
+<span class="sd">        key : str</span>
+<span class="sd">            Fluid property to retrieve.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        val : float</span>
+<span class="sd">            Starting value for pressure/enthalpy in SI units.</span>
+
+<span class="sd">            .. math::</span>
+
+<span class="sd">                val = \begin{cases}</span>
+<span class="sd">                5  \cdot 10^5 &amp; \text{key = &#39;p&#39;}\\</span>
+<span class="sd">                h\left(T=323.15, p=5  \cdot 10^5\right) &amp; \text{key = &#39;h&#39;}</span>
+<span class="sd">                \end{cases}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;p&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">5e5</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;h&#39;</span><span class="p">:</span>
+            <span class="n">flow</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">get_flow</span><span class="p">()</span>
+            <span class="n">T</span> <span class="o">=</span> <span class="mi">50</span> <span class="o">+</span> <span class="mf">273.15</span>
+            <span class="k">return</span> <span class="n">h_mix_pT</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.initialise_target"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.initialise_target">[docs]</a>    <span class="k">def</span> <span class="nf">initialise_target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a starting value for pressure and enthalpy at inlet.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        c : tespy.connections.connection.Connection</span>
+<span class="sd">            Connection to perform initialisation on.</span>
+
+<span class="sd">        key : str</span>
+<span class="sd">            Fluid property to retrieve.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        val : float</span>
+<span class="sd">            Starting value for pressure/enthalpy in SI units.</span>
+
+<span class="sd">            .. math::</span>
+
+<span class="sd">                val = \begin{cases}</span>
+<span class="sd">                5  \cdot 10^5 &amp; \text{key = &#39;p&#39;}\\</span>
+<span class="sd">                h\left(T=293.15, p=5  \cdot 10^5\right) &amp; \text{key = &#39;h&#39;}</span>
+<span class="sd">                \end{cases}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;p&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">5e5</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;h&#39;</span><span class="p">:</span>
+            <span class="n">flow</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">get_flow</span><span class="p">()</span>
+            <span class="n">T</span> <span class="o">=</span> <span class="mi">20</span> <span class="o">+</span> <span class="mf">273.15</span>
+            <span class="k">return</span> <span class="n">h_mix_pT</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.propagate_fluid_to_target"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.propagate_fluid_to_target">[docs]</a>    <span class="k">def</span> <span class="nf">propagate_fluid_to_target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inconn</span><span class="p">,</span> <span class="n">start</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Propagate the fluids towards connection&#39;s target in recursion.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        inconn : tespy.connections.connection.Connection</span>
+<span class="sd">            Connection to initialise.</span>
+
+<span class="sd">        start : tespy.components.component.Component</span>
+<span class="sd">            This component is the fluid propagation starting point.</span>
+<span class="sd">            The starting component is saved to prevent infinite looping.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">inconn</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="n">outconn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="k">for</span> <span class="n">fluid</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">inconn</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">outconn</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val_set</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span>
+                        <span class="n">outconn</span><span class="o">.</span><span class="n">good_starting_values</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">):</span>
+                    <span class="n">outconn</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span>
+
+            <span class="n">outconn</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">propagate_fluid_to_target</span><span class="p">(</span><span class="n">outconn</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.propagate_fluid_to_source"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.propagate_fluid_to_source">[docs]</a>    <span class="k">def</span> <span class="nf">propagate_fluid_to_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outconn</span><span class="p">,</span> <span class="n">start</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Propagate the fluids towards connection&#39;s source in recursion.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        outconn : tespy.connections.connection.Connection</span>
+<span class="sd">            Connection to initialise.</span>
+
+<span class="sd">        start : tespy.components.component.Component</span>
+<span class="sd">            This component is the fluid propagation starting point.</span>
+<span class="sd">            The starting component is saved to prevent infinite looping.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">outconn</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="n">inconn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="k">for</span> <span class="n">fluid</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">outconn</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">inconn</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val_set</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span>
+                        <span class="n">inconn</span><span class="o">.</span><span class="n">good_starting_values</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">):</span>
+                    <span class="n">inconn</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span>
+
+            <span class="n">inconn</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">propagate_fluid_to_source</span><span class="p">(</span><span class="n">inconn</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="WaterElectrolyzer.calc_parameters"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.reactors.water_electrolyzer.WaterElectrolyzer.calc_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">calc_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Postprocessing parameter calculation.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pr</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">val_SI</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">e</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">P</span><span class="o">.</span><span class="n">val</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eta</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">e0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">e</span><span class="o">.</span><span class="n">val</span>
+
+        <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_flow</span><span class="p">()</span>
+        <span class="n">o</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_flow</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">zeta</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="p">((</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">o</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="p">(</span>
+            <span class="mi">4</span> <span class="o">*</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">vol</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">vol</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span>
+            <span class="p">))</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2020, Francesco Witte.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

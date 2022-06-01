@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tespy.components.piping.pipe &mdash; tespy 0.6.0 - Colored Chemicals documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../../index.html" class="icon icon-home"> tespy
+            <img src="../../../../_static/logo_tespy_mid.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.6.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../introduction.html">Thermal Engineering Systems in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installation and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../first_steps.html">First steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials_examples.html">Examples and Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tespy_modules.html">TESPy modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tespy_analyses.html">Thermodynamic analyses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../developing_tespy.html">Developing TESPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../zliterature.html">Literature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">tespy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+      <li>tespy.components.piping.pipe</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for tespy.components.piping.pipe</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8</span>
+
+<span class="sd">&quot;&quot;&quot;Module of class Pipe.</span>
+
+
+<span class="sd">This file is part of project TESPy (github.com/oemof/tespy). It&#39;s copyrighted</span>
+<span class="sd">by the contributors recorded in the version control history of the file,</span>
+<span class="sd">available from its original location tespy/components/piping/pipe.py</span>
+
+<span class="sd">SPDX-License-Identifier: MIT</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">tespy.components.heat_exchangers.simple</span> <span class="kn">import</span> <span class="n">HeatExchangerSimple</span>
+
+
+<div class="viewcode-block" id="Pipe"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.piping.pipe.Pipe">[docs]</a><span class="k">class</span> <span class="nc">Pipe</span><span class="p">(</span><span class="n">HeatExchangerSimple</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The Pipe is a subclass of a HeatExchangerSimple.</span>
+
+<span class="sd">    **Mandatory Equations**</span>
+
+<span class="sd">    - :py:meth:`tespy.components.component.Component.fluid_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.component.Component.mass_flow_func`</span>
+
+<span class="sd">    **Optional Equations**</span>
+
+<span class="sd">    - :py:meth:`tespy.components.component.Component.pr_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.component.Component.zeta_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.heat_exchangers.simple.HeatExchangerSimple.energy_balance_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.heat_exchangers.simple.HeatExchangerSimple.hydro_group_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.heat_exchangers.simple.HeatExchangerSimple.kA_group_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.heat_exchangers.simple.HeatExchangerSimple.kA_char_group_func`</span>
+
+<span class="sd">    Inlets/Outlets</span>
+
+<span class="sd">    - in1</span>
+<span class="sd">    - out1</span>
+
+<span class="sd">    Image</span>
+
+<span class="sd">    .. image:: _images/Pipe.svg</span>
+<span class="sd">       :alt: alternative text</span>
+<span class="sd">       :align: center</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    label : str</span>
+<span class="sd">        The label of the component.</span>
+
+<span class="sd">    design : list</span>
+<span class="sd">        List containing design parameters (stated as String).</span>
+
+<span class="sd">    offdesign : list</span>
+<span class="sd">        List containing offdesign parameters (stated as String).</span>
+
+<span class="sd">    design_path : str</span>
+<span class="sd">        Path to the components design case.</span>
+
+<span class="sd">    local_offdesign : boolean</span>
+<span class="sd">        Treat this component in offdesign mode in a design calculation.</span>
+
+<span class="sd">    local_design : boolean</span>
+<span class="sd">        Treat this component in design mode in an offdesign calculation.</span>
+
+<span class="sd">    char_warnings : boolean</span>
+<span class="sd">        Ignore warnings on default characteristics usage for this component.</span>
+
+<span class="sd">    printout : boolean</span>
+<span class="sd">        Include this component in the network&#39;s results printout.</span>
+
+<span class="sd">    Q : float, dict, :code:`&quot;var&quot;`</span>
+<span class="sd">        Heat transfer, :math:`Q/\text{W}`.</span>
+
+<span class="sd">    pr : float, dict, :code:`&quot;var&quot;`</span>
+<span class="sd">        Outlet to inlet pressure ratio, :math:`pr/1`.</span>
+
+<span class="sd">    zeta : float, dict, :code:`&quot;var&quot;`</span>
+<span class="sd">        Geometry independent friction coefficient,</span>
+<span class="sd">        :math:`\frac{\zeta}{D^4}/\frac{1}{\text{m}^4}`.</span>
+
+<span class="sd">    D : float, dict, :code:`&quot;var&quot;`</span>
+<span class="sd">        Diameter of the pipes, :math:`D/\text{m}`.</span>
+
+<span class="sd">    L : float, dict, :code:`&quot;var&quot;`</span>
+<span class="sd">        Length of the pipes, :math:`L/\text{m}`.</span>
+
+<span class="sd">    ks : float, dict, :code:`&quot;var&quot;`</span>
+<span class="sd">        Pipe&#39;s roughness, :math:`ks/\text{m}` for darcy friction,</span>
+<span class="sd">        :math:`ks/\text{1}` for hazen-williams equation.</span>
+
+<span class="sd">    hydro_group : str, dict</span>
+<span class="sd">        Parametergroup for pressure drop calculation based on pipes dimensions.</span>
+<span class="sd">        Choose &#39;HW&#39; for hazen-williams equation, else darcy friction factor is</span>
+<span class="sd">        used.</span>
+
+<span class="sd">    kA : float, dict, :code:`&quot;var&quot;`</span>
+<span class="sd">        Area independent heat transfer coefficient,</span>
+<span class="sd">        :math:`kA/\frac{\text{W}}{\text{K}}`.</span>
+
+<span class="sd">    kA_char : tespy.tools.characteristics.CharLine, dict</span>
+<span class="sd">        Characteristic line for heat transfer coefficient.</span>
+
+<span class="sd">    Tamb : float, dict</span>
+<span class="sd">        Ambient temperature, provide parameter in network&#39;s temperature</span>
+<span class="sd">        unit.</span>
+
+<span class="sd">    kA_group : str, dict</span>
+<span class="sd">        Parametergroup for heat transfer calculation from ambient temperature</span>
+<span class="sd">        and area independent heat transfer coefficient kA.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    A mass flow of 10 kg/s ethanol is transported in a pipeline. The pipe is</span>
+<span class="sd">    considered adiabatic and has a length of 500 meters. We can calculate the</span>
+<span class="sd">    diameter required at a given pressure loss of 2.5 %. After we determined</span>
+<span class="sd">    the required diameter, we can predict pressure loss at a different mass</span>
+<span class="sd">    flow through the pipeline.</span>
+
+<span class="sd">    &gt;&gt;&gt; from tespy.components import Sink, Source, Pipe</span>
+<span class="sd">    &gt;&gt;&gt; from tespy.connections import Connection</span>
+<span class="sd">    &gt;&gt;&gt; from tespy.networks import Network</span>
+<span class="sd">    &gt;&gt;&gt; import shutil</span>
+<span class="sd">    &gt;&gt;&gt; fluid_list = [&#39;ethanol&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; nw = Network(fluids=fluid_list)</span>
+<span class="sd">    &gt;&gt;&gt; nw.set_attr(p_unit=&#39;bar&#39;, T_unit=&#39;C&#39;, h_unit=&#39;kJ / kg&#39;, iterinfo=False)</span>
+<span class="sd">    &gt;&gt;&gt; so = Source(&#39;source 1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; si = Sink(&#39;sink 1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; pi = Pipe(&#39;pipeline&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; pi.component()</span>
+<span class="sd">    &#39;pipe&#39;</span>
+<span class="sd">    &gt;&gt;&gt; pi.set_attr(pr=0.975, Q=0, design=[&#39;pr&#39;], L=100, D=&#39;var&#39;, ks=5e-5)</span>
+<span class="sd">    &gt;&gt;&gt; inc = Connection(so, &#39;out1&#39;, pi, &#39;in1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; outg = Connection(pi, &#39;out1&#39;, si, &#39;in1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; nw.add_conns(inc, outg)</span>
+<span class="sd">    &gt;&gt;&gt; inc.set_attr(fluid={&#39;ethanol&#39;: 1}, m=10, T=30, p=3)</span>
+<span class="sd">    &gt;&gt;&gt; nw.solve(&#39;design&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; nw.save(&#39;tmp&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; round(pi.D.val, 3)</span>
+<span class="sd">    0.119</span>
+<span class="sd">    &gt;&gt;&gt; outg.p.val / inc.p.val == pi.pr.val</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; inc.set_attr(m=15)</span>
+<span class="sd">    &gt;&gt;&gt; pi.set_attr(D=pi.D.val)</span>
+<span class="sd">    &gt;&gt;&gt; nw.solve(&#39;offdesign&#39;, design_path=&#39;tmp&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; round(pi.pr.val, 2)</span>
+<span class="sd">    0.94</span>
+<span class="sd">    &gt;&gt;&gt; shutil.rmtree(&#39;./tmp&#39;, ignore_errors=True)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Pipe.component"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.piping.pipe.Pipe.component">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">component</span><span class="p">():</span>
+        <span class="k">return</span> <span class="s1">&#39;pipe&#39;</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2020, Francesco Witte.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

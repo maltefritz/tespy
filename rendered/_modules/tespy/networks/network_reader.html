@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tespy.networks.network_reader &mdash; tespy 0.6.0 - Colored Chemicals documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> tespy
+            <img src="../../../_static/logo_tespy_mid.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.6.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../introduction.html">Thermal Engineering Systems in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../first_steps.html">First steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials_examples.html">Examples and Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tespy_modules.html">TESPy modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tespy_analyses.html">Thermodynamic analyses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developing_tespy.html">Developing TESPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../zliterature.html">Literature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">tespy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>tespy.networks.network_reader</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for tespy.networks.network_reader</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8</span>
+
+<span class="sd">&quot;&quot;&quot;Module for loading a tespy network from saved state.</span>
+
+<span class="sd">Use the method :func:`tespy.networks.network_reader.load_network` for importing</span>
+<span class="sd">a network from a saved state.</span>
+
+
+<span class="sd">This file is part of project TESPy (github.com/oemof/tespy). It&#39;s copyrighted</span>
+<span class="sd">by the contributors recorded in the version control history of the file,</span>
+<span class="sd">available from its original location tespy/networks/network_reader.py</span>
+
+<span class="sd">SPDX-License-Identifier: MIT</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">ast</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="n">CombustionChamber</span>
+<span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="n">CombustionEngine</span>
+<span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="n">Compressor</span>
+<span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="n">Condenser</span>
+<span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="n">CycleCloser</span>
+<span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="n">Desuperheater</span>
+<span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="n">DropletSeparator</span>
+<span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="n">Drum</span>
+<span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="n">HeatExchanger</span>
+<span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="n">HeatExchangerSimple</span>
+<span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="n">Merge</span>
+<span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="n">ORCEvaporator</span>
+<span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="n">ParabolicTrough</span>
+<span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="n">Pipe</span>
+<span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="n">Pump</span>
+<span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="n">Separator</span>
+<span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="n">Sink</span>
+<span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="n">SolarCollector</span>
+<span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="n">Source</span>
+<span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="n">Splitter</span>
+<span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="n">SubsystemInterface</span>
+<span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="n">Turbine</span>
+<span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="n">Valve</span>
+<span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="n">WaterElectrolyzer</span>
+<span class="kn">from</span> <span class="nn">tespy.connections</span> <span class="kn">import</span> <span class="n">Bus</span>
+<span class="kn">from</span> <span class="nn">tespy.connections</span> <span class="kn">import</span> <span class="n">Connection</span>
+<span class="kn">from</span> <span class="nn">tespy.connections</span> <span class="kn">import</span> <span class="n">Ref</span>
+<span class="kn">from</span> <span class="nn">tespy.networks.network</span> <span class="kn">import</span> <span class="n">Network</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.characteristics</span> <span class="kn">import</span> <span class="n">CharLine</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.characteristics</span> <span class="kn">import</span> <span class="n">CharMap</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.data_containers</span> <span class="kn">import</span> <span class="n">ComponentCharacteristicMaps</span> <span class="k">as</span> <span class="n">dc_cm</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.data_containers</span> <span class="kn">import</span> <span class="n">ComponentCharacteristics</span> <span class="k">as</span> <span class="n">dc_cc</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.data_containers</span> <span class="kn">import</span> <span class="n">ComponentProperties</span> <span class="k">as</span> <span class="n">dc_cp</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.data_containers</span> <span class="kn">import</span> <span class="n">DataContainerSimple</span> <span class="k">as</span> <span class="n">dc_simple</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.data_containers</span> <span class="kn">import</span> <span class="n">FluidComposition</span> <span class="k">as</span> <span class="n">dc_flu</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.data_containers</span> <span class="kn">import</span> <span class="n">FluidProperties</span> <span class="k">as</span> <span class="n">dc_prop</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.data_containers</span> <span class="kn">import</span> <span class="n">GroupedComponentProperties</span> <span class="k">as</span> <span class="n">dc_gcp</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.helpers</span> <span class="kn">import</span> <span class="n">modify_path_os</span>
+
+<span class="c1"># pass the warning messages to the logger</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">captureWarnings</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+
+<span class="n">comp_target_classes</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;CycleCloser&#39;</span><span class="p">:</span> <span class="n">CycleCloser</span><span class="p">,</span>
+    <span class="s1">&#39;Sink&#39;</span><span class="p">:</span> <span class="n">Sink</span><span class="p">,</span>
+    <span class="s1">&#39;Source&#39;</span><span class="p">:</span> <span class="n">Source</span><span class="p">,</span>
+    <span class="s1">&#39;SubsystemInterface&#39;</span><span class="p">:</span> <span class="n">SubsystemInterface</span><span class="p">,</span>
+    <span class="s1">&#39;CombustionChamber&#39;</span><span class="p">:</span> <span class="n">CombustionChamber</span><span class="p">,</span>
+    <span class="s1">&#39;CombustionEngine&#39;</span><span class="p">:</span> <span class="n">CombustionEngine</span><span class="p">,</span>
+    <span class="s1">&#39;ORCEvaporator&#39;</span><span class="p">:</span> <span class="n">ORCEvaporator</span><span class="p">,</span>
+    <span class="s1">&#39;Condenser&#39;</span><span class="p">:</span> <span class="n">Condenser</span><span class="p">,</span>
+    <span class="s1">&#39;Desuperheater&#39;</span><span class="p">:</span> <span class="n">Desuperheater</span><span class="p">,</span>
+    <span class="s1">&#39;HeatExchanger&#39;</span><span class="p">:</span> <span class="n">HeatExchanger</span><span class="p">,</span>
+    <span class="s1">&#39;HeatExchangerSimple&#39;</span><span class="p">:</span> <span class="n">HeatExchangerSimple</span><span class="p">,</span>
+    <span class="s1">&#39;SolarCollector&#39;</span><span class="p">:</span> <span class="n">SolarCollector</span><span class="p">,</span>
+    <span class="s1">&#39;ParabolicTrough&#39;</span><span class="p">:</span> <span class="n">ParabolicTrough</span><span class="p">,</span>
+    <span class="s1">&#39;DropletSeparator&#39;</span><span class="p">:</span> <span class="n">DropletSeparator</span><span class="p">,</span>
+    <span class="s1">&#39;Drum&#39;</span><span class="p">:</span> <span class="n">Drum</span><span class="p">,</span>
+    <span class="s1">&#39;Merge&#39;</span><span class="p">:</span> <span class="n">Merge</span><span class="p">,</span>
+    <span class="s1">&#39;Separator&#39;</span><span class="p">:</span> <span class="n">Separator</span><span class="p">,</span>
+    <span class="s1">&#39;Splitter&#39;</span><span class="p">:</span> <span class="n">Splitter</span><span class="p">,</span>
+    <span class="s1">&#39;Pipe&#39;</span><span class="p">:</span> <span class="n">Pipe</span><span class="p">,</span>
+    <span class="s1">&#39;Valve&#39;</span><span class="p">:</span> <span class="n">Valve</span><span class="p">,</span>
+    <span class="s1">&#39;WaterElectrolyzer&#39;</span><span class="p">:</span> <span class="n">WaterElectrolyzer</span><span class="p">,</span>
+    <span class="s1">&#39;Compressor&#39;</span><span class="p">:</span> <span class="n">Compressor</span><span class="p">,</span>
+    <span class="s1">&#39;Pump&#39;</span><span class="p">:</span> <span class="n">Pump</span><span class="p">,</span>
+    <span class="s1">&#39;Turbine&#39;</span><span class="p">:</span> <span class="n">Turbine</span>
+<span class="p">}</span>
+
+<span class="c1"># %% network loading</span>
+
+
+<div class="viewcode-block" id="load_network"><a class="viewcode-back" href="../../../api/tespy.networks.html#tespy.networks.network_reader.load_network">[docs]</a><span class="k">def</span> <span class="nf">load_network</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Load a network from a base path.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path : str</span>
+<span class="sd">        The path to the network data.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    nw : tespy.networks.network.Network</span>
+<span class="sd">        TESPy networks object.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    If you save the network structure of an existing TESPy network, it will be</span>
+<span class="sd">    saved to the path you specified. The structure of the saved data in that</span>
+<span class="sd">    path is the structure you need to provide in the path for loading the</span>
+<span class="sd">    network.</span>
+
+<span class="sd">    The structure of the path must be as follows:</span>
+
+<span class="sd">    - Folder: path (e.g. &#39;mynetwork&#39;)</span>
+<span class="sd">    - Subfolder: components (&#39;mynetwork/components&#39;) containing</span>
+
+<span class="sd">        - bus.csv*</span>
+<span class="sd">        - char.csv*</span>
+<span class="sd">        - char_map.csv*</span>
+<span class="sd">        - component_class_name.csv (e.g. heat_exchanger.csv)</span>
+
+<span class="sd">    - connections.csv</span>
+<span class="sd">    - network.json</span>
+
+<span class="sd">    The imported network has the following additional features:</span>
+
+<span class="sd">    - Connections are accessible by label, e.g.</span>
+<span class="sd">      :code:`myimportednetwork.get_conn(&#39;myconnection&#39;)`. The default label</span>
+<span class="sd">      logic is :code:`source:source_id_target:target_id`, where the source</span>
+<span class="sd">      means the label of the component the connection originates from and</span>
+<span class="sd">      target means the label of the component, the connections targets on.</span>
+<span class="sd">    - Components are accessible by label as well, e.g. for a component</span>
+<span class="sd">      &#39;heat exchanger&#39; :code:`myimportednetwork.get_comp(&#39;heat exchanger&#39;)`.</span>
+<span class="sd">    - Busses are stored in a dict like structure, therefore accessible like</span>
+<span class="sd">      follows, e.g. a bus labeld &#39;power input&#39;</span>
+<span class="sd">      :code:`myimportednetwork.busses[&#39;power input&#39;]`.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    Create a network and export it. This is followed by loading the network</span>
+<span class="sd">    with the network_reader module. All network information stored will be</span>
+<span class="sd">    passed to a new network object. Components, connections and busses will</span>
+<span class="sd">    be accessible by label. The following example setup is simple gas turbine</span>
+<span class="sd">    setup with compressor, combustion chamber and turbine. The fuel is fed</span>
+<span class="sd">    from a pipeline and throttled to the required pressure while keeping the</span>
+<span class="sd">    temperature at a constant value.</span>
+
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; from tespy.components import (Sink, Source, CombustionChamber,</span>
+<span class="sd">    ... Compressor, Turbine, HeatExchangerSimple)</span>
+<span class="sd">    &gt;&gt;&gt; from tespy.connections import Connection, Ref, Bus</span>
+<span class="sd">    &gt;&gt;&gt; from tespy.networks import load_network, Network</span>
+<span class="sd">    &gt;&gt;&gt; import shutil</span>
+<span class="sd">    &gt;&gt;&gt; fluid_list = [&#39;CH4&#39;, &#39;O2&#39;, &#39;N2&#39;, &#39;CO2&#39;, &#39;H2O&#39;, &#39;Ar&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; nw = Network(fluids=fluid_list, p_unit=&#39;bar&#39;, T_unit=&#39;C&#39;,</span>
+<span class="sd">    ... h_unit=&#39;kJ / kg&#39;, iterinfo=False)</span>
+<span class="sd">    &gt;&gt;&gt; air = Source(&#39;air&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; f = Source(&#39;fuel&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; c = Compressor(&#39;compressor&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; comb = CombustionChamber(&#39;combustion&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; t = Turbine(&#39;turbine&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; p = HeatExchangerSimple(&#39;fuel preheater&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; si = Sink(&#39;sink&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; inc = Connection(air, &#39;out1&#39;, c, &#39;in1&#39;, label=&#39;ambient air&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; cc = Connection(c, &#39;out1&#39;, comb, &#39;in1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; fp = Connection(f, &#39;out1&#39;, p, &#39;in1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; pc = Connection(p, &#39;out1&#39;, comb, &#39;in2&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; ct = Connection(comb, &#39;out1&#39;, t, &#39;in1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; outg = Connection(t, &#39;out1&#39;, si, &#39;in1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; nw.add_conns(inc, cc, fp, pc, ct, outg)</span>
+
+<span class="sd">    Specify component and connection properties. The intlet pressure at the</span>
+<span class="sd">    compressor and the outlet pressure after the turbine are identical. For the</span>
+<span class="sd">    compressor, the pressure ratio and isentropic efficiency are design</span>
+<span class="sd">    parameters. A compressor map (efficiency vs. mass flow and pressure rise</span>
+<span class="sd">    vs. mass flow) is selected for the compressor. Fuel is Methane.</span>
+
+<span class="sd">    &gt;&gt;&gt; c.set_attr(pr=10, eta_s=0.88, design=[&#39;eta_s&#39;, &#39;pr&#39;],</span>
+<span class="sd">    ... offdesign=[&#39;char_map_eta_s&#39;, &#39;char_map_pr&#39;])</span>
+<span class="sd">    &gt;&gt;&gt; t.set_attr(eta_s=0.9, design=[&#39;eta_s&#39;],</span>
+<span class="sd">    ... offdesign=[&#39;eta_s_char&#39;, &#39;cone&#39;])</span>
+<span class="sd">    &gt;&gt;&gt; inc.set_attr(fluid={&#39;N2&#39;: 0.7556, &#39;O2&#39;: 0.2315, &#39;Ar&#39;: 0.0129, &#39;CH4&#39;: 0,</span>
+<span class="sd">    ... &#39;H2O&#39;: 0}, fluid_balance=True, T=25, p=1)</span>
+<span class="sd">    &gt;&gt;&gt; fp.set_attr(fluid={&#39;N2&#39;: 0, &#39;O2&#39;: 0, &#39;Ar&#39;: 0, &#39;CH4&#39;: 0.96, &#39;H2O&#39;: 0,</span>
+<span class="sd">    ... &#39;CO2&#39;: 0.04}, T=25, p=40)</span>
+<span class="sd">    &gt;&gt;&gt; pc.set_attr(T=25)</span>
+<span class="sd">    &gt;&gt;&gt; ct.set_attr(T=1100)</span>
+<span class="sd">    &gt;&gt;&gt; outg.set_attr(p=Ref(inc, 1, 0))</span>
+<span class="sd">    &gt;&gt;&gt; power = Bus(&#39;total power output&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; power.add_comps({&#39;comp&#39;: c}, {&#39;comp&#39;: t})</span>
+<span class="sd">    &gt;&gt;&gt; nw.add_busses(power)</span>
+
+<span class="sd">    For a stable start, we specify the fresh air mass flow.</span>
+
+<span class="sd">    &gt;&gt;&gt; inc.set_attr(m=3)</span>
+<span class="sd">    &gt;&gt;&gt; nw.solve(&#39;design&#39;)</span>
+
+<span class="sd">    The total power output is set to 1 MW, electrical or mechanical</span>
+<span class="sd">    efficiencies are not considered in this example. The documentation</span>
+<span class="sd">    example in class :py:class:`tespy.connections.bus.Bus` provides more</span>
+<span class="sd">    information on efficiencies of generators, for instance.</span>
+
+<span class="sd">    &gt;&gt;&gt; inc.set_attr(m=np.nan)</span>
+<span class="sd">    &gt;&gt;&gt; power.set_attr(P=-1e6)</span>
+<span class="sd">    &gt;&gt;&gt; nw.solve(&#39;design&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; nw.lin_dep</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; nw.save(&#39;exported_nwk&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; mass_flow = round(nw.get_conn(&#39;ambient air&#39;).m.val_SI, 1)</span>
+<span class="sd">    &gt;&gt;&gt; c.set_attr(igva=&#39;var&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; nw.solve(&#39;offdesign&#39;, design_path=&#39;exported_nwk&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; round(t.eta_s.val, 1)</span>
+<span class="sd">    0.9</span>
+<span class="sd">    &gt;&gt;&gt; power.set_attr(P=-0.75e6)</span>
+<span class="sd">    &gt;&gt;&gt; nw.solve(&#39;offdesign&#39;, design_path=&#39;exported_nwk&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; nw.lin_dep</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; eta_s_t = round(t.eta_s.val, 3)</span>
+<span class="sd">    &gt;&gt;&gt; igva = round(c.igva.val, 3)</span>
+<span class="sd">    &gt;&gt;&gt; eta_s_t</span>
+<span class="sd">    0.898</span>
+<span class="sd">    &gt;&gt;&gt; igva</span>
+<span class="sd">    20.138</span>
+
+<span class="sd">    The designed network is exported to the path &#39;exported_nwk&#39;. Now import the</span>
+<span class="sd">    network and recalculate. Check if the results match with the previous</span>
+<span class="sd">    calculation in design and offdesign case.</span>
+
+<span class="sd">    &gt;&gt;&gt; imported_nwk = load_network(&#39;exported_nwk&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; imported_nwk.set_attr(iterinfo=False)</span>
+<span class="sd">    &gt;&gt;&gt; imported_nwk.solve(&#39;design&#39;, init_path=&#39;exported_nwk&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; imported_nwk.lin_dep</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; round(imported_nwk.get_conn(&#39;ambient air&#39;).m.val_SI, 1) == mass_flow</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; round(imported_nwk.get_comp(&#39;turbine&#39;).eta_s.val, 3)</span>
+<span class="sd">    0.9</span>
+<span class="sd">    &gt;&gt;&gt; imported_nwk.get_comp(&#39;compressor&#39;).set_attr(igva=&#39;var&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; imported_nwk.solve(&#39;offdesign&#39;, design_path=&#39;exported_nwk&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; round(imported_nwk.get_comp(&#39;turbine&#39;).eta_s.val, 3)</span>
+<span class="sd">    0.9</span>
+<span class="sd">    &gt;&gt;&gt; imported_nwk.busses[&#39;total power output&#39;].set_attr(P=-0.75e6)</span>
+<span class="sd">    &gt;&gt;&gt; imported_nwk.solve(&#39;offdesign&#39;, design_path=&#39;exported_nwk&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; round(imported_nwk.get_comp(&#39;turbine&#39;).eta_s.val, 3) == eta_s_t</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; round(imported_nwk.get_comp(&#39;compressor&#39;).igva.val, 3) == igva</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; shutil.rmtree(&#39;./exported_nwk&#39;, ignore_errors=True)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">path</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;/&#39;</span> <span class="ow">and</span> <span class="n">path</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">+=</span> <span class="s1">&#39;/&#39;</span>
+
+    <span class="n">path_comps</span> <span class="o">=</span> <span class="n">modify_path_os</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="s1">&#39;components/&#39;</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">modify_path_os</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+    <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Reading network data from base path &#39;</span> <span class="o">+</span> <span class="n">path</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="c1"># load characteristics</span>
+    <span class="n">fn</span> <span class="o">=</span> <span class="n">path_comps</span> <span class="o">+</span> <span class="s1">&#39;char_line.csv&#39;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">char_lines</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;;&#39;</span><span class="p">,</span> <span class="n">decimal</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span>
+                                 <span class="n">converters</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">,</span>
+                                             <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">})</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Reading characteristic lines data from &#39;</span> <span class="o">+</span> <span class="n">fn</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+        <span class="n">char_lines</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;object&#39;</span><span class="p">)</span>
+
+    <span class="c1"># load characteristic maps</span>
+    <span class="n">fn</span> <span class="o">=</span> <span class="n">path_comps</span> <span class="o">+</span> <span class="s1">&#39;char_map.csv&#39;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Reading characteristic maps data from &#39;</span> <span class="o">+</span> <span class="n">fn</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="n">char_maps</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;;&#39;</span><span class="p">,</span> <span class="n">decimal</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span>
+                                <span class="n">converters</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">,</span>
+                                            <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">,</span>
+                                            <span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">})</span>
+
+    <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+        <span class="n">char_maps</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;object&#39;</span><span class="p">)</span>
+
+    <span class="c1"># load components</span>
+    <span class="n">comps</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;object&#39;</span><span class="p">)</span>
+
+    <span class="n">files</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path_comps</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">f</span> <span class="o">!=</span> <span class="s1">&#39;bus.csv&#39;</span> <span class="ow">and</span> <span class="n">f</span> <span class="o">!=</span> <span class="s1">&#39;char_line.csv&#39;</span> <span class="ow">and</span> <span class="n">f</span> <span class="o">!=</span> <span class="s1">&#39;char_map.csv&#39;</span><span class="p">:</span>
+            <span class="n">fn</span> <span class="o">=</span> <span class="n">path_comps</span> <span class="o">+</span> <span class="n">f</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;;&#39;</span><span class="p">,</span> <span class="n">decimal</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span>
+                             <span class="n">converters</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;design&#39;</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">,</span>
+                                         <span class="s1">&#39;offdesign&#39;</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">,</span>
+                                         <span class="s1">&#39;busses&#39;</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">,</span>
+                                         <span class="s1">&#39;bus_param&#39;</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">,</span>
+                                         <span class="s1">&#39;bus_P_ref&#39;</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">,</span>
+                                         <span class="s1">&#39;bus_char&#39;</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">,</span>
+                                         <span class="s1">&#39;bus_base&#39;</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">})</span>
+
+            <span class="c1"># create components</span>
+            <span class="n">df</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+                <span class="n">construct_components</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>  <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">char_lines</span><span class="p">,</span> <span class="n">char_maps</span><span class="p">))</span>
+
+            <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="s1">&#39;instance&#39;</span><span class="p">,</span> <span class="s1">&#39;label&#39;</span><span class="p">,</span> <span class="s1">&#39;busses&#39;</span><span class="p">,</span> <span class="s1">&#39;bus_param&#39;</span><span class="p">,</span> <span class="s1">&#39;bus_P_ref&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;bus_char&#39;</span><span class="p">,</span> <span class="s1">&#39;bus_base&#39;</span><span class="p">]</span>
+
+            <span class="n">comps</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">((</span><span class="n">comps</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="n">cols</span><span class="p">]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Reading component data (&#39;</span> <span class="o">+</span> <span class="n">f</span><span class="p">[:</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;) from &#39;</span> <span class="o">+</span> <span class="n">fn</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="n">comps</span> <span class="o">=</span> <span class="n">comps</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;label&#39;</span><span class="p">)</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Created network components.&#39;</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="c1"># create network</span>
+    <span class="n">nw</span> <span class="o">=</span> <span class="n">construct_network</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+    <span class="c1"># load connections</span>
+    <span class="n">fn</span> <span class="o">=</span> <span class="n">path</span> <span class="o">+</span> <span class="s1">&#39;connections.csv&#39;</span>
+    <span class="n">conns</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;;&#39;</span><span class="p">,</span> <span class="n">decimal</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span>
+                        <span class="n">converters</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;design&#39;</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">,</span>
+                                    <span class="s1">&#39;offdesign&#39;</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">})</span>
+
+    <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Reading connection data from &#39;</span> <span class="o">+</span> <span class="n">fn</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="c1"># create connections</span>
+    <span class="n">conns</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">conns</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+        <span class="n">construct_connections</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">comps</span><span class="p">,</span> <span class="n">nw</span><span class="p">,))</span>
+    <span class="n">conns</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">conns_set_ref</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">conns</span><span class="p">,))</span>
+    <span class="n">conns</span> <span class="o">=</span> <span class="n">conns</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">)</span>
+
+    <span class="c1"># add connections to network</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">conns</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]:</span>
+        <span class="n">nw</span><span class="o">.</span><span class="n">add_conns</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+
+    <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Created connections.&#39;</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="c1"># load busses</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">fn</span> <span class="o">=</span> <span class="n">path_comps</span> <span class="o">+</span> <span class="s1">&#39;bus.csv&#39;</span>
+        <span class="n">busses</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;;&#39;</span><span class="p">,</span> <span class="n">decimal</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Reading bus data from &#39;</span> <span class="o">+</span> <span class="n">fn</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+        <span class="n">busses</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;object&#39;</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;No bus data found!&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="c1"># create busses</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">busses</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">busses</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">busses</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">construct_busses</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># add components to busses</span>
+        <span class="n">comps</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">busses_add_comps</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">busses</span><span class="p">,</span> <span class="n">char_lines</span><span class="p">,))</span>
+
+        <span class="c1"># add busses to network</span>
+        <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">busses</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]:</span>
+            <span class="n">nw</span><span class="o">.</span><span class="n">add_busses</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Created busses.&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Created network.&#39;</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="n">nw</span><span class="o">.</span><span class="n">check_network</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">nw</span></div>
+
+
+<span class="c1"># %% create components</span>
+
+
+<div class="viewcode-block" id="construct_components"><a class="viewcode-back" href="../../../api/tespy.networks.html#tespy.networks.network_reader.construct_components">[docs]</a><span class="k">def</span> <span class="nf">construct_components</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create TESPy component from class name and set parameters.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    c : pandas.core.series.Series</span>
+<span class="sd">        Component information from .csv-file.</span>
+
+<span class="sd">    args[0] : pandas.core.frame.DataFrame</span>
+<span class="sd">        DataFrame containing the data of characteristic lines.</span>
+
+<span class="sd">    args[1] : pandas.core.frame.DataFrame</span>
+<span class="sd">        DataFrame containing the data of characteristic maps.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    instance : tespy.components.component.Component</span>
+<span class="sd">        TESPy component object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">target_class</span> <span class="o">=</span> <span class="n">comp_target_classes</span><span class="p">[</span><span class="n">c</span><span class="p">[</span><span class="s1">&#39;comp_type&#39;</span><span class="p">]]</span>
+    <span class="n">instance</span> <span class="o">=</span> <span class="n">target_class</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]))</span>
+    <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c1"># basic properties</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;design&#39;</span><span class="p">,</span> <span class="s1">&#39;offdesign&#39;</span><span class="p">,</span> <span class="s1">&#39;design_path&#39;</span><span class="p">,</span> <span class="s1">&#39;local_design&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;local_offdesign&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">c</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">float</span><span class="p">):</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">instance</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">c</span><span class="p">:</span>
+            <span class="c1"># component parameters</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">dc_cp</span><span class="p">):</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s1">&#39;val&#39;</span><span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="n">key</span><span class="p">],</span>
+                    <span class="s1">&#39;is_set&#39;</span><span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;_set&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;is_var&#39;</span><span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;_var&#39;</span><span class="p">]}</span>
+
+            <span class="c1"># component parameters</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">dc_simple</span><span class="p">):</span>
+                <span class="n">instance</span><span class="o">.</span><span class="n">get_attr</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span>
+                    <span class="o">**</span><span class="p">{</span><span class="s1">&#39;val&#39;</span><span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="s1">&#39;is_set&#39;</span><span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;_set&#39;</span><span class="p">]})</span>
+
+            <span class="c1"># component characteristics</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">dc_cc</span><span class="p">):</span>
+                <span class="c1"># finding x and y values of the characteristic function</span>
+                <span class="n">values</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">c</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">x</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">values</span><span class="p">]</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">y</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">values</span><span class="p">]</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">extrapolate</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">if</span> <span class="s1">&#39;extrapolate&#39;</span> <span class="ow">in</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                        <span class="n">extrapolate</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">values</span><span class="p">]</span><span class="o">.</span><span class="n">extrapolate</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">char</span> <span class="o">=</span> <span class="n">CharLine</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">extrapolate</span><span class="o">=</span><span class="n">extrapolate</span><span class="p">)</span>
+
+                <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+
+                    <span class="n">char</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Could not find x and y values for characteristic &#39;</span>
+                           <span class="s1">&#39;line, using defaults instead for function &#39;</span> <span class="o">+</span> <span class="n">key</span> <span class="o">+</span>
+                           <span class="s1">&#39; at component &#39;</span> <span class="o">+</span> <span class="n">c</span><span class="o">.</span><span class="n">label</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+                <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s1">&#39;is_set&#39;</span><span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;_set&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;param&#39;</span><span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;_param&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;char_func&#39;</span><span class="p">:</span> <span class="n">char</span><span class="p">}</span>
+
+            <span class="c1"># component characteristics</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">dc_cm</span><span class="p">):</span>
+                <span class="c1"># finding x and y values of the characteristic function</span>
+                <span class="n">values</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">c</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">x</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">values</span><span class="p">]</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="n">y</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">values</span><span class="p">]</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="n">z</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">values</span><span class="p">]</span><span class="o">.</span><span class="n">z</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="n">char</span> <span class="o">=</span> <span class="n">CharMap</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="n">z</span><span class="p">)</span>
+
+                <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+                    <span class="n">char</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Could not find x, y and z values for &#39;</span>
+                           <span class="s1">&#39;characteristic map of component &#39;</span> <span class="o">+</span> <span class="n">c</span><span class="o">.</span><span class="n">label</span> <span class="o">+</span> <span class="s1">&#39;!&#39;</span><span class="p">)</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+                <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s1">&#39;is_set&#39;</span><span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;_set&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;param&#39;</span><span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;_param&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;char_func&#39;</span><span class="p">:</span> <span class="n">char</span><span class="p">}</span>
+
+            <span class="c1"># grouped component parameters</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">dc_gcp</span><span class="p">):</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;method&#39;</span><span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="n">key</span><span class="p">]}</span>
+
+    <span class="n">instance</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">instance</span></div>
+
+<span class="c1"># %% create network object</span>
+
+
+<div class="viewcode-block" id="construct_network"><a class="viewcode-back" href="../../../api/tespy.networks.html#tespy.networks.network_reader.construct_network">[docs]</a><span class="k">def</span> <span class="nf">construct_network</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create TESPy network from the data provided in the netw.csv-file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path : str</span>
+<span class="sd">        Base-path to stored network data.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    nw : tespy.networks.network.Network</span>
+<span class="sd">        TESPy network object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># read network .csv-file</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="s1">&#39;network.json&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+
+    <span class="c1"># construct fluid list</span>
+    <span class="n">fluid_list</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">backend</span> <span class="o">+</span> <span class="s1">&#39;::&#39;</span> <span class="o">+</span> <span class="n">fluid</span> <span class="k">for</span> <span class="n">fluid</span><span class="p">,</span> <span class="n">backend</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;fluids&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+
+    <span class="c1"># delete fluids from data</span>
+    <span class="k">del</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;fluids&#39;</span><span class="p">]</span>
+
+    <span class="c1"># create network object with its properties</span>
+    <span class="n">nw</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span><span class="n">fluids</span><span class="o">=</span><span class="n">fluid_list</span><span class="p">,</span> <span class="o">**</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">nw</span></div>
+
+<span class="c1"># %% create connections</span>
+
+
+<div class="viewcode-block" id="construct_connections"><a class="viewcode-back" href="../../../api/tespy.networks.html#tespy.networks.network_reader.construct_connections">[docs]</a><span class="k">def</span> <span class="nf">construct_connections</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create TESPy connection from data in the .csv-file and its parameters.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    c : pandas.core.series.Series</span>
+<span class="sd">        Connection information from .csv-file.</span>
+
+<span class="sd">    args[0] : pandas.core.frame.DataFrame</span>
+<span class="sd">        DataFrame containing all created components.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    conn : tespy.connections.connection.Connection</span>
+<span class="sd">        TESPy connection object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># create connection</span>
+    <span class="n">conn</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span>
+        <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">instance</span><span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">source</span><span class="p">],</span> <span class="n">c</span><span class="o">.</span><span class="n">source_id</span><span class="p">,</span>
+        <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">instance</span><span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">target</span><span class="p">],</span> <span class="n">c</span><span class="o">.</span><span class="n">target_id</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="c1"># read basic properties</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;design&#39;</span><span class="p">,</span> <span class="s1">&#39;offdesign&#39;</span><span class="p">,</span> <span class="s1">&#39;design_path&#39;</span><span class="p">,</span> <span class="s1">&#39;local_design&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;local_offdesign&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">c</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">float</span><span class="p">):</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+
+    <span class="c1"># read fluid properties</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="s1">&#39;Td_bp&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">c</span><span class="p">:</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">dc_prop</span><span class="p">(</span>
+                <span class="n">val</span><span class="o">=</span><span class="n">c</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">val0</span><span class="o">=</span><span class="n">c</span><span class="p">[</span><span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;0&#39;</span><span class="p">],</span> <span class="n">val_set</span><span class="o">=</span><span class="n">c</span><span class="p">[</span><span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;_set&#39;</span><span class="p">],</span>
+                <span class="n">unit</span><span class="o">=</span><span class="n">c</span><span class="p">[</span><span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;_unit&#39;</span><span class="p">],</span> <span class="n">ref</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ref_set</span><span class="o">=</span><span class="n">c</span><span class="p">[</span><span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;_ref_set&#39;</span><span class="p">]))</span>
+
+    <span class="k">if</span> <span class="s1">&#39;state&#39;</span> <span class="ow">in</span> <span class="n">c</span><span class="p">:</span>
+        <span class="n">conn</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">dc_simple</span><span class="p">(</span><span class="n">val</span><span class="o">=</span><span class="n">c</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">is_set</span><span class="o">=</span><span class="n">c</span><span class="p">[</span><span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;_set&#39;</span><span class="p">])</span>
+
+    <span class="c1"># read fluid vector</span>
+    <span class="n">val</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">val0</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">val_set</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">fluids</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">c</span><span class="p">:</span>
+            <span class="n">val</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="n">val0</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;0&#39;</span><span class="p">]</span>
+            <span class="n">val_set</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;_set&#39;</span><span class="p">]</span>
+
+    <span class="n">conn</span><span class="o">.</span><span class="n">fluid</span> <span class="o">=</span> <span class="n">dc_flu</span><span class="p">(</span>
+        <span class="n">val</span><span class="o">=</span><span class="n">val</span><span class="p">,</span> <span class="n">val0</span><span class="o">=</span><span class="n">val0</span><span class="p">,</span> <span class="n">val_set</span><span class="o">=</span><span class="n">val_set</span><span class="p">,</span> <span class="n">balance</span><span class="o">=</span><span class="n">c</span><span class="p">[</span><span class="s1">&#39;balance&#39;</span><span class="p">])</span>
+
+    <span class="c1"># write properties to connection and return connection object</span>
+    <span class="k">return</span> <span class="n">conn</span></div>
+
+<span class="c1"># %% set references on connections</span>
+
+
+<div class="viewcode-block" id="conns_set_ref"><a class="viewcode-back" href="../../../api/tespy.networks.html#tespy.networks.network_reader.conns_set_ref">[docs]</a><span class="k">def</span> <span class="nf">conns_set_ref</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Set references on connections as specified in connection data.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    c : pandas.core.series.Series</span>
+<span class="sd">        Connection information from .csv-file.</span>
+
+<span class="sd">    args[0] : pandas.core.frame.DataFrame</span>
+<span class="sd">        DataFrame containing all created connections.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    instance : tespy.connections.ref</span>
+<span class="sd">        TESPy reference object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">]:</span>
+        <span class="c1"># search for referenced connections</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="n">col</span> <span class="o">+</span> <span class="s1">&#39;_ref&#39;</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="c1"># create reference object</span>
+            <span class="n">instance</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">instance</span><span class="p">[</span><span class="n">c</span><span class="p">[</span><span class="n">col</span> <span class="o">+</span> <span class="s1">&#39;_ref&#39;</span><span class="p">]</span> <span class="o">==</span>
+                                        <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="c1"># write to connection properties</span>
+            <span class="n">c</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get_attr</span><span class="p">(</span><span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">ref</span> <span class="o">=</span> <span class="n">Ref</span><span class="p">(</span>
+                <span class="n">instance</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="n">col</span> <span class="o">+</span> <span class="s1">&#39;_ref_f&#39;</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="n">col</span> <span class="o">+</span> <span class="s1">&#39;_ref_d&#39;</span><span class="p">])</span></div>
+
+<span class="c1"># %% create busses</span>
+
+
+<div class="viewcode-block" id="construct_busses"><a class="viewcode-back" href="../../../api/tespy.networks.html#tespy.networks.network_reader.construct_busses">[docs]</a><span class="k">def</span> <span class="nf">construct_busses</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create busses of the network.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    c : pandas.core.series.Series</span>
+<span class="sd">        Bus information from .csv-file.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    b : tespy.connections.bus.Bus</span>
+<span class="sd">        TESPy bus object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># set up bus with label and specify value for power</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">Bus</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">label</span><span class="p">),</span> <span class="n">P</span><span class="o">=</span><span class="n">c</span><span class="o">.</span><span class="n">P</span><span class="p">)</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">P</span><span class="o">.</span><span class="n">is_set</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">P_set</span>
+    <span class="k">return</span> <span class="n">b</span></div>
+
+<span class="c1"># %% add components to busses</span>
+
+
+<div class="viewcode-block" id="busses_add_comps"><a class="viewcode-back" href="../../../api/tespy.networks.html#tespy.networks.network_reader.busses_add_comps">[docs]</a><span class="k">def</span> <span class="nf">busses_add_comps</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Add components to busses according to data from .csv file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    c : pandas.core.series.Series</span>
+<span class="sd">        Component information from .csv-file.</span>
+
+<span class="sd">    args[0] : pandas.core.frame.DataFrame</span>
+<span class="sd">        DataFrame containing all created busses.</span>
+
+<span class="sd">    args[1] : pandas.core.frame.DataFrame</span>
+<span class="sd">        DataFrame containing all created characteristic lines.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">busses</span><span class="p">:</span>
+        <span class="n">param</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">bus_param</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">P_ref</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">bus_P_ref</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">char</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">bus_char</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">base</span> <span class="o">=</span> <span class="s1">&#39;component&#39;</span>
+        <span class="k">if</span> <span class="s1">&#39;bus_base&#39;</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+            <span class="n">base</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">bus_base</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+        <span class="n">values</span> <span class="o">=</span> <span class="n">char</span> <span class="o">==</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
+        <span class="n">char</span> <span class="o">=</span> <span class="n">CharLine</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">values</span><span class="p">]</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                        <span class="n">y</span><span class="o">=</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">values</span><span class="p">]</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="c1"># add component with corresponding details to bus</span>
+        <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">instance</span><span class="p">[</span><span class="n">b</span> <span class="o">==</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;label&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">add_comps</span><span class="p">({</span>
+            <span class="s1">&#39;comp&#39;</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span>
+            <span class="s1">&#39;param&#39;</span><span class="p">:</span> <span class="n">param</span><span class="p">,</span>
+            <span class="s1">&#39;P_ref&#39;</span><span class="p">:</span> <span class="n">P_ref</span><span class="p">,</span>
+            <span class="s1">&#39;char&#39;</span><span class="p">:</span> <span class="n">char</span><span class="p">,</span>
+            <span class="s1">&#39;base&#39;</span><span class="p">:</span> <span class="n">base</span><span class="p">})</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2020, Francesco Witte.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

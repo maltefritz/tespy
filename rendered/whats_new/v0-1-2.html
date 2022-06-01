@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>v0.1.2 (August, 6, 2019) &mdash; tespy 0.6.0 - Colored Chemicals documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> tespy
+            <img src="../_static/logo_tespy_mid.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.6.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Thermal Engineering Systems in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../first_steps.html">First steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials_examples.html">Examples and Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tespy_modules.html">TESPy modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tespy_analyses.html">Thermodynamic analyses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developing_tespy.html">Developing TESPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zliterature.html">Literature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">tespy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>v0.1.2 (August, 6, 2019)</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/whats_new/v0-1-2.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="v0-1-2-august-6-2019">
+<h1>v0.1.2 (August, 6, 2019)<a class="headerlink" href="#v0-1-2-august-6-2019" title="Permalink to this headline">¶</a></h1>
+<section id="new-features">
+<h2>New Features<a class="headerlink" href="#new-features" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>The water electrolyzer is available as new component of TESPy (<a class="reference external" href="https://github.com/oemof/tespy/pull/73">PR #73</a>).</p></li>
+<li><p>The components <code class="xref py py-class docutils literal notranslate"><span class="pre">combustion</span> <span class="pre">chamber</span></code> and <code class="xref py py-class docutils literal notranslate"><span class="pre">cogeneration</span> <span class="pre">unit</span></code>
+now work with fuel mixtures, too. Specification of the component’s fuel is not required anymore, the software automatically detects,
+which fuels are connected to the component’s inlets. Available fuels are: methane, ethane, propane, butane and hydrogen (<a class="reference external" href="https://github.com/oemof/tespy/pull/79">PR #79</a>).</p></li>
+<li><p>Add busses to the <code class="xref py py-meth docutils literal notranslate"><span class="pre">network's</span> <span class="pre">result</span> <span class="pre">printout</span></code>.</p></li>
+</ul>
+</section>
+<section id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Fix some typos in the docstrings and improvements of default values (<a class="reference external" href="https://github.com/oemof/tespy/pull/69">PR #69</a> and <a class="reference external" href="https://github.com/oemof/tespy/pull/71">PR #71</a>).</p></li>
+<li><p>Update combustion chamber tutorial (<a class="reference external" href="https://github.com/oemof/tespy/pull/79">PR #79</a>).</p></li>
+<li><p>Improve API documentation of the solar collector: Handling of optical losses (<a class="reference external" href="https://github.com/oemof/tespy/pull/83">PR #83</a>).</p></li>
+</ul>
+</section>
+<section id="parameter-renaming">
+<h2>Parameter renaming<a class="headerlink" href="#parameter-renaming" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="testing">
+<h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="bug-fixes">
+<h2>Bug fixes<a class="headerlink" href="#bug-fixes" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Fix convergence check for negative minimum enthalpy values (<a class="reference external" href="https://github.com/oemof/tespy/pull/71">PR #71</a>).</p></li>
+<li><p>Add an error message if the user did not add any connections to the network (<a class="reference external" href="https://github.com/oemof/tespy/pull/79">PR #79</a>).</p></li>
+<li><p>Fix loading bus information from design-case .csv-file. Components can be attached to multiple busses now (<a class="reference external" href="https://github.com/oemof/tespy/pull/79">PR #79</a>).</p></li>
+<li><p>Fix solar collector energy balance equation and adjust documentation (<a class="reference external" href="https://github.com/oemof/tespy/pull/83">PR #83</a>).</p></li>
+</ul>
+</section>
+<section id="other-changes">
+<h2>Other changes<a class="headerlink" href="#other-changes" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Add method to calculate and export vapour mass fraction values of pure fluids in the post processing (<a class="reference external" href="https://github.com/oemof/tespy/pull/74">PR #74</a>).</p></li>
+<li><p>Only allow label and P as parameters for busses to avoid misleading parameter specification (<a class="reference external" href="https://github.com/oemof/tespy/pull/78">PR #78</a>).</p></li>
+</ul>
+</section>
+<section id="water-electrolyzer-example">
+<span id="whats-new-012-example-label"></span><h2>Water Electrolyzer Example<a class="headerlink" href="#water-electrolyzer-example" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tespy</span> <span class="kn">import</span> <span class="n">cmp</span><span class="p">,</span> <span class="n">con</span><span class="p">,</span> <span class="n">nwk</span>
+
+<span class="n">fluid_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;O2&#39;</span><span class="p">,</span> <span class="s1">&#39;H2O&#39;</span><span class="p">,</span> <span class="s1">&#39;H2&#39;</span><span class="p">]</span>
+<span class="n">nw</span> <span class="o">=</span> <span class="n">nwk</span><span class="o">.</span><span class="n">network</span><span class="p">(</span><span class="n">fluids</span><span class="o">=</span><span class="n">fluid_list</span><span class="p">,</span> <span class="n">T_unit</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="n">p_unit</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">)</span>
+
+<span class="c1"># sinks and sources</span>
+<span class="n">fw</span> <span class="o">=</span> <span class="n">cmp</span><span class="o">.</span><span class="n">source</span><span class="p">(</span><span class="s1">&#39;feed water&#39;</span><span class="p">)</span>
+<span class="n">oxy</span> <span class="o">=</span> <span class="n">cmp</span><span class="o">.</span><span class="n">sink</span><span class="p">(</span><span class="s1">&#39;oxygen sink&#39;</span><span class="p">)</span>
+<span class="n">hydro</span> <span class="o">=</span> <span class="n">cmp</span><span class="o">.</span><span class="n">sink</span><span class="p">(</span><span class="s1">&#39;hydrogen sink&#39;</span><span class="p">)</span>
+<span class="n">cw</span> <span class="o">=</span> <span class="n">cmp</span><span class="o">.</span><span class="n">source</span><span class="p">(</span><span class="s1">&#39;cooling water&#39;</span><span class="p">)</span>
+<span class="n">cw_hot</span> <span class="o">=</span> <span class="n">cmp</span><span class="o">.</span><span class="n">sink</span><span class="p">(</span><span class="s1">&#39;cooling water out&#39;</span><span class="p">)</span>
+
+<span class="c1"># specification of electrolysis efficiency</span>
+<span class="n">el</span> <span class="o">=</span> <span class="n">cmp</span><span class="o">.</span><span class="n">water_electrolyzer</span><span class="p">(</span><span class="s1">&#39;electrolyzer 1&#39;</span><span class="p">,</span> <span class="n">eta</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">design</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;eta&#39;</span><span class="p">],</span> <span class="n">offdesign</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;eta_char&#39;</span><span class="p">])</span>
+
+<span class="c1"># hydrogen compression</span>
+<span class="n">comp</span> <span class="o">=</span> <span class="n">cmp</span><span class="o">.</span><span class="n">compressor</span><span class="p">(</span><span class="s1">&#39;compressor&#39;</span><span class="p">,</span> <span class="n">eta_s</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
+
+<span class="c1"># specify the feed water mass flow</span>
+<span class="c1"># the fluid composition at the feed water inlet and the oxygen as well as</span>
+<span class="c1"># hydrogen outlets are not required. These parameters are set automatically.</span>
+<span class="n">fw_el</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">connection</span><span class="p">(</span><span class="n">fw</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">el</span><span class="p">,</span> <span class="s1">&#39;in2&#39;</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+<span class="n">el_o</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">connection</span><span class="p">(</span><span class="n">el</span><span class="p">,</span> <span class="s1">&#39;out2&#39;</span><span class="p">,</span> <span class="n">oxy</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+<span class="n">el_cmp</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">connection</span><span class="p">(</span><span class="n">el</span><span class="p">,</span> <span class="s1">&#39;out3&#39;</span><span class="p">,</span> <span class="n">comp</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+<span class="n">cmp_h</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">connection</span><span class="p">(</span><span class="n">comp</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">hydro</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+
+<span class="c1"># cooling water specifications</span>
+<span class="n">cw_el</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">connection</span><span class="p">(</span><span class="n">cw</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">el</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">,</span> <span class="n">fluid</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;H2O&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;H2&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;O2&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span> <span class="n">p</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+<span class="n">el_cw</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">connection</span><span class="p">(</span><span class="n">el</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">cw_hot</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mf">4.9</span><span class="p">)</span>
+<span class="n">nw</span><span class="o">.</span><span class="n">add_conns</span><span class="p">(</span><span class="n">fw_el</span><span class="p">,</span> <span class="n">el_o</span><span class="p">,</span> <span class="n">el_cmp</span><span class="p">,</span> <span class="n">cmp_h</span><span class="p">,</span> <span class="n">cw_el</span><span class="p">,</span> <span class="n">el_cw</span><span class="p">)</span>
+
+<span class="c1"># solve design case</span>
+<span class="n">nw</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="s1">&#39;design&#39;</span><span class="p">)</span>
+<span class="n">nw</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;tmp&#39;</span><span class="p">)</span>
+<span class="c1"># test offdesign case</span>
+<span class="n">nw</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="s1">&#39;offdesign&#39;</span><span class="p">,</span> <span class="n">design_path</span><span class="o">=</span><span class="s1">&#39;tmp&#39;</span><span class="p">)</span>
+
+<span class="c1"># change feed water flow and recalculate operation</span>
+<span class="n">fw_el</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">m</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+<span class="n">nw</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="s1">&#39;offdesign&#39;</span><span class="p">,</span> <span class="n">design_path</span><span class="o">=</span><span class="s1">&#39;tmp&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="contributors">
+<h2>Contributors<a class="headerlink" href="#contributors" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Francesco Witte</p></li>
+<li><p>Tim Hoener, Nils Stolze, Markus Brandt</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2020, Francesco Witte.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

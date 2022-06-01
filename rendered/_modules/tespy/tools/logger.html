@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tespy.tools.logger &mdash; tespy 0.6.0 - Colored Chemicals documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> tespy
+            <img src="../../../_static/logo_tespy_mid.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.6.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../introduction.html">Thermal Engineering Systems in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../first_steps.html">First steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials_examples.html">Examples and Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tespy_modules.html">TESPy modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tespy_analyses.html">Thermodynamic analyses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developing_tespy.html">Developing TESPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../zliterature.html">Literature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">tespy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>tespy.tools.logger</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for tespy.tools.logger</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8</span>
+
+<span class="sd">&quot;&quot;&quot;Module for logging specification.</span>
+
+<span class="sd">This file is part of project TESPy (github.com/oemof/tespy). It&#39;s copyrighted</span>
+<span class="sd">by the contributors recorded in the version control history of the file,</span>
+<span class="sd">available from its original location tespy/tools/logger.py</span>
+
+<span class="sd">SPDX-License-Identifier: MIT</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">handlers</span>
+
+<span class="kn">import</span> <span class="nn">tespy</span>
+
+
+<div class="viewcode-block" id="define_logging"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.logger.define_logging">[docs]</a><span class="k">def</span> <span class="nf">define_logging</span><span class="p">(</span><span class="n">logpath</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">logfile</span><span class="o">=</span><span class="s1">&#39;tespy.log&#39;</span><span class="p">,</span> <span class="n">file_format</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                   <span class="n">screen_format</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">file_datefmt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">screen_datefmt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                   <span class="n">screen_level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="n">file_level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span>
+                   <span class="n">log_version</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">log_path</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">timed_rotating</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Initialise customisable logger.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    logfile : str</span>
+<span class="sd">        Name of the log file, default: tespy.log</span>
+
+<span class="sd">    logpath : str</span>
+<span class="sd">        The path for log files. By default a &quot;.tespy&#39; folder is created in your</span>
+<span class="sd">        home directory with subfolder called &#39;log_files&#39;.</span>
+
+<span class="sd">    file_format : str</span>
+<span class="sd">        Format of the file output.</span>
+<span class="sd">        Default: &quot;%(asctime)s - %(levelname)s - %(module)s - %(message)s&quot;</span>
+
+<span class="sd">    screen_format : str</span>
+<span class="sd">        Format of the screen output.</span>
+<span class="sd">        Default: &quot;%(asctime)s-%(levelname)s-%(message)s&quot;</span>
+
+<span class="sd">    file_datefmt : str</span>
+<span class="sd">        Format of the datetime in the file output. Default: None</span>
+
+<span class="sd">    screen_datefmt : str</span>
+<span class="sd">        Format of the datetime in the screen output. Default: &quot;%H:%M:%S&quot;</span>
+
+<span class="sd">    screen_level : int</span>
+<span class="sd">        Level of logging to stdout. Default: 20 (logging.INFO)</span>
+
+<span class="sd">    file_level : int</span>
+<span class="sd">        Level of logging to file. Default: 10 (logging.DEBUG)</span>
+
+<span class="sd">    log_version : boolean</span>
+<span class="sd">        If True the actual version or commit is logged while initialising the</span>
+<span class="sd">        logger.</span>
+
+<span class="sd">    log_path : boolean</span>
+<span class="sd">        If True the used file path is logged while initialising the logger.</span>
+
+<span class="sd">    timed_rotating : dict</span>
+<span class="sd">        Option to pass parameters to the TimedRotatingFileHandler.</span>
+
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    file : str</span>
+<span class="sd">        Place where the log file is stored.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    By default the WARNING level is printed on the screen and the DEBUG level</span>
+<span class="sd">    in a file, but you can easily configure the logger.</span>
+<span class="sd">    Every module that wants to create logging messages has to import the</span>
+<span class="sd">    logging module. The oemof logger module has to be imported once to</span>
+<span class="sd">    initialise it.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    To define the default logger you have to import the python logging</span>
+<span class="sd">    library and this function. The first logging message should be the</span>
+<span class="sd">    path where the log file is saved to.</span>
+
+<span class="sd">    &gt;&gt;&gt; import logging</span>
+<span class="sd">    &gt;&gt;&gt; from tespy.tools import logger</span>
+<span class="sd">    &gt;&gt;&gt; mypath = logger.define_logging(</span>
+<span class="sd">    ...     log_path=True, log_version=True, timed_rotating={&#39;backupCount&#39;: 4},</span>
+<span class="sd">    ...     screen_level=logging.ERROR, screen_datefmt = &quot;no_date&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; mypath[-9:]</span>
+<span class="sd">    &#39;tespy.log&#39;</span>
+<span class="sd">    &gt;&gt;&gt; logging.debug(&#39;Hi&#39;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">logpath</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">logpath</span> <span class="o">=</span> <span class="n">tespy</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">extend_basic_path</span><span class="p">(</span><span class="s1">&#39;log_files&#39;</span><span class="p">)</span>
+
+    <span class="n">file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">logpath</span><span class="p">,</span> <span class="n">logfile</span><span class="p">)</span>
+
+    <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Remove existing handlers to avoid interference.</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">handlers</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">file_format</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">file_format</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;</span><span class="si">%(asctime)s</span><span class="s2"> - </span><span class="si">%(levelname)s</span><span class="s2"> - </span><span class="si">%(module)s</span><span class="s2"> - </span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">file_formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="n">file_format</span><span class="p">,</span> <span class="n">file_datefmt</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">screen_format</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">screen_format</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%(asctime)s</span><span class="s2">-</span><span class="si">%(levelname)s</span><span class="s2">-</span><span class="si">%(message)s</span><span class="s2">&quot;</span>
+    <span class="k">if</span> <span class="n">screen_datefmt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">screen_datefmt</span> <span class="o">=</span> <span class="s2">&quot;%H:%M:%S&quot;</span>
+    <span class="n">screen_formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="n">screen_format</span><span class="p">,</span> <span class="n">screen_datefmt</span><span class="p">)</span>
+
+    <span class="n">tmp_formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">ch</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+    <span class="n">ch</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">screen_formatter</span><span class="p">)</span>
+    <span class="n">ch</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">screen_level</span><span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span>
+
+    <span class="n">timed_rotating_p</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;when&#39;</span><span class="p">:</span> <span class="s1">&#39;midnight&#39;</span><span class="p">,</span> <span class="s1">&#39;backupCount&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">timed_rotating</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">timed_rotating_p</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">timed_rotating</span><span class="p">)</span>
+
+    <span class="n">fh</span> <span class="o">=</span> <span class="n">handlers</span><span class="o">.</span><span class="n">TimedRotatingFileHandler</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="o">**</span><span class="n">timed_rotating_p</span><span class="p">)</span>
+    <span class="n">fh</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">tmp_formatter</span><span class="p">)</span>
+    <span class="n">fh</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">file_level</span><span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">fh</span><span class="p">)</span>
+
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;******************************************************&quot;</span><span class="p">)</span>
+    <span class="n">fh</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">file_formatter</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">log_path</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Path for logging: </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">log_version</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Used TESPy version: </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">get_version</span><span class="p">()))</span>
+    <span class="k">return</span> <span class="n">file</span></div>
+
+
+<div class="viewcode-block" id="get_version"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.logger.get_version">[docs]</a><span class="k">def</span> <span class="nf">get_version</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a string part of the used version.</span>
+
+<span class="sd">    If the commit and the branch is available the commit and the branch will b</span>
+<span class="sd">    returned otherwise the version number.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    &gt;&gt;&gt; from tespy.tools import logger</span>
+<span class="sd">    &gt;&gt;&gt; v = logger.get_version()</span>
+<span class="sd">    &gt;&gt;&gt; type(v)</span>
+<span class="sd">    &lt;class &#39;str&#39;&gt;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">check_git_branch</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">check_version</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="check_version"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.logger.check_version">[docs]</a><span class="k">def</span> <span class="nf">check_version</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return the actual version number of the used TESPy version.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    &gt;&gt;&gt; from tespy.tools import logger</span>
+<span class="sd">    &gt;&gt;&gt; v = logger.check_version()</span>
+<span class="sd">    &gt;&gt;&gt; int(v.split(&#39;.&#39;)[0])</span>
+<span class="sd">    0</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">version</span> <span class="o">=</span> <span class="n">tespy</span><span class="o">.</span><span class="n">__version__</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="n">version</span> <span class="o">=</span> <span class="s1">&#39;No version found due to internal error.&#39;</span>
+    <span class="k">return</span> <span class="n">version</span></div>
+
+
+<div class="viewcode-block" id="check_git_branch"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.logger.check_git_branch">[docs]</a><span class="k">def</span> <span class="nf">check_git_branch</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Pass the used branch and commit to the logger.</span>
+
+<span class="sd">    The following test reacts on a local system different than on Travis-CI.</span>
+<span class="sd">    Therefore, a try/except test is created.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    &gt;&gt;&gt; from tespy import logger</span>
+<span class="sd">    &gt;&gt;&gt; try:</span>
+<span class="sd">    ...    v = logger.check_git_branch()</span>
+<span class="sd">    ... except FileNotFoundError:</span>
+<span class="sd">    ...    v = &#39;dsfafasdfsdf&#39;</span>
+<span class="sd">    &gt;&gt;&gt; type(v)</span>
+<span class="sd">    &lt;class &#39;str&#39;&gt;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)),</span> <span class="n">os</span><span class="o">.</span><span class="n">pardir</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">pardir</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">pardir</span><span class="p">,</span> <span class="s1">&#39;.git&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Reads the name of the branch</span>
+    <span class="n">f_branch</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;HEAD&#39;</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">f_branch</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span>
+    <span class="n">first_line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">name_full</span> <span class="o">=</span> <span class="n">first_line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">name_branch</span> <span class="o">=</span> <span class="n">name_full</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;ref: refs/heads/&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="c1"># Reads the code of the last commit used</span>
+    <span class="n">f_commit</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;refs&#39;</span><span class="p">,</span> <span class="s1">&#39;heads&#39;</span><span class="p">,</span> <span class="n">name_branch</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">f_commit</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span>
+    <span class="n">last_commit</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">@</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">last_commit</span><span class="p">,</span> <span class="n">name_branch</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2020, Francesco Witte.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

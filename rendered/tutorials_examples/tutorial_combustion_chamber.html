@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Combustion Chamber Tutorial &mdash; tespy 0.6.0 - Colored Chemicals documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> tespy
+            <img src="../_static/logo_tespy_mid.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.6.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Thermal Engineering Systems in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../first_steps.html">First steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials_examples.html">Examples and Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tespy_modules.html">TESPy modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tespy_analyses.html">Thermodynamic analyses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developing_tespy.html">Developing TESPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zliterature.html">Literature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">tespy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Combustion Chamber Tutorial</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tutorials_examples/tutorial_combustion_chamber.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="combustion-chamber-tutorial">
+<h1>Combustion Chamber Tutorial<a class="headerlink" href="#combustion-chamber-tutorial" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#combustionchamber" id="id2">CombustionChamber</a></p></li>
+<li><p><a class="reference internal" href="#diabaticcombustionchamber" id="id3">DiabaticCombustionChamber</a></p></li>
+</ul>
+</div>
+<p>There are two different types of combustion chambers available:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber" title="tespy.components.combustion.base.CombustionChamber"><code class="xref py py-class docutils literal notranslate"><span class="pre">tespy.components.combustion.base.CombustionChamber</span></code></a> and</p></li>
+<li><p><a class="reference internal" href="../api/tespy.components.html#tespy.components.combustion.diabatic.DiabaticCombustionChamber" title="tespy.components.combustion.diabatic.DiabaticCombustionChamber"><code class="xref py py-class docutils literal notranslate"><span class="pre">tespy.components.combustion.diabatic.DiabaticCombustionChamber</span></code></a>.</p></li>
+</ul>
+<p>Both can handle varying fluid compositions for the air and the fuel and
+calculates the fluid composition of the flue gas. Thus, it is possible to e.g.
+specify the oxygen mass fraction in the flue gas in a calculation. The
+difference between the components lies in the fact, that the
+<code class="code docutils literal notranslate"><span class="pre">CombustionChamber</span></code> does <strong>not consider heat or pressure losses</strong>, while
+<code class="code docutils literal notranslate"><span class="pre">DiabaticCombustionChamber</span></code> does so. We provide a tutorial for both
+components, where you learn how they work, and what the differences are.</p>
+<section id="combustionchamber">
+<h2><a class="toc-backref" href="#contents">CombustionChamber</a><a class="headerlink" href="#combustionchamber" title="Permalink to this headline">¶</a></h2>
+<p>The combustion chamber is an important component within thermal power plants,
+but unfortunately is the reason for many issues, as the solving algorithm is
+very sensitive to small changes e.g. the fluid composition. We will
+demonstrate how to handle the combustion chamber in a very small, simple
+example. You can download the full code from the <a class="reference external" href="https://github.com/oemof/oemof-examples/tree/master/oemof_examples/tespy/combustion/combustion_chamber.py">tespy_examples repository</a>.</p>
+<p>First of all you need to define the network containing all fluid components
+used for the combustion chamber. <strong>These are at least the fuel, oxygen,
+carbon-dioxide and water</strong>. For this example we added Argon, and of course - as
+we are using Air for the combustion - Nitrogen.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tespy.networks</span> <span class="kn">import</span> <span class="n">Network</span>
+
+<span class="c1"># define full fluid list for the network&#39;s variable space</span>
+<span class="n">fluid_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Ar&#39;</span><span class="p">,</span> <span class="s1">&#39;N2&#39;</span><span class="p">,</span> <span class="s1">&#39;O2&#39;</span><span class="p">,</span> <span class="s1">&#39;CO2&#39;</span><span class="p">,</span> <span class="s1">&#39;CH4&#39;</span><span class="p">,</span> <span class="s1">&#39;H2O&#39;</span><span class="p">]</span>
+
+<span class="c1"># define unit systems</span>
+<span class="n">nw</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span><span class="n">fluids</span><span class="o">=</span><span class="n">fluid_list</span><span class="p">,</span> <span class="n">p_unit</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="n">T_unit</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>As components there are two sources required, one for the fresh air, one for
+the fuel, a sink for the flue gas and the combustion chamber. Connect the
+components and add the connections to your network afterwards.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="n">Sink</span><span class="p">,</span> <span class="n">Source</span><span class="p">,</span> <span class="n">CombustionChamber</span>
+
+<span class="c1"># sinks &amp; sources</span>
+<span class="n">amb</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span><span class="s1">&#39;ambient&#39;</span><span class="p">)</span>
+<span class="n">sf</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span><span class="s1">&#39;fuel&#39;</span><span class="p">)</span>
+<span class="n">fg</span> <span class="o">=</span> <span class="n">Sink</span><span class="p">(</span><span class="s1">&#39;flue gas outlet&#39;</span><span class="p">)</span>
+
+<span class="c1"># combustion chamber</span>
+<span class="n">comb</span> <span class="o">=</span> <span class="n">CombustionChamber</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;combustion chamber&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tespy.connections</span> <span class="kn">import</span> <span class="n">Connection</span>
+
+<span class="n">amb_comb</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">amb</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">comb</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+<span class="n">sf_comb</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">sf</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">comb</span><span class="p">,</span> <span class="s1">&#39;in2&#39;</span><span class="p">)</span>
+<span class="n">comb_fg</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">comb</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">fg</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+
+<span class="n">nw</span><span class="o">.</span><span class="n">add_conns</span><span class="p">(</span><span class="n">sf_comb</span><span class="p">,</span> <span class="n">amb_comb</span><span class="p">,</span> <span class="n">comb_fg</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For the parametrisation we specify the combustion chamber’s air to
+stoichiometric air ratio lamb and the thermal input
+(<img class="math" src="../_images/math/9dedd8ada926c12c9c7fbea11082a6e8e0e8a149.png" alt="LHV \cdot \dot{m}_{f}"/>).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># set combustion chamber air to stoichiometric air ratio and thermal input</span>
+<span class="n">comb</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">lamb</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">ti</span><span class="o">=</span><span class="mf">2e6</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The ambient conditions as well as the fuel gas inlet temperature are defined in
+the next step. The air and the fuel gas composition must fully be stated, the
+component combustion chamber can not handle “Air” as input fluid!</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># air from ambient (ambient pressure and temperature), air composition must</span>
+<span class="c1"># be stated component wise.</span>
+<span class="n">amb_comb</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">fluid</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;Ar&#39;</span><span class="p">:</span> <span class="mf">0.0129</span><span class="p">,</span> <span class="s1">&#39;N2&#39;</span><span class="p">:</span> <span class="mf">0.7553</span><span class="p">,</span> <span class="s1">&#39;H2O&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                                    <span class="s1">&#39;CH4&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;CO2&#39;</span><span class="p">:</span> <span class="mf">0.0004</span><span class="p">,</span> <span class="s1">&#39;O2&#39;</span><span class="p">:</span> <span class="mf">0.2314</span><span class="p">})</span>
+
+<span class="c1"># fuel, pressure must not be stated, as pressure is the same at all inlets</span>
+<span class="c1"># and outlets of the combustion chamber</span>
+<span class="n">sf_comb</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">T</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">fluid</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;CO2&#39;</span><span class="p">:</span> <span class="mf">0.04</span><span class="p">,</span> <span class="s1">&#39;Ar&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;N2&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;O2&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                              <span class="s1">&#39;H2O&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;CH4&#39;</span><span class="p">:</span> <span class="mf">0.96</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>Finally run the code:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nw</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="s1">&#39;design&#39;</span><span class="p">)</span>
+<span class="n">nw</span><span class="o">.</span><span class="n">print_results</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Of course, you can change the parametrisation in any desired way. For example
+instead of stating the thermal input, you could choose any of the mass flows,
+or instead of the air to stoichiometric air ratio you could specify the flue
+gas temperature. It is also possible to make modifications on the fluid
+composition, for example stating the oxygen content in the flue gas or to
+change the fuel composition. Make sure, all desired fuels of your fuel mixture
+are also within the fluid_list of the network. For the example below we added
+hydrogen to the fuel mixture.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tespy.networks</span> <span class="kn">import</span> <span class="n">Network</span>
+<span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="n">Sink</span><span class="p">,</span> <span class="n">Source</span><span class="p">,</span> <span class="n">CombustionChamber</span>
+<span class="kn">from</span> <span class="nn">tespy.connections</span> <span class="kn">import</span> <span class="n">Connection</span>
+
+<span class="c1"># %% network</span>
+
+<span class="n">fluid_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Ar&#39;</span><span class="p">,</span> <span class="s1">&#39;N2&#39;</span><span class="p">,</span> <span class="s1">&#39;O2&#39;</span><span class="p">,</span> <span class="s1">&#39;CO2&#39;</span><span class="p">,</span> <span class="s1">&#39;CH4&#39;</span><span class="p">,</span> <span class="s1">&#39;H2O&#39;</span><span class="p">,</span> <span class="s1">&#39;H2&#39;</span><span class="p">]</span>
+<span class="n">nw</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span><span class="n">fluids</span><span class="o">=</span><span class="n">fluid_list</span><span class="p">,</span> <span class="n">p_unit</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="n">T_unit</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">)</span>
+
+<span class="c1"># %% components</span>
+
+<span class="c1"># sinks &amp; sources</span>
+<span class="n">amb</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span><span class="s1">&#39;ambient&#39;</span><span class="p">)</span>
+<span class="n">sf</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span><span class="s1">&#39;fuel&#39;</span><span class="p">)</span>
+<span class="n">fg</span> <span class="o">=</span> <span class="n">Sink</span><span class="p">(</span><span class="s1">&#39;flue gas outlet&#39;</span><span class="p">)</span>
+
+<span class="c1"># combustion chamber</span>
+<span class="n">comb</span> <span class="o">=</span> <span class="n">CombustionChamber</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;combustion chamber&#39;</span><span class="p">)</span>
+
+<span class="c1"># %% connections</span>
+
+<span class="n">amb_comb</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">amb</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">comb</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+<span class="n">sf_comb</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">sf</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">comb</span><span class="p">,</span> <span class="s1">&#39;in2&#39;</span><span class="p">)</span>
+<span class="n">comb_fg</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">comb</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">fg</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+
+<span class="n">nw</span><span class="o">.</span><span class="n">add_conns</span><span class="p">(</span><span class="n">sf_comb</span><span class="p">,</span> <span class="n">amb_comb</span><span class="p">,</span> <span class="n">comb_fg</span><span class="p">)</span>
+
+<span class="c1"># %% component parameters</span>
+
+<span class="c1"># set combustion chamber air to stoichometric air ratio and thermal input</span>
+<span class="n">comb</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">lamb</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">ti</span><span class="o">=</span><span class="mf">2e6</span><span class="p">)</span>
+
+<span class="c1"># %% connection parameters</span>
+
+<span class="n">amb_comb</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">fluid</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;Ar&#39;</span><span class="p">:</span> <span class="mf">0.0129</span><span class="p">,</span> <span class="s1">&#39;N2&#39;</span><span class="p">:</span> <span class="mf">0.7553</span><span class="p">,</span> <span class="s1">&#39;H2O&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                                    <span class="s1">&#39;CH4&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;CO2&#39;</span><span class="p">:</span> <span class="mf">0.0004</span><span class="p">,</span> <span class="s1">&#39;O2&#39;</span><span class="p">:</span> <span class="mf">0.2314</span><span class="p">,</span>
+                                    <span class="s1">&#39;H2&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
+
+<span class="n">sf_comb</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">T</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">fluid</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;CO2&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Ar&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;N2&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span><span class="s1">&#39;O2&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;H2O&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                              <span class="s1">&#39;CH4&#39;</span><span class="p">:</span> <span class="mf">0.95</span><span class="p">,</span> <span class="s1">&#39;H2&#39;</span><span class="p">:</span> <span class="mf">0.05</span><span class="p">})</span>
+
+<span class="c1"># %% solving</span>
+
+<span class="n">nw</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="s1">&#39;design&#39;</span><span class="p">)</span>
+<span class="n">nw</span><span class="o">.</span><span class="n">print_results</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="diabaticcombustionchamber">
+<h2><a class="toc-backref" href="#contents">DiabaticCombustionChamber</a><a class="headerlink" href="#diabaticcombustionchamber" title="Permalink to this headline">¶</a></h2>
+<p>The example for the diabatic combustion chamber can as well be taken from
+the <a class="reference external" href="https://github.com/oemof/oemof-examples/tree/master/oemof_examples/tespy/combustion/diabatic_combustion_chamber.py">tespy_examples repository</a>.</p>
+<p>The setup of the network, connections and components is identical to the
+first setup, therefore we skip over that part in this section. Note, that
+instead of <code class="code docutils literal notranslate"><span class="pre">CombustionChamber</span></code> we are importing the component
+<code class="code docutils literal notranslate"><span class="pre">DiabaticCombustionChamber</span></code>. Since heat losses and pressure losses are
+considered in this component, we have to make additional assumptions to
+simulate it. First, we will make run the simulation with inputs in a way, that
+the outcome is identical to the behavior of the adiabatic version without
+pressure losses as described above.</p>
+<p>As in the example above, we also specify thermal input and lambda, as well as
+identical parameters for the connections. Furthermore, we specify the efficiency
+<code class="code docutils literal notranslate"><span class="pre">eta</span></code> of the component, which determines the heat loss as ratio of the
+thermal input. <code class="code docutils literal notranslate"><span class="pre">eta=1</span></code> means, no heat losses, thus adiabatic behavior.
+On top of that, we set the pressure ratio <code class="code docutils literal notranslate"><span class="pre">pr</span></code>, which describes the
+ratio of the pressure at the outlet to the pressure at <strong>the inlet 1</strong>. The
+pressure value at the inlet 2 is detached from the other pressure values, it
+must be a result of a different parameter specification. In this example, we
+set it directly. To match the inputs of the first tutorial, we set
+<code class="code docutils literal notranslate"><span class="pre">pr=1</span></code> and <code class="code docutils literal notranslate"><span class="pre">p=1</span></code> for connection <code class="code docutils literal notranslate"><span class="pre">sf_comb</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A warning message is promted at the end of the simulation, if the pressure
+of the inlet 2 is lower or equal to the pressure of inlet 1.</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tespy.networks</span> <span class="kn">import</span> <span class="n">Network</span>
+<span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="n">Sink</span><span class="p">,</span> <span class="n">Source</span><span class="p">,</span> <span class="n">DiabaticCombustionChamber</span>
+<span class="kn">from</span> <span class="nn">tespy.connections</span> <span class="kn">import</span> <span class="n">Connection</span>
+
+<span class="c1"># %% network</span>
+
+<span class="n">fluid_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Ar&#39;</span><span class="p">,</span> <span class="s1">&#39;N2&#39;</span><span class="p">,</span> <span class="s1">&#39;O2&#39;</span><span class="p">,</span> <span class="s1">&#39;CO2&#39;</span><span class="p">,</span> <span class="s1">&#39;CH4&#39;</span><span class="p">,</span> <span class="s1">&#39;H2O&#39;</span><span class="p">,</span> <span class="s1">&#39;H2&#39;</span><span class="p">]</span>
+<span class="n">nw</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span><span class="n">fluids</span><span class="o">=</span><span class="n">fluid_list</span><span class="p">,</span> <span class="n">p_unit</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="n">T_unit</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">)</span>
+
+<span class="c1"># %% components</span>
+
+<span class="c1"># sinks &amp; sources</span>
+<span class="n">amb</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span><span class="s1">&#39;ambient&#39;</span><span class="p">)</span>
+<span class="n">sf</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span><span class="s1">&#39;fuel&#39;</span><span class="p">)</span>
+<span class="n">fg</span> <span class="o">=</span> <span class="n">Sink</span><span class="p">(</span><span class="s1">&#39;flue gas outlet&#39;</span><span class="p">)</span>
+
+<span class="c1"># combustion chamber</span>
+<span class="n">comb</span> <span class="o">=</span> <span class="n">DiabaticCombustionChamber</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;combustion chamber&#39;</span><span class="p">)</span>
+
+<span class="c1"># %% connections</span>
+
+<span class="n">amb_comb</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">amb</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">comb</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+<span class="n">sf_comb</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">sf</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">comb</span><span class="p">,</span> <span class="s1">&#39;in2&#39;</span><span class="p">)</span>
+<span class="n">comb_fg</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">comb</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">fg</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+
+<span class="n">nw</span><span class="o">.</span><span class="n">add_conns</span><span class="p">(</span><span class="n">sf_comb</span><span class="p">,</span> <span class="n">amb_comb</span><span class="p">,</span> <span class="n">comb_fg</span><span class="p">)</span>
+
+<span class="c1"># set combustion chamber air to stoichometric air ratio, thermal input</span>
+<span class="c1"># and efficiency</span>
+<span class="n">comb</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">lamb</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">ti</span><span class="o">=</span><span class="mf">2e6</span><span class="p">,</span> <span class="n">eta</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">pr</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># %% connection parameters</span>
+
+<span class="n">amb_comb</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">fluid</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;Ar&#39;</span><span class="p">:</span> <span class="mf">0.0129</span><span class="p">,</span> <span class="s1">&#39;N2&#39;</span><span class="p">:</span> <span class="mf">0.7553</span><span class="p">,</span> <span class="s1">&#39;H2O&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                                    <span class="s1">&#39;CH4&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;CO2&#39;</span><span class="p">:</span> <span class="mf">0.0004</span><span class="p">,</span> <span class="s1">&#39;O2&#39;</span><span class="p">:</span> <span class="mf">0.2314</span><span class="p">,</span>
+                                    <span class="s1">&#39;H2&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
+
+<span class="n">sf_comb</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">fluid</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;CO2&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Ar&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;N2&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span><span class="s1">&#39;O2&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                                   <span class="s1">&#39;H2O&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;CH4&#39;</span><span class="p">:</span> <span class="mf">0.95</span><span class="p">,</span> <span class="s1">&#39;H2&#39;</span><span class="p">:</span> <span class="mf">0.05</span><span class="p">})</span>
+
+<span class="c1"># %% solving</span>
+
+<span class="n">nw</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="s1">&#39;design&#39;</span><span class="p">)</span>
+<span class="n">nw</span><span class="o">.</span><span class="n">print_results</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Now, consider heat loss of the surface of the component. This is simply done by
+specifying the value for <code class="code docutils literal notranslate"><span class="pre">eta</span></code>. We assume 4 % of thermal input as heat
+loss and set that value accordingly. Furthermore, the pressure of the fuel is
+set to 1.5 bar. The air inlet pressure will be the result of the specified
+pressure ratio and the outlet pressure assuming 2 % pressure losses. All
+other parameters stay untouched.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">comb</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">eta</span><span class="o">=</span><span class="mf">0.96</span><span class="p">,</span> <span class="n">pr</span><span class="o">=</span><span class="mf">0.98</span><span class="p">)</span>
+
+<span class="n">amb_comb</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">sf_comb</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
+<span class="n">comb_fg</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+
+<span class="n">nw</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="s1">&#39;design&#39;</span><span class="p">)</span>
+<span class="n">nw</span><span class="o">.</span><span class="n">print_results</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2020, Francesco Witte.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

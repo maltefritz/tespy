@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tespy.components.heat_exchangers.desuperheater &mdash; tespy 0.6.0 - Colored Chemicals documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../../index.html" class="icon icon-home"> tespy
+            <img src="../../../../_static/logo_tespy_mid.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.6.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../introduction.html">Thermal Engineering Systems in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installation and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../first_steps.html">First steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials_examples.html">Examples and Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tespy_modules.html">TESPy modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tespy_analyses.html">Thermodynamic analyses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../developing_tespy.html">Developing TESPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../zliterature.html">Literature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">tespy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+      <li>tespy.components.heat_exchangers.desuperheater</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for tespy.components.heat_exchangers.desuperheater</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8</span>
+
+<span class="sd">&quot;&quot;&quot;Module of class Desuperheater.</span>
+
+
+<span class="sd">This file is part of project TESPy (github.com/oemof/tespy). It&#39;s copyrighted</span>
+<span class="sd">by the contributors recorded in the version control history of the file,</span>
+<span class="sd">available from its original location</span>
+<span class="sd">tespy/components/heat_exchangers/desuperheater.py</span>
+
+<span class="sd">SPDX-License-Identifier: MIT</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">tespy.components.heat_exchangers.base</span> <span class="kn">import</span> <span class="n">HeatExchanger</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.document_models</span> <span class="kn">import</span> <span class="n">generate_latex_eq</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.fluid_properties</span> <span class="kn">import</span> <span class="n">dh_mix_dpQ</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.fluid_properties</span> <span class="kn">import</span> <span class="n">h_mix_pQ</span>
+
+
+<div class="viewcode-block" id="Desuperheater"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.desuperheater.Desuperheater">[docs]</a><span class="k">class</span> <span class="nc">Desuperheater</span><span class="p">(</span><span class="n">HeatExchanger</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The Desuperheater cools a fluid to the saturated gas state.</span>
+
+<span class="sd">    **Mandatory Equations**</span>
+
+<span class="sd">    - :py:meth:`tespy.components.component.Component.fluid_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.component.Component.mass_flow_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.heat_exchangers.base.HeatExchanger.energy_balance_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.heat_exchangers.desuperheater.Desuperheater.saturated_gas_func`</span>
+
+<span class="sd">    **Optional Equations**</span>
+
+<span class="sd">    - :py:meth:`tespy.components.heat_exchangers.base.HeatExchanger.energy_balance_hot_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.heat_exchangers.base.HeatExchanger.kA_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.heat_exchangers.base.HeatExchanger.kA_char_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.heat_exchangers.base.HeatExchanger.ttd_u_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.heat_exchangers.base.HeatExchanger.ttd_l_func`</span>
+<span class="sd">    - hot side :py:meth:`tespy.components.component.Component.pr_func`</span>
+<span class="sd">    - cold side :py:meth:`tespy.components.component.Component.pr_func`</span>
+<span class="sd">    - hot side :py:meth:`tespy.components.component.Component.zeta_func`</span>
+<span class="sd">    - cold side :py:meth:`tespy.components.component.Component.zeta_func`</span>
+
+<span class="sd">    Inlets/Outlets</span>
+
+<span class="sd">    - in1, in2 (index 1: hot side, index 2: cold side)</span>
+<span class="sd">    - out1, out2 (index 1: hot side, index 2: cold side)</span>
+
+<span class="sd">    Image</span>
+
+<span class="sd">    .. image:: _images/HeatExchanger.svg</span>
+<span class="sd">       :alt: alternative text</span>
+<span class="sd">       :align: center</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    label : str</span>
+<span class="sd">        The label of the component.</span>
+
+<span class="sd">    design : list</span>
+<span class="sd">        List containing design parameters (stated as String).</span>
+
+<span class="sd">    offdesign : list</span>
+<span class="sd">        List containing offdesign parameters (stated as String).</span>
+
+<span class="sd">    design_path : str</span>
+<span class="sd">        Path to the components design case.</span>
+
+<span class="sd">    local_offdesign : boolean</span>
+<span class="sd">        Treat this component in offdesign mode in a design calculation.</span>
+
+<span class="sd">    local_design : boolean</span>
+<span class="sd">        Treat this component in design mode in an offdesign calculation.</span>
+
+<span class="sd">    char_warnings : boolean</span>
+<span class="sd">        Ignore warnings on default characteristics usage for this component.</span>
+
+<span class="sd">    printout : boolean</span>
+<span class="sd">        Include this component in the network&#39;s results printout.</span>
+
+<span class="sd">    Q : float, dict</span>
+<span class="sd">        Heat transfer, :math:`Q/\text{W}`.</span>
+
+<span class="sd">    pr1 : float, dict, :code:`&quot;var&quot;`</span>
+<span class="sd">        Outlet to inlet pressure ratio at hot side, :math:`pr/1`.</span>
+
+<span class="sd">    pr2 : float, dict, :code:`&quot;var&quot;`</span>
+<span class="sd">        Outlet to inlet pressure ratio at cold side, :math:`pr/1`.</span>
+
+<span class="sd">    zeta1 : float, dict, :code:`&quot;var&quot;`</span>
+<span class="sd">        Geometry independent friction coefficient at hot side,</span>
+<span class="sd">        :math:`\frac{\zeta}{D^4}/\frac{1}{\text{m}^4}`.</span>
+
+<span class="sd">    zeta2 : float, dict, :code:`&quot;var&quot;`</span>
+<span class="sd">        Geometry independent friction coefficient at cold side,</span>
+<span class="sd">        :math:`\frac{\zeta}{D^4}/\frac{1}{\text{m}^4}`.</span>
+
+<span class="sd">    ttd_l : float, dict</span>
+<span class="sd">        Lower terminal temperature difference :math:`ttd_\mathrm{l}/\text{K}`.</span>
+
+<span class="sd">    ttd_u : float, dict</span>
+<span class="sd">        Upper terminal temperature difference :math:`ttd_\mathrm{u}/\text{K}`.</span>
+
+<span class="sd">    kA : float, dict</span>
+<span class="sd">        Area independent heat transfer coefficient,</span>
+<span class="sd">        :math:`kA/\frac{\text{W}}{\text{K}}`.</span>
+
+<span class="sd">    kA_char1 : tespy.tools.characteristics.CharLine, dict</span>
+<span class="sd">        Characteristic line for hot side heat transfer coefficient.</span>
+
+<span class="sd">    kA_char2 : tespy.tools.characteristics.CharLine, dict</span>
+<span class="sd">        Characteristic line for cold side heat transfer coefficient.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    The desuperheater has an additional equation for enthalpy at hot side</span>
+<span class="sd">    outlet: The fluid leaves the component in saturated gas state.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    Overheated enthanol is cooled with water in a heat exchanger until it</span>
+<span class="sd">    reaches the state of saturated gas.</span>
+
+<span class="sd">    &gt;&gt;&gt; from tespy.components import Sink, Source, Desuperheater</span>
+<span class="sd">    &gt;&gt;&gt; from tespy.connections import Connection</span>
+<span class="sd">    &gt;&gt;&gt; from tespy.networks import Network</span>
+<span class="sd">    &gt;&gt;&gt; from tespy.tools.fluid_properties import T_bp_p</span>
+<span class="sd">    &gt;&gt;&gt; import shutil</span>
+<span class="sd">    &gt;&gt;&gt; nw = Network(fluids=[&#39;water&#39;, &#39;ethanol&#39;], T_unit=&#39;C&#39;, p_unit=&#39;bar&#39;,</span>
+<span class="sd">    ... h_unit=&#39;kJ / kg&#39;, v_unit=&#39;l / s&#39;, m_range=[0.001, 10], iterinfo=False)</span>
+<span class="sd">    &gt;&gt;&gt; et_in = Source(&#39;ethanol inlet&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; et_out = Sink(&#39;ethanol outlet&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; cw_in = Source(&#39;cooling water inlet&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; cw_out = Sink(&#39;cooling water outlet&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; desu = Desuperheater(&#39;desuperheater&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; desu.component()</span>
+<span class="sd">    &#39;desuperheater&#39;</span>
+<span class="sd">    &gt;&gt;&gt; et_de = Connection(et_in, &#39;out1&#39;, desu, &#39;in1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; de_et = Connection(desu, &#39;out1&#39;, et_out, &#39;in1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; cw_de = Connection(cw_in, &#39;out1&#39;, desu, &#39;in2&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; de_cw = Connection(desu, &#39;out2&#39;, cw_out, &#39;in1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; nw.add_conns(et_de, de_et, cw_de, de_cw)</span>
+
+<span class="sd">    The cooling water enters the component at 15 °C. 10 l/s of ethanol is</span>
+<span class="sd">    cooled from 100 K above boiling point. The water flow rate is at 1 l/s.</span>
+<span class="sd">    Knowing the component&#39;s design parameters it is possible to predict</span>
+<span class="sd">    behavior at different inlet temperatures or different volumetric flow of</span>
+<span class="sd">    ethanol. Controlling the ethanol&#39;s state at the outlet is only possible,</span>
+<span class="sd">    if the cooling water flow rate is adjusted accordingly.</span>
+
+<span class="sd">    &gt;&gt;&gt; desu.set_attr(pr1=0.99, pr2=0.98, design=[&#39;pr1&#39;, &#39;pr2&#39;],</span>
+<span class="sd">    ... offdesign=[&#39;zeta1&#39;, &#39;zeta2&#39;, &#39;kA_char&#39;])</span>
+<span class="sd">    &gt;&gt;&gt; cw_de.set_attr(fluid={&#39;water&#39;: 1, &#39;ethanol&#39;: 0}, T=15, v=1,</span>
+<span class="sd">    ... design=[&#39;v&#39;])</span>
+<span class="sd">    &gt;&gt;&gt; de_cw.set_attr(p=1)</span>
+<span class="sd">    &gt;&gt;&gt; et_de.set_attr(fluid={&#39;water&#39;: 0, &#39;ethanol&#39;: 1}, Td_bp=100, v=10)</span>
+<span class="sd">    &gt;&gt;&gt; de_et.set_attr(p=1)</span>
+<span class="sd">    &gt;&gt;&gt; nw.solve(&#39;design&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; nw.save(&#39;tmp&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; round(de_cw.T.val, 1)</span>
+<span class="sd">    15.5</span>
+<span class="sd">    &gt;&gt;&gt; round(de_et.x.val, 1)</span>
+<span class="sd">    1.0</span>
+<span class="sd">    &gt;&gt;&gt; et_de.set_attr(v=12)</span>
+<span class="sd">    &gt;&gt;&gt; nw.solve(&#39;offdesign&#39;, design_path=&#39;tmp&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; round(cw_de.v.val, 2)</span>
+<span class="sd">    1.94</span>
+<span class="sd">    &gt;&gt;&gt; et_de.set_attr(v=7)</span>
+<span class="sd">    &gt;&gt;&gt; nw.solve(&#39;offdesign&#39;, design_path=&#39;tmp&#39;, init_path=&#39;tmp&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; round(cw_de.v.val, 2)</span>
+<span class="sd">    0.41</span>
+<span class="sd">    &gt;&gt;&gt; shutil.rmtree(&#39;./tmp&#39;, ignore_errors=True)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Desuperheater.component"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.desuperheater.Desuperheater.component">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">component</span><span class="p">():</span>
+        <span class="k">return</span> <span class="s1">&#39;desuperheater&#39;</span></div>
+
+<div class="viewcode-block" id="Desuperheater.get_mandatory_constraints"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.desuperheater.Desuperheater.get_mandatory_constraints">[docs]</a>    <span class="k">def</span> <span class="nf">get_mandatory_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;mass_flow_constraints&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;func&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass_flow_func</span><span class="p">,</span> <span class="s1">&#39;deriv&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass_flow_deriv</span><span class="p">,</span>
+                <span class="s1">&#39;constant_deriv&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;latex&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass_flow_func_doc</span><span class="p">,</span>
+                <span class="s1">&#39;num_eq&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+            <span class="s1">&#39;fluid_constraints&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;func&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">fluid_func</span><span class="p">,</span> <span class="s1">&#39;deriv&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">fluid_deriv</span><span class="p">,</span>
+                <span class="s1">&#39;constant_deriv&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;latex&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">fluid_func_doc</span><span class="p">,</span>
+                <span class="s1">&#39;num_eq&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_nw_fluids</span> <span class="o">*</span> <span class="mi">2</span><span class="p">},</span>
+            <span class="s1">&#39;energy_balance_constraints&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;func&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_balance_func</span><span class="p">,</span>
+                <span class="s1">&#39;deriv&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_balance_deriv</span><span class="p">,</span>
+                <span class="s1">&#39;constant_deriv&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;latex&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_balance_func_doc</span><span class="p">,</span>
+                <span class="s1">&#39;num_eq&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+            <span class="s1">&#39;saturated_gas_constraints&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;func&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">saturated_gas_func</span><span class="p">,</span>
+                <span class="s1">&#39;deriv&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">saturated_gas_deriv</span><span class="p">,</span>
+                <span class="s1">&#39;constant_deriv&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;latex&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">saturated_gas_func_doc</span><span class="p">,</span>
+                <span class="s1">&#39;num_eq&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+        <span class="p">}</span></div>
+
+<div class="viewcode-block" id="Desuperheater.saturated_gas_func"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.desuperheater.Desuperheater.saturated_gas_func">[docs]</a>    <span class="k">def</span> <span class="nf">saturated_gas_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate hot side outlet state.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        residual : float</span>
+<span class="sd">            Residual value of equation</span>
+
+<span class="sd">            .. math::</span>
+
+<span class="sd">                0 = h_{out,1} - h\left(p_{out,1}, x=1 \right)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="n">h_mix_pQ</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_flow</span><span class="p">(),</span> <span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Desuperheater.saturated_gas_func_doc"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.desuperheater.Desuperheater.saturated_gas_func_doc">[docs]</a>    <span class="k">def</span> <span class="nf">saturated_gas_func_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate hot side outlet state.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        label : str</span>
+<span class="sd">            Label for equation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        latex : str</span>
+<span class="sd">            LaTeX code of equations applied.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">latex</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;0=h_\mathrm{out,1}-h\left(p_\mathrm{out,1}, x=1 \right)&#39;</span>
+        <span class="k">return</span> <span class="n">generate_latex_eq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latex</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Desuperheater.saturated_gas_deriv"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.desuperheater.Desuperheater.saturated_gas_deriv">[docs]</a>    <span class="k">def</span> <span class="nf">saturated_gas_deriv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">increment_filter</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Partial derivatives of saturated gas at hot side outlet function.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        increment_filter : ndarray</span>
+<span class="sd">            Matrix for filtering non-changing variables.</span>
+
+<span class="sd">        k : int</span>
+<span class="sd">            Position of derivatives in Jacobian matrix (k-th equation).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">o1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_flow</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">dh_mix_dpQ</span><span class="p">(</span><span class="n">o1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2020, Francesco Witte.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

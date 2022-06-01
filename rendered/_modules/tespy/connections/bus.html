@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tespy.connections.bus &mdash; tespy 0.6.0 - Colored Chemicals documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> tespy
+            <img src="../../../_static/logo_tespy_mid.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.6.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../introduction.html">Thermal Engineering Systems in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../first_steps.html">First steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials_examples.html">Examples and Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tespy_modules.html">TESPy modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tespy_analyses.html">Thermodynamic analyses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developing_tespy.html">Developing TESPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../zliterature.html">Literature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">tespy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>tespy.connections.bus</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for tespy.connections.bus</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8</span>
+
+<span class="sd">&quot;&quot;&quot;Module of class Bus.</span>
+
+
+<span class="sd">This file is part of project TESPy (github.com/oemof/tespy). It&#39;s copyrighted</span>
+<span class="sd">by the contributors recorded in the version control history of the file,</span>
+<span class="sd">available from its original location tespy/connections/bus.py</span>
+
+<span class="sd">SPDX-License-Identifier: MIT</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">tespy.components.component</span> <span class="kn">import</span> <span class="n">Component</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.characteristics</span> <span class="kn">import</span> <span class="n">CharLine</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.data_containers</span> <span class="kn">import</span> <span class="n">DataContainerSimple</span> <span class="k">as</span> <span class="n">dc_simple</span>
+
+<span class="c1"># pass the warning messages to the logger</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">captureWarnings</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Bus"><a class="viewcode-back" href="../../../api/tespy.connections.html#tespy.connections.bus.Bus">[docs]</a><span class="k">class</span> <span class="nc">Bus</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A bus is used to connect different energy flows.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    label : str</span>
+<span class="sd">        Label for the bus.</span>
+
+<span class="sd">    P : float</span>
+<span class="sd">        Total power/heat flow specification for bus, :math:`P \text{/W}`.</span>
+
+<span class="sd">    printout : boolean</span>
+<span class="sd">        Print the results of this bus to prompt with the</span>
+<span class="sd">        :py:meth:`tespy.networks.network.Network.print_results` method.</span>
+<span class="sd">        Standard value is :code:`True`.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    Busses are used to connect energy flow of different components. They can</span>
+<span class="sd">    also be used to introduce efficiencies of energy conversion, e.g. in</span>
+<span class="sd">    motors, generator or boilers. This example takes the combustion engine</span>
+<span class="sd">    example at</span>
+<span class="sd">    :py:class:`tespy.components.combustion.engine.CombustionEngine`</span>
+<span class="sd">    and adds a flue gas cooler and a circulation pump for the cooling water.</span>
+<span class="sd">    Then busses for heat output, thermal input and electricity output are</span>
+<span class="sd">    implemented.</span>
+
+<span class="sd">    &gt;&gt;&gt; from tespy.components import (Sink, Source, CombustionEngine,</span>
+<span class="sd">    ... HeatExchanger, Merge, Splitter, Pump)</span>
+<span class="sd">    &gt;&gt;&gt; from tespy.connections import Connection, Ref, Bus</span>
+<span class="sd">    &gt;&gt;&gt; from tespy.networks import Network</span>
+<span class="sd">    &gt;&gt;&gt; from tespy.tools import CharLine</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; import shutil</span>
+<span class="sd">    &gt;&gt;&gt; fluid_list = [&#39;Ar&#39;, &#39;N2&#39;, &#39;O2&#39;, &#39;CO2&#39;, &#39;CH4&#39;, &#39;H2O&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; nw = Network(fluids=fluid_list, p_unit=&#39;bar&#39;, T_unit=&#39;C&#39;,</span>
+<span class="sd">    ... p_range=[0.5, 10], iterinfo=False)</span>
+<span class="sd">    &gt;&gt;&gt; amb = Source(&#39;ambient&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; sf = Source(&#39;fuel&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; fg = Sink(&#39;flue gas outlet&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; cw_in = Source(&#39;cooling water inlet&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; sp = Splitter(&#39;cooling water splitter&#39;, num_out=2)</span>
+<span class="sd">    &gt;&gt;&gt; me = Merge(&#39;cooling water merge&#39;, num_in=2)</span>
+<span class="sd">    &gt;&gt;&gt; cw_out = Sink(&#39;cooling water outlet&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; fgc = HeatExchanger(&#39;flue gas cooler&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; pu = Pump(&#39;cooling water pump&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; chp = CombustionEngine(label=&#39;internal combustion engine&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; amb_comb = Connection(amb, &#39;out1&#39;, chp, &#39;in3&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; sf_comb = Connection(sf, &#39;out1&#39;, chp, &#39;in4&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; comb_fgc = Connection(chp, &#39;out3&#39;, fgc, &#39;in1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; fgc_fg = Connection(fgc, &#39;out1&#39;, fg, &#39;in1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; nw.add_conns(sf_comb, amb_comb, comb_fgc, fgc_fg)</span>
+<span class="sd">    &gt;&gt;&gt; cw_pu = Connection(cw_in, &#39;out1&#39;, pu, &#39;in1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; pu_sp = Connection(pu, &#39;out1&#39;, sp, &#39;in1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; sp_chp1 = Connection(sp, &#39;out1&#39;, chp, &#39;in1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; sp_chp2 = Connection(sp, &#39;out2&#39;, chp, &#39;in2&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; chp1_me = Connection(chp, &#39;out1&#39;, me, &#39;in1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; chp2_me = Connection(chp, &#39;out2&#39;, me, &#39;in2&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; me_fgc = Connection(me, &#39;out1&#39;, fgc, &#39;in2&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; fgc_cw = Connection(fgc, &#39;out2&#39;, cw_out, &#39;in1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; nw.add_conns(cw_pu, pu_sp, sp_chp1, sp_chp2, chp1_me, chp2_me, me_fgc,</span>
+<span class="sd">    ... fgc_cw)</span>
+<span class="sd">    &gt;&gt;&gt; chp.set_attr(pr1=0.99, lamb=1.0,</span>
+<span class="sd">    ... design=[&#39;pr1&#39;], offdesign=[&#39;zeta1&#39;])</span>
+<span class="sd">    &gt;&gt;&gt; fgc.set_attr(pr1=0.999, pr2=0.98, design=[&#39;pr1&#39;, &#39;pr2&#39;],</span>
+<span class="sd">    ... offdesign=[&#39;zeta1&#39;, &#39;zeta2&#39;, &#39;kA_char&#39;])</span>
+<span class="sd">    &gt;&gt;&gt; pu.set_attr(eta_s=0.8, design=[&#39;eta_s&#39;], offdesign=[&#39;eta_s_char&#39;])</span>
+<span class="sd">    &gt;&gt;&gt; amb_comb.set_attr(p=5, T=30, fluid={&#39;Ar&#39;: 0.0129, &#39;N2&#39;: 0.7553,</span>
+<span class="sd">    ... &#39;H2O&#39;: 0, &#39;CH4&#39;: 0, &#39;CO2&#39;: 0.0004, &#39;O2&#39;: 0.2314})</span>
+<span class="sd">    &gt;&gt;&gt; sf_comb.set_attr(m0=0.1, T=30, fluid={&#39;CO2&#39;: 0, &#39;Ar&#39;: 0, &#39;N2&#39;: 0,</span>
+<span class="sd">    ... &#39;O2&#39;: 0, &#39;H2O&#39;: 0, &#39;CH4&#39;: 1})</span>
+<span class="sd">    &gt;&gt;&gt; cw_pu.set_attr(p=3, T=60, fluid={&#39;CO2&#39;: 0, &#39;Ar&#39;: 0, &#39;N2&#39;: 0,</span>
+<span class="sd">    ... &#39;O2&#39;: 0, &#39;H2O&#39;: 1, &#39;CH4&#39;: 0})</span>
+<span class="sd">    &gt;&gt;&gt; sp_chp2.set_attr(m=Ref(sp_chp1, 1, 0))</span>
+
+<span class="sd">    Cooling water mass flow is calculated given the feed water temperature</span>
+<span class="sd">    (90 °C). The pressure at the cooling water outlet should be identical to</span>
+<span class="sd">    pressure before pump. The flue gases of the combustion engine leave the</span>
+<span class="sd">    flue gas cooler at 120 °C.</span>
+
+<span class="sd">    &gt;&gt;&gt; fgc_cw.set_attr(p=Ref(cw_pu, 1, 0), T=90)</span>
+<span class="sd">    &gt;&gt;&gt; fgc_fg.set_attr(T=120, design=[&#39;T&#39;])</span>
+
+<span class="sd">    Now add the busses, pump and combustion engine generator will get a</span>
+<span class="sd">    characteristic function for conversion efficiency. In case of the</span>
+<span class="sd">    combustion engine we have to individually choose the bus parameter as there</span>
+<span class="sd">    are several available (P, TI, Q1, Q2, Q). For heat exchangers or</span>
+<span class="sd">    turbomachinery the bus parameter is unique. The characteristic function for</span>
+<span class="sd">    the flue gas cooler is set to -1, as the heat transferred is always</span>
+<span class="sd">    negative in class heat_exchanger by definition. Instead of specifying the</span>
+<span class="sd">    combustion engine power output we will define the total electrical power</span>
+<span class="sd">    output at the bus.</span>
+
+<span class="sd">    &gt;&gt;&gt; load = np.array([0.2, 0.4, 0.6, 0.8, 1, 1.2])</span>
+<span class="sd">    &gt;&gt;&gt; eff = np.array([0.9, 0.94, 0.97, 0.99, 1, 0.99]) * 0.98</span>
+<span class="sd">    &gt;&gt;&gt; gen = CharLine(x=load, y=eff)</span>
+<span class="sd">    &gt;&gt;&gt; mot = CharLine(x=load, y=eff)</span>
+<span class="sd">    &gt;&gt;&gt; power_bus = Bus(&#39;total power output&#39;, P=-10e6)</span>
+<span class="sd">    &gt;&gt;&gt; heat_bus = Bus(&#39;total heat input&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; fuel_bus = Bus(&#39;thermal input&#39;)</span>
+
+<span class="sd">    You can check, if the bus value is set or not identically to connections.</span>
+<span class="sd">    Unsetting is possible using :code:`np.nan` or :code:`None`. For</span>
+<span class="sd">    demonstration we will specify a value for the heat bus and unset it again.</span>
+
+<span class="sd">    &gt;&gt;&gt; heat_bus.P.is_set</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; heat_bus.set_attr(P=-1e5)</span>
+<span class="sd">    &gt;&gt;&gt; heat_bus.P.is_set</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; heat_bus.set_attr(P=None)</span>
+<span class="sd">    &gt;&gt;&gt; heat_bus.P.is_set</span>
+<span class="sd">    False</span>
+
+<span class="sd">    &gt;&gt;&gt; power_bus.add_comps({&#39;comp&#39;: chp, &#39;char&#39;: gen, &#39;param&#39;: &#39;P&#39;},</span>
+<span class="sd">    ... {&#39;comp&#39;: pu, &#39;char&#39;: mot, &#39;base&#39;: &#39;bus&#39;})</span>
+<span class="sd">    &gt;&gt;&gt; heat_bus.add_comps({&#39;comp&#39;: chp, &#39;param&#39;: &#39;Q&#39;, &#39;char&#39;: -1},</span>
+<span class="sd">    ... {&#39;comp&#39;: fgc, &#39;char&#39;: -1})</span>
+<span class="sd">    &gt;&gt;&gt; fuel_bus.add_comps({&#39;comp&#39;: chp, &#39;param&#39;: &#39;TI&#39;},</span>
+<span class="sd">    ... {&#39;comp&#39;: pu, &#39;char&#39;: mot})</span>
+<span class="sd">    &gt;&gt;&gt; nw.add_busses(power_bus, heat_bus, fuel_bus)</span>
+<span class="sd">    &gt;&gt;&gt; mode = &#39;design&#39;</span>
+<span class="sd">    &gt;&gt;&gt; nw.solve(mode=mode)</span>
+<span class="sd">    &gt;&gt;&gt; nw.save(&#39;tmp&#39;)</span>
+
+<span class="sd">    The heat bus characteristic for the combustion engine and the flue gas</span>
+<span class="sd">    cooler have automatically been transformed into an array. The total heat</span>
+<span class="sd">    output can be seen on both, the heat bus and in the enthalpy rise of the</span>
+<span class="sd">    cooling water in the combustion engine and the flue gas cooler. Therefore</span>
+<span class="sd">    these values must be identical.</span>
+
+<span class="sd">    &gt;&gt;&gt; heat_bus.comps.loc[fgc][&#39;char&#39;].x</span>
+<span class="sd">    array([0., 3.])</span>
+<span class="sd">    &gt;&gt;&gt; heat_bus.comps.loc[fgc][&#39;char&#39;].y</span>
+<span class="sd">    array([-1., -1.])</span>
+<span class="sd">    &gt;&gt;&gt; round(chp.ti.val, 0)</span>
+<span class="sd">    25819387.0</span>
+<span class="sd">    &gt;&gt;&gt; round(chp.Q1.val + chp.Q2.val, 0)</span>
+<span class="sd">    -8899014.0</span>
+<span class="sd">    &gt;&gt;&gt; round(fgc_cw.m.val_SI * (fgc_cw.h.val_SI - pu_sp.h.val_SI), 0)</span>
+<span class="sd">    12477089.0</span>
+<span class="sd">    &gt;&gt;&gt; round(heat_bus.P.val, 0)</span>
+<span class="sd">    12477089.0</span>
+<span class="sd">    &gt;&gt;&gt; round(pu.calc_bus_efficiency(power_bus), 2)</span>
+<span class="sd">    0.98</span>
+<span class="sd">    &gt;&gt;&gt; power_bus.set_attr(P=-7.5e6)</span>
+<span class="sd">    &gt;&gt;&gt; mode = &#39;offdesign&#39;</span>
+<span class="sd">    &gt;&gt;&gt; nw.solve(mode=mode, design_path=&#39;tmp&#39;, init_path=&#39;tmp&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; round(chp.ti.val, 0)</span>
+<span class="sd">    21192700.0</span>
+<span class="sd">    &gt;&gt;&gt; round(chp.P.val / chp.P.design, 3)</span>
+<span class="sd">    0.761</span>
+<span class="sd">    &gt;&gt;&gt; round(pu.calc_bus_efficiency(power_bus), 3)</span>
+<span class="sd">    0.968</span>
+<span class="sd">    &gt;&gt;&gt; shutil.rmtree(&#39;./tmp&#39;, ignore_errors=True)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">comps</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;param&#39;</span><span class="p">,</span> <span class="s1">&#39;P_ref&#39;</span><span class="p">,</span> <span class="s1">&#39;char&#39;</span><span class="p">,</span> <span class="s1">&#39;efficiency&#39;</span><span class="p">,</span> <span class="s1">&#39;base&#39;</span><span class="p">],</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;object&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">label</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">P</span> <span class="o">=</span> <span class="n">dc_simple</span><span class="p">(</span><span class="n">val</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">is_set</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">char</span> <span class="o">=</span> <span class="n">CharLine</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">]),</span> <span class="n">y</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">printout</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Created bus &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Bus.set_attr"><a class="viewcode-back" href="../../../api/tespy.connections.html#tespy.connections.bus.Bus.set_attr">[docs]</a>    <span class="k">def</span> <span class="nf">set_attr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set, reset or unset attributes of a bus object.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        label : str</span>
+<span class="sd">            Label for the bus.</span>
+
+<span class="sd">        P : float</span>
+<span class="sd">            Total power/heat flow specification for bus, :math:`P \text{/W}`.</span>
+
+<span class="sd">        printout : boolean</span>
+<span class="sd">            Print the results of this bus to prompt with the</span>
+<span class="sd">            :py:meth:`tespy.networks.network.Network.print_results` method.</span>
+<span class="sd">            Standard value is :code:`True`.</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        Specify :math:`P=\text{nan}`, if you want to unset the value of P.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="nb">float</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+                <span class="n">is_numeric</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+                <span class="n">is_numeric</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;P&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">is_numeric</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">P</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">is_set</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">P</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">val</span><span class="o">=</span><span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">is_set</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">P</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">is_set</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Keyword argument &#39;</span> <span class="o">+</span> <span class="n">key</span> <span class="o">+</span> <span class="s1">&#39; must be numeric.&#39;</span><span class="p">)</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;printout&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">bool</span><span class="p">):</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Please provide the &#39;</span> <span class="o">+</span> <span class="n">key</span> <span class="o">+</span> <span class="s1">&#39; as boolean.&#39;</span><span class="p">)</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">key</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]})</span>
+
+            <span class="c1"># invalid keyword</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;A bus has no attribute &#39;</span> <span class="o">+</span> <span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Bus.get_attr"><a class="viewcode-back" href="../../../api/tespy.connections.html#tespy.connections.bus.Bus.get_attr">[docs]</a>    <span class="k">def</span> <span class="nf">get_attr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the value of a busses attribute.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : str</span>
+<span class="sd">            The attribute you want to retrieve.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        out :</span>
+<span class="sd">            Specified attribute.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Bus &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">+</span> <span class="s1">&#39; has no attribute &#39;</span> <span class="o">+</span> <span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Bus.add_comps"><a class="viewcode-back" href="../../../api/tespy.connections.html#tespy.connections.bus.Bus.add_comps">[docs]</a>    <span class="k">def</span> <span class="nf">add_comps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add components to a bus.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        *args : dict</span>
+<span class="sd">            Dictionaries containing the component information to be added to</span>
+<span class="sd">            the bus. The information are described below.</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        **Required Key**</span>
+
+<span class="sd">        - comp (tespy.components.component.Component): Component you want to</span>
+<span class="sd">          add to the bus.</span>
+
+<span class="sd">        **Optional Keys**</span>
+
+<span class="sd">        - param (str): Bus parameter, optional.</span>
+
+<span class="sd">            - You do not need to provide a parameter, if the component only has</span>
+<span class="sd">              one option for the bus (turbomachines, heat exchangers,</span>
+<span class="sd">              combustion chamber).</span>
+<span class="sd">            - For instance, you do neet do provide a parameter, if you want to</span>
+<span class="sd">              add a combustion engine (&#39;Q&#39;, &#39;Q1&#39;, &#39;Q2&#39;, &#39;TI&#39;, &#39;P&#39;, &#39;Qloss&#39;).</span>
+
+<span class="sd">        - char (float/tespy.components.characteristics.characteristics):</span>
+<span class="sd">          Characteristic function for this components share to the bus value,</span>
+<span class="sd">          optional.</span>
+
+<span class="sd">            - If you do not provide a characteristic line at all, TESPy assumes</span>
+<span class="sd">              a constant factor of 1.</span>
+<span class="sd">            - If you provide a numeric value instead of a characteristic line,</span>
+<span class="sd">              TESPy takes this numeric value as a constant factor.</span>
+<span class="sd">            - Provide a :py:class:`tespy.tools.characteristics.CharLine`, if</span>
+<span class="sd">              you want the factor to follow a characteristic line.</span>
+
+<span class="sd">        - P_ref (float): Energy flow specification for reference case,</span>
+<span class="sd">          :math:`P \text{/W}`, optional.</span>
+<span class="sd">        - base (str): Base value for characteristic line and efficiency</span>
+<span class="sd">          calculation. The base can either be :code:`&#39;component&#39;` (default) or</span>
+<span class="sd">          :code:`&#39;bus&#39;`.</span>
+
+<span class="sd">            - In case you choose :code:`&#39;component&#39;`, the characteristic line</span>
+<span class="sd">              input will follow the value of the component&#39;s bus function and</span>
+<span class="sd">              the efficiency definition is</span>
+<span class="sd">              :math:`\eta=\frac{P_\mathrm{bus}}{P_\mathrm{component}}`.</span>
+<span class="sd">            - In case you choose :code:`&#39;bus&#39;`, the characteristic line</span>
+<span class="sd">              input will follow the bus value of the component and the</span>
+<span class="sd">              efficiency definition is</span>
+<span class="sd">              :math:`\eta=\frac{P_\mathrm{component}}{P_\mathrm{bus}}`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="k">if</span> <span class="s1">&#39;comp&#39;</span> <span class="ow">in</span> <span class="n">c</span><span class="p">:</span>
+                    <span class="n">comp</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;comp&#39;</span><span class="p">]</span>
+                    <span class="c1"># default values</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">comp</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">comps</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                            <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">char</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="s1">&#39;component&#39;</span><span class="p">]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Keyword &quot;comp&quot; must hold a TESPy component.&#39;</span>
+                        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;You must provide the component &quot;comp&quot;.&#39;</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;param&#39;</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">comps</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">comp</span><span class="p">,</span> <span class="s1">&#39;param&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                                <span class="s1">&#39;The bus parameter selection must be a &#39;</span>
+                                <span class="s1">&#39;string (at bus &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">+</span> <span class="s1">&#39;).&#39;</span><span class="p">)</span>
+                            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+                    <span class="k">elif</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;char&#39;</span><span class="p">:</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="nb">float</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                            <span class="n">is_numeric</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+                            <span class="n">is_numeric</span> <span class="o">=</span> <span class="kc">False</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">CharLine</span><span class="p">):</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">comps</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">comp</span><span class="p">,</span> <span class="s1">&#39;char&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+                        <span class="k">elif</span> <span class="n">is_numeric</span><span class="p">:</span>
+                            <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+                            <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">v</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">comps</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">comp</span><span class="p">,</span> <span class="s1">&#39;char&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                                    <span class="n">CharLine</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">))</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                                <span class="s1">&#39;Char must be a number or a TESPy &#39;</span>
+                                <span class="s1">&#39;characteristics char line.&#39;</span><span class="p">)</span>
+                            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+                    <span class="k">elif</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;P_ref&#39;</span><span class="p">:</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="nb">float</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                            <span class="n">is_numeric</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+                            <span class="n">is_numeric</span> <span class="o">=</span> <span class="kc">False</span>
+                        <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">is_numeric</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">comps</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">comp</span><span class="p">,</span> <span class="s1">&#39;P_ref&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Reference value must be numeric.&#39;</span>
+                            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+                    <span class="k">elif</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;base&#39;</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;bus&#39;</span><span class="p">,</span> <span class="s1">&#39;component&#39;</span><span class="p">]:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">comps</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">comp</span><span class="p">,</span> <span class="s1">&#39;base&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                                <span class="s1">&#39;The base value must be &quot;bus&quot; or &quot;component&quot;.&#39;</span><span class="p">)</span>
+                            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="s1">&#39;Provide arguments as dictionaries. See the documentation &#39;</span>
+                    <span class="s1">&#39;of bus.add_comps() for more information.&#39;</span><span class="p">)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s1">&#39;Added component &#39;</span> <span class="o">+</span> <span class="n">comp</span><span class="o">.</span><span class="n">label</span> <span class="o">+</span> <span class="s1">&#39; to bus &#39;</span> <span class="o">+</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2020, Francesco Witte.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

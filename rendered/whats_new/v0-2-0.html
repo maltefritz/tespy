@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>v0.2.0 - Clausius’ Circus (January, 15, 2020) &mdash; tespy 0.6.0 - Colored Chemicals documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> tespy
+            <img src="../_static/logo_tespy_mid.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.6.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Thermal Engineering Systems in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../first_steps.html">First steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials_examples.html">Examples and Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tespy_modules.html">TESPy modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tespy_analyses.html">Thermodynamic analyses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developing_tespy.html">Developing TESPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zliterature.html">Literature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">tespy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>v0.2.0 - Clausius’ Circus (January, 15, 2020)</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/whats_new/v0-2-0.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="v0-2-0-clausius-circus-january-15-2020">
+<h1>v0.2.0 - Clausius’ Circus (January, 15, 2020)<a class="headerlink" href="#v0-2-0-clausius-circus-january-15-2020" title="Permalink to this headline">¶</a></h1>
+<p>TESPy <a class="reference external" href="https://en.wikipedia.org/wiki/Rudolf_Clausius">Clausius’ Circus</a>
+includes many back end adjustments for future development. Additionally, some
+new features have been implemented improving the usage of the software. Due to
+changes in the API, <strong>version 0.2.0 will not be compatible with older</strong>
+<strong>versions of TESPy!</strong></p>
+<p>The <a class="reference internal" href="../whats_new.html#tespy-v020-examples-label"><span class="std std-ref">example section below</span></a> quickly shows,
+how to modify your scripts in order to work with the new version.</p>
+<section id="new-features">
+<h2>New Features<a class="headerlink" href="#new-features" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Implemented a new component “cycle_closer”. This component may serve as substitute for a
+sink/source or splitter/merge combination in closed cycle simulations (<a class="reference external" href="https://github.com/oemof/tespy/pull/107">PR #107</a>).</p></li>
+<li><p>Added optical efficiency to the “solar_collector”. The incoming radiation E no longer represents
+the actual absorption but the radiation on the collector surface area (<a class="reference external" href="https://github.com/oemof/tespy/pull/110">PR #110</a>).</p></li>
+<li><p>Parameters <code class="code docutils literal notranslate"><span class="pre">local_design</span></code> and <code class="code docutils literal notranslate"><span class="pre">local_offdesign</span></code> are now also available for network exports and imports
+(<a class="reference external" href="https://github.com/oemof/tespy/pull/109">PR #109</a>).</p></li>
+<li><p>Busses, components and connections are now equipped with <code class="code docutils literal notranslate"><span class="pre">printout</span></code> attribute. For example, if you specify <code class="code docutils literal notranslate"><span class="pre">myconn.set_attr(printout=False)</span></code>
+the results of the specified connection will not be printed by the <code class="code docutils literal notranslate"><span class="pre">print_results</span></code> method of your network. This is especially useful, if you have a
+large network and only want to print the results at the most important points (<a class="reference external" href="https://github.com/oemof/tespy/pull/126">PR #126</a>).</p></li>
+<li><p>It is possible to place custom characteristic lines and maps in the <code class="code docutils literal notranslate"><span class="pre">HOME/.tespy/data</span></code> folder and import these
+for your TESPy scripts. Have a look at <a class="reference internal" href="../tespy_modules/characteristics.html#import-custom-characteristics-label"><span class="std std-ref">the documentation</span></a> for more information
+(<a class="reference external" href="https://github.com/oemof/tespy/pull/118">PR #118</a>).</p></li>
+<li><p>If the network check fails due to component inlets or outlets being connected to more than one connection at a time,
+all connections are printed for easier network topology debugging (<a class="reference external" href="https://github.com/oemof/tespy/pull/135">PR #135</a>).</p></li>
+</ul>
+</section>
+<section id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Full review of online documentation (<a class="reference external" href="https://github.com/oemof/tespy/pull/112">PR #112</a>).</p></li>
+<li><p>Full review of the examples repository (<a class="reference external" href="https://github.com/oemof/oemof_examples/pull/46">PR #46 of oemof_examples</a>).</p></li>
+<li><p>Plots of default characteristic lines and maps are generated automatically on
+documentation build (<a class="reference external" href="https://github.com/oemof/tespy/pull/139">PR #139</a>).</p></li>
+</ul>
+</section>
+<section id="parameter-renaming">
+<h2>Parameter renaming<a class="headerlink" href="#parameter-renaming" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>New name for <em>cogeneration_unit</em>: <strong>combustion_engine</strong> (<a class="reference external" href="https://github.com/oemof/tespy/pull/105">PR #105</a>).</p></li>
+<li><p>New name for <em>subsys_interface</em>: <strong>subsystem_interface</strong> (<a class="reference external" href="https://github.com/oemof/tespy/pull/107">PR #107</a>).</p></li>
+<li><p>The module import shortcuts (<code class="code docutils literal notranslate"><span class="pre">from</span> <span class="pre">tespy</span> <span class="pre">import</span> <span class="pre">...</span></code>) for components (cmp), connections (con),
+helpers (hlp), logger (logger), networks (nwk), network_reader (nwkr) are <strong>no longer supported</strong>
+(<a class="reference external" href="https://github.com/oemof/tespy/pull/108">PR #108</a>)! We instead implemented new shortcuts instead
+for tespy.networks and tespy.components modules (<a class="reference external" href="https://github.com/oemof/tespy/pull/118">PR #118</a>).</p></li>
+<li><p>The method <code class="code docutils literal notranslate"><span class="pre">set_printoptions</span></code> for the <code class="xref py py-class docutils literal notranslate"><span class="pre">tespy.networks.networks.network</span></code> class is not available anymore.
+Use <code class="code docutils literal notranslate"><span class="pre">yournetwork.set_attr(iterinfo=True/False)</span></code> in future (<a class="reference external" href="https://github.com/oemof/tespy/pull/109">PR #109</a>).</p></li>
+<li><p>Parameter <code class="code docutils literal notranslate"><span class="pre">interface</span></code> for sinks and sources has been removed (<a class="reference external" href="https://github.com/oemof/tespy/pull/109">PR #109</a>).</p></li>
+<li><p>The method for loading networks from the network_reader module has been renamed from <code class="code docutils literal notranslate"><span class="pre">load_nwk</span></code> to
+<code class="code docutils literal notranslate"><span class="pre">load_network</span></code> (<a class="reference external" href="https://github.com/oemof/tespy/pull/118">PR #118</a>).</p></li>
+</ul>
+</section>
+<section id="testing">
+<h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Improved doc-test for class tespy_fluid (<a class="reference external" href="https://github.com/oemof/tespy/pull/109">PR #109</a>).</p></li>
+<li><p>Add doc-test for fluid_structure function of tespy.tools.helpers (<a class="reference external" href="https://github.com/oemof/tespy/pull/109">PR #109</a>).</p></li>
+<li><p>Reworked a lot of examples in the components API-documentation (<a class="reference external" href="https://github.com/oemof/tespy/pull/109">PR #109</a>).</p></li>
+<li><p>Update software tests (<a class="reference external" href="https://github.com/oemof/tespy/pull/111">PR #111</a>).</p></li>
+<li><p>Add value limit test for newton-algorithm (<a class="reference external" href="https://github.com/oemof/tespy/pull/129">PR #129</a>).</p></li>
+</ul>
+</section>
+<section id="bug-fixes">
+<h2>Bug fixes<a class="headerlink" href="#bug-fixes" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Bus value specification uses <code class="code docutils literal notranslate"><span class="pre">is_set</span></code> instead of <code class="code docutils literal notranslate"><span class="pre">val_set</span></code> as the component
+properties data container is used (<a class="reference external" href="https://github.com/oemof/tespy/commit/39ca830c05f6b97a2e4867265ce1de32f6a6f2bc">39ca830</a>).</p></li>
+<li><p>Parameters <code class="code docutils literal notranslate"><span class="pre">local_design</span></code> and <code class="code docutils literal notranslate"><span class="pre">local_offdesign</span></code> are now also available for network exports and imports (<a class="reference external" href="https://github.com/oemof/tespy/pull/109">PR #109</a>).</p></li>
+<li><p>Busses and characteristics are not exported, if none are used in the network. The network_reader can now
+handle missing bus.csv, char_line.csv and char_map.csv (<a class="reference external" href="https://github.com/oemof/tespy/pull/127">PR #127</a>).</p></li>
+<li><p>Some parameters of class <a class="reference internal" href="../api/tespy.components.html#module-tespy.components.combustion.engine" title="tespy.components.combustion.engine"><code class="xref py py-class docutils literal notranslate"><span class="pre">combustion_engine</span></code></a> have been
+printed out twice in the value range check (<a class="reference external" href="https://github.com/oemof/tespy/pull/135">PR #135</a>).</p></li>
+</ul>
+</section>
+<section id="other-changes">
+<h2>Other changes<a class="headerlink" href="#other-changes" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Adjust logging levels for grouped component parameter initialisation (<a class="reference external" href="https://github.com/oemof/tespy/pull/111">PR #111</a>).</p></li>
+<li><p>Implement pep8speaks (PEP8 checker) in GitHub repository (<a class="reference external" href="https://github.com/oemof/tespy/pull/131">PR #131</a>).</p></li>
+<li><p>The subsystem architecture has been simplified. Your connections and components are saved to dictionaries to make
+accessing the individual properties much easier (<a class="reference external" href="https://github.com/oemof/tespy/pull/126">PR #126</a>). For a use
+case of subsystems, have a look at the <a class="reference internal" href="../tutorials_examples.html#dh-example-label"><span class="std std-ref">district heating example</span></a>.</p></li>
+<li><p>Change the specification of set value for <code class="xref py py-class docutils literal notranslate"><span class="pre">dc_simple</span></code>
+class from <code class="code docutils literal notranslate"><span class="pre">val_set</span></code> to <code class="code docutils literal notranslate"><span class="pre">is_set</span></code> (<a class="reference external" href="https://github.com/oemof/tespy/pull/138">PR #138</a>).</p></li>
+<li><p>Move the default characteristic function plots to the <a class="reference internal" href="../api/tespy.data.html#module-tespy.data" title="tespy.data"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tespy.data</span></code></a> module documentation
+(<a class="reference external" href="https://github.com/oemof/tespy/pull/138">PR #138</a>).</p></li>
+</ul>
+</section>
+<section id="contributors">
+<h2>Contributors<a class="headerlink" href="#contributors" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Francesco Witte (&#64;fwitte)</p></li>
+<li><p>&#64;MarBrandt</p></li>
+<li><p>&#64;maltefritz</p></li>
+<li><p>&#64;jfreissmann</p></li>
+<li><p>&#64;stianchris</p></li>
+<li><p>&#64;FranziPl</p></li>
+</ul>
+</section>
+<section id="examples">
+<span id="tespy-v020-examples-label"></span><h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p><strong>Removed default import shortcuts</strong></p>
+<p><em>tespy 0.1.x</em></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tespy</span> <span class="kn">import</span> <span class="n">cmp</span><span class="p">,</span> <span class="n">cmp_char</span><span class="p">,</span> <span class="n">con</span><span class="p">,</span> <span class="n">hlp</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">nwk</span><span class="p">,</span> <span class="n">nwkr</span><span class="p">,</span> <span class="n">subsys</span>
+</pre></div>
+</div>
+<p><em>tespy 0.2.x (example imports)</em></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="n">heat_exchanger</span><span class="p">,</span> <span class="n">turbine</span>
+<span class="kn">from</span> <span class="nn">tespy.connections</span> <span class="kn">import</span> <span class="n">connection</span><span class="p">,</span> <span class="n">bus</span><span class="p">,</span> <span class="n">ref</span>
+<span class="kn">from</span> <span class="nn">tespy.networks</span> <span class="kn">import</span> <span class="n">network</span><span class="p">,</span> <span class="n">load_network</span>
+<span class="kn">from</span> <span class="nn">tespy.tools</span> <span class="kn">import</span> <span class="n">char_line</span><span class="p">,</span> <span class="n">char_map</span>
+<span class="kn">from</span> <span class="nn">tespy.tools</span> <span class="kn">import</span> <span class="n">logger</span>
+</pre></div>
+</div>
+<p><strong>Renaming components</strong></p>
+<p><em>tespy 0.1.x</em></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tespy</span> <span class="kn">import</span> <span class="n">cmp</span>
+<span class="n">chp</span> <span class="o">=</span> <span class="n">cmp</span><span class="o">.</span><span class="n">cogeneration_unit</span><span class="p">(</span><span class="s1">&#39;combined heat and power&#39;</span><span class="p">)</span>
+<span class="n">IF</span> <span class="o">=</span> <span class="n">cmp</span><span class="o">.</span><span class="n">subsys_interface</span><span class="p">(</span><span class="s1">&#39;subsystem interface&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><em>tespy 0.2.x</em></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="n">combustion_engine</span><span class="p">,</span> <span class="n">subsystem_interface</span>
+<span class="n">chp</span> <span class="o">=</span> <span class="n">combustion_engine</span><span class="p">(</span><span class="s1">&#39;combined heat and power&#39;</span><span class="p">)</span>
+<span class="n">IF</span> <span class="o">=</span> <span class="n">subsystem_interface</span><span class="p">(</span><span class="s1">&#39;subsystem interface&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Renaming tespy.networks functionalities</strong></p>
+<p><em>tespy 0.1.x</em></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tespy</span> <span class="kn">import</span> <span class="n">nwkr</span>
+<span class="n">mynetwork</span> <span class="o">=</span> <span class="n">nwkr</span><span class="o">.</span><span class="n">load_nwk</span><span class="p">(</span><span class="s1">&#39;path/to/exported/networkfiles&#39;</span><span class="p">)</span>
+<span class="n">mynetwork</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">print_level</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+<span class="n">mynetwork</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">print_level</span><span class="o">=</span><span class="s1">&#39;info&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><em>tespy 0.2.x</em></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tespy.networks</span> <span class="kn">import</span> <span class="n">load_network</span>
+<span class="n">mynetwork</span> <span class="o">=</span> <span class="n">load_network</span><span class="p">(</span><span class="s1">&#39;path/to/exported/networkfiles&#39;</span><span class="p">)</span>
+<span class="n">mynetwork</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">iterinfo</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">mynetwork</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">iterinfo</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Component characteristic specification</strong></p>
+<p><em>tespy 0.1.x</em></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tespy</span> <span class="kn">import</span> <span class="n">cmp</span><span class="p">,</span> <span class="n">hlp</span>
+<span class="n">turb</span> <span class="o">=</span> <span class="n">cmp</span><span class="o">.</span><span class="n">turbine</span><span class="p">(</span><span class="s1">&#39;turbine&#39;</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.50</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">,</span> <span class="mf">1.00</span><span class="p">,</span> <span class="mf">1.25</span><span class="p">]</span>
+<span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.90</span><span class="p">,</span> <span class="mf">0.98</span><span class="p">,</span> <span class="mf">1.00</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">]</span>
+<span class="n">char</span> <span class="o">=</span> <span class="n">hlp</span><span class="o">.</span><span class="n">dc_cc</span><span class="p">(</span><span class="n">is_set</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
+<span class="n">turb</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">eta_s_char</span><span class="o">=</span><span class="n">char</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><em>tespy 0.2.x</em></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="n">turbine</span>
+<span class="kn">from</span> <span class="nn">tespy.tools</span> <span class="kn">import</span> <span class="n">char_line</span>
+<span class="n">turb</span> <span class="o">=</span> <span class="n">turbine</span><span class="p">(</span><span class="s1">&#39;turbine&#39;</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.50</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">,</span> <span class="mf">1.00</span><span class="p">,</span> <span class="mf">1.25</span><span class="p">]</span>
+<span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.90</span><span class="p">,</span> <span class="mf">0.98</span><span class="p">,</span> <span class="mf">1.00</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">]</span>
+<span class="n">char</span> <span class="o">=</span> <span class="n">dc_cc</span><span class="p">(</span><span class="n">is_set</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="n">char_line</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
+<span class="n">turb</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">eta_s_char</span><span class="o">=</span><span class="n">char</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2020, Francesco Witte.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

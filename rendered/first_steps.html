@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>First steps &mdash; tespy 0.6.0 - Colored Chemicals documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Examples and Tutorials" href="tutorials_examples.html" />
+    <link rel="prev" title="Installation and setup" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> tespy
+            <img src="_static/logo_tespy_mid.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.6.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Thermal Engineering Systems in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation and setup</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">First steps</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#set-up-a-plant">Set up a plant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#set-up-components">Set up components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#establish-connections">Establish connections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#start-your-calculation">Start your calculation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials_examples.html">Examples and Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tespy_modules.html">TESPy modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tespy_analyses.html">Thermodynamic analyses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developing_tespy.html">Developing TESPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="zliterature.html">Literature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">tespy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>First steps</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/first_steps.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="first-steps">
+<h1>First steps<a class="headerlink" href="#first-steps" title="Permalink to this headline">¶</a></h1>
+<p>In this section we provide you with a very simple example as firsts steps in
+using TESPy. The model used in this introduction is shown the figure. It
+consists of a central heating plant and a consumer, represented by a heat
+exchanger with a control valve.</p>
+<figure class="align-center" id="id1">
+<img alt="_images/intro_district_heating_scheme.svg" src="_images/intro_district_heating_scheme.svg" /><figcaption>
+<p><span class="caption-text">Figure: Topology of the simplest district heating system.</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+<section id="set-up-a-plant">
+<h2>Set up a plant<a class="headerlink" href="#set-up-a-plant" title="Permalink to this headline">¶</a></h2>
+<p>In order to simulate a plant we start by creating a network
+(<a class="reference internal" href="api/tespy.networks.html#tespy.networks.network.Network" title="tespy.networks.network.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">tespy.networks.network.Network</span></code></a>). The network is the main container
+for the model. You need to specify a list of the fluids you require for the
+calculation in your plant. For more information on the fluid properties go to
+the <a class="reference internal" href="tespy_modules.html#tespy-fluid-properties-label"><span class="std std-ref">corresponding section</span></a> in TESPy
+modules.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tespy.networks</span> <span class="kn">import</span> <span class="n">Network</span>
+
+<span class="c1"># create a network object with water as fluid</span>
+<span class="n">fluid_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;water&#39;</span><span class="p">]</span>
+<span class="n">my_plant</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span><span class="n">fluids</span><span class="o">=</span><span class="n">fluid_list</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>On top of that, it is possible to specify a unit system and value ranges for
+the network’s variables. If you do not specify these, TESPy will use SI-units.
+The specification of the <strong>value range</strong> is used to <strong>improve convergence</strong>
+<strong>stability</strong>, in case you are dealing with <strong>fluid mixtures</strong>, e.g. using
+combustion. We will thus only specify the unit systems, in this case.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># set the unitsystem for temperatures to °C and for pressure to bar</span>
+<span class="n">my_plant</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">T_unit</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="n">p_unit</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="n">h_unit</span><span class="o">=</span><span class="s1">&#39;kJ / kg&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now you can start to create the components of the network.</p>
+</section>
+<section id="set-up-components">
+<h2>Set up components<a class="headerlink" href="#set-up-components" title="Permalink to this headline">¶</a></h2>
+<p>The list of components available can be found
+<a class="reference internal" href="tespy_modules.html#using-tespy-components-label"><span class="std std-ref">here</span></a>. If you set up a component you have
+to specify a (within one network) unique label. Moreover, it is possible to
+specify parameters for the component, for example power <img class="math" src="_images/math/c2aa3dff9bffb099e9dff196fd36aed56ec16baf.png" alt="P"/> for a turbine
+or upper terminal temperature difference <img class="math" src="_images/math/f5753127671dd64b157bf83f485eb525c88ef6b7.png" alt="ttd_\mathrm{u}"/> of a heat
+exchanger. The full list of parameters for a specific component is stated in
+the respective class documentation. The example uses pipes, a control valve and
+a heat exchanger. The definition of the parameters available can be found here:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="api/tespy.components.html#tespy.components.piping.pipe.Pipe" title="tespy.components.piping.pipe.Pipe"><code class="xref py py-class docutils literal notranslate"><span class="pre">tespy.components.piping.pipe.Pipe</span></code></a></p></li>
+<li><p><a class="reference internal" href="api/tespy.components.html#tespy.components.piping.valve.Valve" title="tespy.components.piping.valve.Valve"><code class="xref py py-class docutils literal notranslate"><span class="pre">tespy.components.piping.valve.Valve</span></code></a></p></li>
+<li><p><a class="reference internal" href="api/tespy.components.html#tespy.components.heat_exchangers.simple.HeatExchangerSimple" title="tespy.components.heat_exchangers.simple.HeatExchangerSimple"><code class="xref py py-class docutils literal notranslate"><span class="pre">tespy.components.heat_exchangers.simple.HeatExchangerSimple</span></code></a></p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Parameters for components are generally optional. Only the component’s
+label is mandatory. If an optional parameter is not specified by the user,
+it will be a result of the plant’s simulation. This way, the set of
+equations a component returns is determined by which parameters you
+specify. You can find all equations in the components documentation as
+well.</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Sink</span><span class="p">,</span> <span class="n">Source</span><span class="p">,</span> <span class="n">Pipe</span><span class="p">,</span> <span class="n">Valve</span><span class="p">,</span> <span class="n">HeatExchangerSimple</span><span class="p">)</span>
+
+<span class="c1"># sources &amp; sinks (central heating plant)</span>
+<span class="n">so</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span><span class="s1">&#39;heat source output&#39;</span><span class="p">)</span>
+<span class="n">si</span> <span class="o">=</span> <span class="n">Sink</span><span class="p">(</span><span class="s1">&#39;heat source input&#39;</span><span class="p">)</span>
+
+<span class="c1"># consumer</span>
+<span class="n">cons</span> <span class="o">=</span> <span class="n">HeatExchangerSimple</span><span class="p">(</span><span class="s1">&#39;consumer&#39;</span><span class="p">)</span>
+<span class="n">cons</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">Q</span><span class="o">=-</span><span class="mi">10000</span><span class="p">,</span> <span class="n">pr</span><span class="o">=</span><span class="mf">0.98</span><span class="p">)</span>  <span class="c1"># Q in W</span>
+<span class="n">val</span> <span class="o">=</span> <span class="n">Valve</span><span class="p">(</span><span class="s1">&#39;valve&#39;</span><span class="p">)</span>
+<span class="n">val</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">pr</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># pr - pressure ratio (output/input pressure)</span>
+
+<span class="c1"># pipes</span>
+<span class="n">pipe_feed</span> <span class="o">=</span> <span class="n">Pipe</span><span class="p">(</span><span class="s1">&#39;pipe_feed&#39;</span><span class="p">)</span>
+<span class="n">pipe_back</span> <span class="o">=</span> <span class="n">Pipe</span><span class="p">(</span><span class="s1">&#39;pipe_back&#39;</span><span class="p">)</span>
+
+<span class="n">pipe_feed</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">ks</span><span class="o">=</span><span class="mf">0.0005</span><span class="p">,</span>  <span class="c1"># pipe&#39;s roughness in meters</span>
+                   <span class="n">L</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>  <span class="c1"># length in m</span>
+                   <span class="n">D</span><span class="o">=</span><span class="mf">0.06</span><span class="p">,</span>  <span class="c1"># diameter in m</span>
+                   <span class="n">kA</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>  <span class="c1"># area independent heat transfer coefficient kA in W/K</span>
+                   <span class="n">Tamb</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>  <span class="c1"># ambient temperature of the pipe environment (ground temperature)</span>
+<span class="n">pipe_back</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">ks</span><span class="o">=</span><span class="mf">0.0005</span><span class="p">,</span>
+                   <span class="n">L</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+                   <span class="n">D</span><span class="o">=</span><span class="mf">0.06</span><span class="p">,</span>
+                   <span class="n">kA</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                   <span class="n">Tamb</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>After creating the components the next step is to connect them in order to form
+your topological network.</p>
+</section>
+<section id="establish-connections">
+<h2>Establish connections<a class="headerlink" href="#establish-connections" title="Permalink to this headline">¶</a></h2>
+<p>Connections are used to link two components (outlet of component 1 to inlet of
+component 2: source to target). If two components are connected with each other
+the fluid properties at the source will be equal to the properties at the
+target. It is possible to set the properties on each connection in a similar
+way as parameters are set for components. The basic specification options are:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>mass flow (m)</p></li>
+<li><p>volumetric flow (v)</p></li>
+<li><p>pressure (p)</p></li>
+<li><p>enthalpy (h)</p></li>
+<li><p>temperature (T)</p></li>
+<li><p>a fluid vector (fluid)</p></li>
+</ul>
+</div></blockquote>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>There are more specification options available. Please refer to
+the <a class="reference internal" href="tespy_modules.html#using-tespy-connections-label"><span class="std std-ref">connections section</span></a> in the TESPy
+modules chapter for detailed information. The specification options are
+stated in the
+connection class documentation, too:
+<a class="reference internal" href="api/tespy.connections.html#tespy.connections.connection.Connection" title="tespy.connections.connection.Connection"><code class="xref py py-class docutils literal notranslate"><span class="pre">tespy.connections.connection.Connection</span></code></a>.</p>
+</div>
+<p>After creating the connections, we need to add them to the network. As the
+connections hold the information, which components are connected in which way,
+we do not need to pass the components to the network.</p>
+<p>The connection parameters specified in the example case, are inlet and outlet
+temperature of the system as well as the inlet pressure. The pressure losses in
+the pipes, the consumer and the control valve determine the pressure at all
+other points of the network. The enthalpy is calculated from given temperature
+and heat losses in the pipes. Additionally we have to specify the fluid vector
+at one point in our network.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tespy.connections</span> <span class="kn">import</span> <span class="n">Connection</span>
+
+<span class="c1"># connections of the disctrict heating system</span>
+<span class="n">so_pif</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">pipe_feed</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+
+<span class="n">pif_cons</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">pipe_feed</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">cons</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+<span class="n">cons_val</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">cons</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+
+<span class="n">val_pib</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">pipe_back</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+<span class="n">pib_si</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">pipe_back</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">si</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+
+<span class="c1"># this line is crutial: you have to add all connections to your network</span>
+<span class="n">my_plant</span><span class="o">.</span><span class="n">add_conns</span><span class="p">(</span><span class="n">so_pif</span><span class="p">,</span> <span class="n">pif_cons</span><span class="p">,</span> <span class="n">cons_val</span><span class="p">,</span> <span class="n">val_pib</span><span class="p">,</span> <span class="n">pib_si</span><span class="p">)</span>
+
+<span class="n">so_pif</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">T</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">fluid</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;water&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+<span class="n">cons_val</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">T</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="start-your-calculation">
+<h2>Start your calculation<a class="headerlink" href="#start-your-calculation" title="Permalink to this headline">¶</a></h2>
+<p>After building your network, the components and the connections, add the
+following line at the end of your script and run it:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">my_plant</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;design&#39;</span><span class="p">)</span>
+<span class="n">my_plant</span><span class="o">.</span><span class="n">print_results</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>We highly recommend to check our step-by-step
+<a class="reference internal" href="tutorials_examples.html#heat-pump-tutorial-label"><span class="std std-ref">tutorial</span></a> on how to set up a heat pump (see
+figure below) in TESPy. You will learn, how to set up and design a plant as
+well as calculate offdesign/partload performance.</p>
+<figure class="align-center" id="id2">
+<img alt="_images/tutorial_heat_pump.svg" src="_images/tutorial_heat_pump.svg" /><figcaption>
+<p><span class="caption-text">Figure: Topology of a heat pump</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>Additional examples are provided in the
+<a class="reference internal" href="tutorials_examples.html#tespy-examples-label"><span class="std std-ref">examples section</span></a>.</p>
+<p>In order to get a good overview of the TESPy functionalities, the sections on
+the <a class="reference internal" href="tespy_modules.html#tespy-modules-label"><span class="std std-ref">TESPy modules</span></a> will guide you in detail.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installation and setup" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tutorials_examples.html" class="btn btn-neutral float-right" title="Examples and Tutorials" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2020, Francesco Witte.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

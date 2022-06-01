@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tespy.data module &mdash; tespy 0.6.0 - Colored Chemicals documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="tespy.networks module" href="tespy.networks.html" />
+    <link rel="prev" title="tespy.connections module" href="tespy.connections.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> tespy
+            <img src="../_static/logo_tespy_mid.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.6.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Thermal Engineering Systems in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../first_steps.html">First steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials_examples.html">Examples and Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tespy_modules.html">TESPy modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tespy_analyses.html">Thermodynamic analyses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developing_tespy.html">Developing TESPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zliterature.html">Literature</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="tespy.components.html">tespy.components module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tespy.connections.html">tespy.connections module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">tespy.data module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-tespy.data">Module contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#default-characteristics">Default characteristics</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#characteristic-lines">Characteristic lines</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#characteristic-maps">Characteristic maps</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tespy.networks.html">tespy.networks module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tespy.tools.html">tespy.tools module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">tespy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../api.html">API Documentation</a> &raquo;</li>
+      <li>tespy.data module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/tespy.data.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="tespy-data-module">
+<h1>tespy.data module<a class="headerlink" href="#tespy-data-module" title="Permalink to this headline">¶</a></h1>
+<section id="module-tespy.data">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-tespy.data" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="default-characteristics">
+<h2>Default characteristics<a class="headerlink" href="#default-characteristics" title="Permalink to this headline">¶</a></h2>
+<section id="characteristic-lines">
+<h3>Characteristic lines<a class="headerlink" href="#characteristic-lines" title="Permalink to this headline">¶</a></h3>
+<p><strong>turbine</strong></p>
+<figure class="align-center" id="id4">
+<img alt="Characteristic line &quot;DEFAULT&quot; for parameter &quot;eta_s_char&quot;." src="../_images/turbine_eta_s_char_DEFAULT.svg" /><figcaption>
+<p><span class="caption-text">Reference: Generic data.</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id5">
+<img alt="Characteristic line &quot;TRAUPEL&quot; for parameter &quot;eta_s_char&quot;." src="../_images/turbine_eta_s_char_TRAUPEL.svg" /><figcaption>
+<p><span class="caption-text">Reference: <span id="id1">[<a class="reference internal" href="../zliterature.html#id13" title="Walter Traupel. Thermische Turbomaschinen. Springer Berlin Heidelberg, 2001. doi:10.1007/978-3-642-17465-0.">Tra01</a>]</span>.</span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+<p><strong>compressor</strong></p>
+<figure class="align-center" id="id6">
+<img alt="Characteristic line &quot;DEFAULT&quot; for parameter &quot;eta_s_char&quot;." src="../_images/compressor_eta_s_char_DEFAULT.svg" /><figcaption>
+<p><span class="caption-text">Reference: Generic data.</span><a class="headerlink" href="#id6" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+<p><strong>pump</strong></p>
+<figure class="align-center" id="id7">
+<img alt="Characteristic line &quot;DEFAULT&quot; for parameter &quot;eta_s_char&quot;." src="../_images/pump_eta_s_char_DEFAULT.svg" /><figcaption>
+<p><span class="caption-text">Reference: Generic data.</span><a class="headerlink" href="#id7" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+<p><strong>combustion engine</strong></p>
+<figure class="align-center" id="id8">
+<img alt="Characteristic line &quot;DEFAULT&quot; for parameter &quot;tiP_char&quot;." src="../_images/combustion_engine_tiP_char_DEFAULT.svg" /><figcaption>
+<p><span class="caption-text">Reference: Generic data.</span><a class="headerlink" href="#id8" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id9">
+<img alt="Characteristic line &quot;DEFAULT&quot; for parameter &quot;Q1_char&quot;." src="../_images/combustion_engine_Q1_char_DEFAULT.svg" /><figcaption>
+<p><span class="caption-text">Reference: Generic data.</span><a class="headerlink" href="#id9" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id10">
+<img alt="Characteristic line &quot;DEFAULT&quot; for parameter &quot;Q2_char&quot;." src="../_images/combustion_engine_Q2_char_DEFAULT.svg" /><figcaption>
+<p><span class="caption-text">Reference: Generic data.</span><a class="headerlink" href="#id10" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id11">
+<img alt="Characteristic line &quot;DEFAULT&quot; for parameter &quot;Qloss_char&quot;." src="../_images/combustion_engine_Qloss_char_DEFAULT.svg" /><figcaption>
+<p><span class="caption-text">Reference: Generic data.</span><a class="headerlink" href="#id11" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+<p><strong>heat exchanger</strong></p>
+<figure class="align-center" id="id12">
+<img alt="Characteristic line &quot;DEFAULT&quot; for parameter &quot;kA_char1&quot;." src="../_images/heat_exchanger_kA_char1_DEFAULT.svg" /><figcaption>
+<p><span class="caption-text">Reference: Generic data.</span><a class="headerlink" href="#id12" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id13">
+<img alt="Characteristic line &quot;CONDENSING FLUID&quot; for parameter &quot;kA_char1&quot;." src="../_images/heat_exchanger_kA_char1_CONDENSING_FLUID.svg" /><figcaption>
+<p><span class="caption-text">Reference: Generic data.</span><a class="headerlink" href="#id13" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id14">
+<img alt="Characteristic line &quot;DEFAULT&quot; for parameter &quot;kA_char2&quot;." src="../_images/heat_exchanger_kA_char2_DEFAULT.svg" /><figcaption>
+<p><span class="caption-text">Reference: Generic data.</span><a class="headerlink" href="#id14" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id15">
+<img alt="Characteristic line &quot;EVAPORATING FLUID&quot; for parameter &quot;kA_char2&quot;." src="../_images/heat_exchanger_kA_char2_EVAPORATING_FLUID.svg" /><figcaption>
+<p><span class="caption-text">Reference: Generic data.</span><a class="headerlink" href="#id15" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+<p><strong>condenser</strong></p>
+<figure class="align-center" id="id16">
+<img alt="Characteristic line &quot;DEFAULT&quot; for parameter &quot;kA_char1&quot;." src="../_images/condenser_kA_char1_DEFAULT.svg" /><figcaption>
+<p><span class="caption-text">Reference: Generic data.</span><a class="headerlink" href="#id16" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id17">
+<img alt="Characteristic line &quot;DEFAULT&quot; for parameter &quot;kA_char2&quot;." src="../_images/condenser_kA_char2_DEFAULT.svg" /><figcaption>
+<p><span class="caption-text">Reference: Generic data.</span><a class="headerlink" href="#id17" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+<p><strong>desuperheater</strong></p>
+<figure class="align-center" id="id18">
+<img alt="Characteristic line &quot;DEFAULT&quot; for parameter &quot;kA_char1&quot;." src="../_images/desuperheater_kA_char1_DEFAULT.svg" /><figcaption>
+<p><span class="caption-text">Reference: Generic data.</span><a class="headerlink" href="#id18" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id19">
+<img alt="Characteristic line &quot;DEFAULT&quot; for parameter &quot;kA_char2&quot;." src="../_images/desuperheater_kA_char2_DEFAULT.svg" /><figcaption>
+<p><span class="caption-text">Reference: Generic data.</span><a class="headerlink" href="#id19" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+<p><strong>heat exchanger simple</strong></p>
+<figure class="align-center" id="id20">
+<img alt="Characteristic line &quot;DEFAULT&quot; for parameter &quot;kA_char&quot;." src="../_images/heat_exchanger_simple_kA_char_DEFAULT.svg" /><figcaption>
+<p><span class="caption-text">Reference: Generic data.</span><a class="headerlink" href="#id20" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+<p><strong>pipe</strong></p>
+<figure class="align-center" id="id21">
+<img alt="Characteristic line &quot;DEFAULT&quot; for parameter &quot;kA_char&quot;." src="../_images/pipe_kA_char_DEFAULT.svg" /><figcaption>
+<p><span class="caption-text">Reference: Generic data.</span><a class="headerlink" href="#id21" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+<p><strong>water electrolyzer</strong></p>
+<figure class="align-center" id="id22">
+<img alt="Characteristic line &quot;DEFAULT&quot; for parameter &quot;eta_char&quot;." src="../_images/water_electrolyzer_eta_char_DEFAULT.svg" /><figcaption>
+<p><span class="caption-text">Reference: Generic data.</span><a class="headerlink" href="#id22" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="characteristic-maps">
+<h3>Characteristic maps<a class="headerlink" href="#characteristic-maps" title="Permalink to this headline">¶</a></h3>
+<p><strong>compressor</strong></p>
+<figure class="align-center" id="id23">
+<img alt="Characteristic map &quot;DEFAULT&quot; for parameter &quot;char_map_pr&quot;." src="../_images/compressor_char_map_pr_DEFAULT.svg" /><figcaption>
+<p><span class="caption-text">Reference: <span id="id2">[<a class="reference internal" href="../zliterature.html#id11" title="Marcin Plis and Henryk Rusinowski. Mathematical modeling of an axial compressor in a gas turbine cycle. Journal of Power Technologies, 96(3):194-199, 2016.">PR16</a>]</span>.</span><a class="headerlink" href="#id23" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id24">
+<img alt="Characteristic map &quot;DEFAULT&quot; for parameter &quot;char_map_eta_s&quot;." src="../_images/compressor_char_map_eta_s_DEFAULT.svg" /><figcaption>
+<p><span class="caption-text">Reference: <span id="id3">[<a class="reference internal" href="../zliterature.html#id11" title="Marcin Plis and Henryk Rusinowski. Mathematical modeling of an axial compressor in a gas turbine cycle. Journal of Power Technologies, 96(3):194-199, 2016.">PR16</a>]</span>.</span><a class="headerlink" href="#id24" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="tespy.connections.html" class="btn btn-neutral float-left" title="tespy.connections module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tespy.networks.html" class="btn btn-neutral float-right" title="tespy.networks module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2020, Francesco Witte.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,1504 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tespy.components.combustion.base &mdash; tespy 0.6.0 - Colored Chemicals documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../../index.html" class="icon icon-home"> tespy
+            <img src="../../../../_static/logo_tespy_mid.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.6.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../introduction.html">Thermal Engineering Systems in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installation and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../first_steps.html">First steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials_examples.html">Examples and Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tespy_modules.html">TESPy modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tespy_analyses.html">Thermodynamic analyses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../developing_tespy.html">Developing TESPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../zliterature.html">Literature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">tespy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+      <li>tespy.components.combustion.base</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for tespy.components.combustion.base</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8</span>
+
+<span class="sd">&quot;&quot;&quot;Module of class CombustionChamber.</span>
+
+
+<span class="sd">This file is part of project TESPy (github.com/oemof/tespy). It&#39;s copyrighted</span>
+<span class="sd">by the contributors recorded in the version control history of the file,</span>
+<span class="sd">available from its original location</span>
+<span class="sd">tespy/components/combustion/base.py</span>
+
+<span class="sd">SPDX-License-Identifier: MIT</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">import</span> <span class="nn">CoolProp.CoolProp</span> <span class="k">as</span> <span class="nn">CP</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">tespy.components.component</span> <span class="kn">import</span> <span class="n">Component</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.data_containers</span> <span class="kn">import</span> <span class="n">ComponentProperties</span> <span class="k">as</span> <span class="n">dc_cp</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.document_models</span> <span class="kn">import</span> <span class="n">generate_latex_eq</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.fluid_properties</span> <span class="kn">import</span> <span class="n">h_mix_pT</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.fluid_properties</span> <span class="kn">import</span> <span class="n">s_mix_pT</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.global_vars</span> <span class="kn">import</span> <span class="n">molar_masses</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.helpers</span> <span class="kn">import</span> <span class="n">TESPyComponentError</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.helpers</span> <span class="kn">import</span> <span class="n">fluid_structure</span>
+
+
+<div class="viewcode-block" id="CombustionChamber"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber">[docs]</a><span class="k">class</span> <span class="nc">CombustionChamber</span><span class="p">(</span><span class="n">Component</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The class CombustionChamber is parent class of all combustion components.</span>
+
+<span class="sd">    **Mandatory Equations**</span>
+
+<span class="sd">    - :py:meth:`tespy.components.combustion.base.CombustionChamber.mass_flow_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.combustion.base.CombustionChamber.combustion_pressure_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.combustion.base.CombustionChamber.stoichiometry`</span>
+<span class="sd">    - :py:meth:`tespy.components.combustion.base.CombustionChamber.energy_balance_func`</span>
+
+<span class="sd">    **Optional Equations**</span>
+
+<span class="sd">    - :py:meth:`tespy.components.combustion.base.CombustionChamber.lambda_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.combustion.base.CombustionChamber.ti_func`</span>
+
+<span class="sd">    Available fuels</span>
+
+<span class="sd">    - methane, ethane, propane, butane, hydrogen</span>
+
+<span class="sd">    Inlets/Outlets</span>
+
+<span class="sd">    - in1, in2</span>
+<span class="sd">    - out1</span>
+
+<span class="sd">    Image</span>
+
+<span class="sd">    .. image:: _images/CombustionChamber.svg</span>
+<span class="sd">       :alt: alternative text</span>
+<span class="sd">       :align: center</span>
+
+<span class="sd">    .. note::</span>
+
+<span class="sd">        The fuel and the air components can be connected to either of the</span>
+<span class="sd">        inlets.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    label : str</span>
+<span class="sd">        The label of the component.</span>
+
+<span class="sd">    design : list</span>
+<span class="sd">        List containing design parameters (stated as String).</span>
+
+<span class="sd">    offdesign : list</span>
+<span class="sd">        List containing offdesign parameters (stated as String).</span>
+
+<span class="sd">    design_path : str</span>
+<span class="sd">        Path to the components design case.</span>
+
+<span class="sd">    local_offdesign : boolean</span>
+<span class="sd">        Treat this component in offdesign mode in a design calculation.</span>
+
+<span class="sd">    local_design : boolean</span>
+<span class="sd">        Treat this component in design mode in an offdesign calculation.</span>
+
+<span class="sd">    char_warnings : boolean</span>
+<span class="sd">        Ignore warnings on default characteristics usage for this component.</span>
+
+<span class="sd">    printout : boolean</span>
+<span class="sd">        Include this component in the network&#39;s results printout.</span>
+
+<span class="sd">    lamb : float, dict</span>
+<span class="sd">        Actual oxygen to stoichiometric oxygen ratio, :math:`\lambda/1`.</span>
+
+<span class="sd">    ti : float, dict</span>
+<span class="sd">        Thermal input, (:math:`{LHV \cdot \dot{m}_f}`), :math:`ti/\text{W}`.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    For more information on the usage of the combustion chamber see the</span>
+<span class="sd">    examples section on github or look for the combustion chamber tutorials</span>
+<span class="sd">    at tespy.readthedocs.io.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    The combustion chamber calculates energy input due to combustion as well as</span>
+<span class="sd">    the flue gas composition based on the type of fuel and the amount of</span>
+<span class="sd">    oxygen supplied. In this example a mixture of methane, hydrogen and</span>
+<span class="sd">    carbondioxide is used as fuel.</span>
+
+<span class="sd">    &gt;&gt;&gt; from tespy.components import Sink, Source, CombustionChamber</span>
+<span class="sd">    &gt;&gt;&gt; from tespy.connections import Connection</span>
+<span class="sd">    &gt;&gt;&gt; from tespy.networks import Network</span>
+<span class="sd">    &gt;&gt;&gt; from tespy.tools.fluid_properties import T_bp_p</span>
+<span class="sd">    &gt;&gt;&gt; import shutil</span>
+<span class="sd">    &gt;&gt;&gt; fluid_list = [&#39;Ar&#39;, &#39;N2&#39;, &#39;H2&#39;, &#39;O2&#39;, &#39;CO2&#39;, &#39;CH4&#39;, &#39;H2O&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; nw = Network(fluids=fluid_list, p_unit=&#39;bar&#39;, T_unit=&#39;C&#39;,</span>
+<span class="sd">    ... iterinfo=False)</span>
+<span class="sd">    &gt;&gt;&gt; amb = Source(&#39;ambient air&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; sf = Source(&#39;fuel&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; fg = Sink(&#39;flue gas outlet&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; comb = CombustionChamber(&#39;combustion chamber&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; comb.component()</span>
+<span class="sd">    &#39;combustion chamber&#39;</span>
+<span class="sd">    &gt;&gt;&gt; amb_comb = Connection(amb, &#39;out1&#39;, comb, &#39;in1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; sf_comb = Connection(sf, &#39;out1&#39;, comb, &#39;in2&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; comb_fg = Connection(comb, &#39;out1&#39;, fg, &#39;in1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; nw.add_conns(sf_comb, amb_comb, comb_fg)</span>
+
+<span class="sd">    Specify the thermal input of the combustion chamber. At the given fluid</span>
+<span class="sd">    compositions this determines the mass flow of the fuel. The outlet</span>
+<span class="sd">    temperature of the flue gas determines the ratio of oxygen to fuel mass</span>
+<span class="sd">    flow.</span>
+
+<span class="sd">    &gt;&gt;&gt; comb.set_attr(ti=500000)</span>
+<span class="sd">    &gt;&gt;&gt; amb_comb.set_attr(p=1, T=20, fluid={&#39;Ar&#39;: 0.0129, &#39;N2&#39;: 0.7553,</span>
+<span class="sd">    ... &#39;H2O&#39;: 0, &#39;CH4&#39;: 0, &#39;CO2&#39;: 0.0004, &#39;O2&#39;: 0.2314, &#39;H2&#39;: 0})</span>
+<span class="sd">    &gt;&gt;&gt; sf_comb.set_attr(T=25, fluid={&#39;CO2&#39;: 0.03, &#39;H2&#39;: 0.01, &#39;Ar&#39;: 0,</span>
+<span class="sd">    ... &#39;N2&#39;: 0, &#39;O2&#39;: 0, &#39;H2O&#39;: 0, &#39;CH4&#39;: 0.96})</span>
+<span class="sd">    &gt;&gt;&gt; comb_fg.set_attr(T=1200)</span>
+<span class="sd">    &gt;&gt;&gt; nw.solve(&#39;design&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; round(comb.lamb.val, 3)</span>
+<span class="sd">    2.014</span>
+<span class="sd">    &gt;&gt;&gt; comb.set_attr(lamb=2)</span>
+<span class="sd">    &gt;&gt;&gt; comb_fg.set_attr(T=np.nan)</span>
+<span class="sd">    &gt;&gt;&gt; nw.solve(&#39;design&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; round(comb_fg.T.val, 1)</span>
+<span class="sd">    1206.6</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CombustionChamber.component"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber.component">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">component</span><span class="p">():</span>
+        <span class="k">return</span> <span class="s1">&#39;combustion chamber&#39;</span></div>
+
+<div class="viewcode-block" id="CombustionChamber.get_variables"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber.get_variables">[docs]</a>    <span class="k">def</span> <span class="nf">get_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;lamb&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(</span>
+                <span class="n">min_val</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">deriv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lambda_deriv</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lambda_func</span><span class="p">,</span>
+                <span class="n">latex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lambda_func_doc</span><span class="p">,</span> <span class="n">num_eq</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+            <span class="s1">&#39;ti&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(</span>
+                <span class="n">min_val</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">deriv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ti_deriv</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ti_func</span><span class="p">,</span>
+                <span class="n">latex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ti_func_doc</span><span class="p">,</span> <span class="n">num_eq</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="p">}</span></div>
+
+<div class="viewcode-block" id="CombustionChamber.get_mandatory_constraints"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber.get_mandatory_constraints">[docs]</a>    <span class="k">def</span> <span class="nf">get_mandatory_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;mass_flow_constraints&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;func&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass_flow_func</span><span class="p">,</span> <span class="s1">&#39;deriv&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass_flow_deriv</span><span class="p">,</span>
+                <span class="s1">&#39;constant_deriv&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;latex&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass_flow_func_doc</span><span class="p">,</span>
+                <span class="s1">&#39;num_eq&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+            <span class="s1">&#39;reactor_pressure_constraints&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;func&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">combustion_pressure_func</span><span class="p">,</span>
+                <span class="s1">&#39;deriv&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">combustion_pressure_deriv</span><span class="p">,</span>
+                <span class="s1">&#39;constant_deriv&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="s1">&#39;latex&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">combustion_pressure_func_doc</span><span class="p">,</span>
+                <span class="s1">&#39;num_eq&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+            <span class="s1">&#39;stoichiometry_constraints&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;func&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">stoichiometry_func</span><span class="p">,</span>
+                <span class="s1">&#39;deriv&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">stoichiometry_deriv</span><span class="p">,</span>
+                <span class="s1">&#39;constant_deriv&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s1">&#39;latex&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">stoichiometry_func_doc</span><span class="p">,</span>
+                <span class="s1">&#39;num_eq&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_nw_fluids</span><span class="p">},</span>
+            <span class="s1">&#39;energy_balance_constraints&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;func&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_balance_func</span><span class="p">,</span>
+                <span class="s1">&#39;deriv&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_balance_deriv</span><span class="p">,</span>
+                <span class="s1">&#39;constant_deriv&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;latex&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_balance_func_doc</span><span class="p">,</span>
+                <span class="s1">&#39;num_eq&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+        <span class="p">}</span></div>
+
+<div class="viewcode-block" id="CombustionChamber.inlets"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber.inlets">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">inlets</span><span class="p">():</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;in1&#39;</span><span class="p">,</span> <span class="s1">&#39;in2&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="CombustionChamber.outlets"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber.outlets">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">outlets</span><span class="p">():</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;out1&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="CombustionChamber.comp_init"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber.comp_init">[docs]</a>    <span class="k">def</span> <span class="nf">comp_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nw</span><span class="p">):</span>
+        <span class="n">Component</span><span class="o">.</span><span class="n">comp_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nw</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup_reaction_parameters</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CombustionChamber.setup_reaction_parameters"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber.setup_reaction_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">setup_reaction_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Setup parameters for reaction (gas name aliases and LHV).&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fuel_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">fuels</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;methane&#39;</span><span class="p">,</span> <span class="s1">&#39;ethane&#39;</span><span class="p">,</span> <span class="s1">&#39;propane&#39;</span><span class="p">,</span> <span class="s1">&#39;butane&#39;</span><span class="p">,</span> <span class="s1">&#39;hydrogen&#39;</span><span class="p">,</span> <span class="s1">&#39;nDodecane&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fuels</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fuel_list</span> <span class="o">+=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nw_fluids</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span>
+                <span class="n">a</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">CP</span><span class="o">.</span><span class="n">get_aliases</span><span class="p">(</span><span class="n">f</span><span class="p">)]]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fuel_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Your network</span><span class="se">\&#39;</span><span class="s1">s fluids do not contain any fuels, that are &#39;</span>
+                   <span class="s1">&#39;available for the component &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">+</span> <span class="s1">&#39; of type &#39;</span> <span class="o">+</span>
+                   <span class="bp">self</span><span class="o">.</span><span class="n">component</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;. Available fuels are: &#39;</span> <span class="o">+</span>
+                   <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fuels</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">TESPyComponentError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;The fuels for component &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">+</span> <span class="s1">&#39; of type &#39;</span> <span class="o">+</span>
+                   <span class="bp">self</span><span class="o">.</span><span class="n">component</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39; are: &#39;</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fuel_list</span><span class="p">)</span> <span class="o">+</span>
+                   <span class="s1">&#39;.&#39;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">fluid</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;o2&#39;</span><span class="p">,</span> <span class="s1">&#39;co2&#39;</span><span class="p">,</span> <span class="s1">&#39;h2o&#39;</span><span class="p">,</span> <span class="s1">&#39;n2&#39;</span><span class="p">]:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="nb">setattr</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="p">,</span> <span class="n">fluid</span><span class="p">,</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nw_fluids</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span>
+                        <span class="n">a</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span>
+                        <span class="n">CP</span><span class="o">.</span><span class="n">get_aliases</span><span class="p">(</span><span class="n">fluid</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
+                    <span class="p">]][</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="s1">&#39;The component &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">+</span> <span class="s1">&#39; (class &#39;</span> <span class="o">+</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39;) requires that the fluid &#39;</span>
+                    <span class="s1">&#39;[fluid] is in the network</span><span class="se">\&#39;</span><span class="s1">s list of fluids.&#39;</span><span class="p">)</span>
+                <span class="n">aliases</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">CP</span><span class="o">.</span><span class="n">get_aliases</span><span class="p">(</span><span class="n">fluid</span><span class="o">.</span><span class="n">upper</span><span class="p">()))</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+                    <span class="s1">&#39;[fluid]&#39;</span><span class="p">,</span> <span class="n">fluid</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39; (aliases: &#39;</span> <span class="o">+</span> <span class="n">aliases</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span><span class="p">)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">TESPyComponentError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fuels</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fuel_list</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fuels</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">structure</span> <span class="o">=</span> <span class="n">fluid_structure</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;H&#39;</span><span class="p">,</span> <span class="s1">&#39;O&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">structure</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">fuels</span><span class="p">[</span><span class="n">f</span><span class="p">][</span><span class="n">el</span><span class="p">]</span> <span class="o">=</span> <span class="n">structure</span><span class="p">[</span><span class="n">el</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">fuels</span><span class="p">[</span><span class="n">f</span><span class="p">][</span><span class="n">el</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fuels</span><span class="p">[</span><span class="n">f</span><span class="p">][</span><span class="s1">&#39;LHV&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_lhv</span><span class="p">(</span><span class="n">f</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CombustionChamber.calc_lhv"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber.calc_lhv">[docs]</a>    <span class="k">def</span> <span class="nf">calc_lhv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the lower heating value of the combustion chamber&#39;s fuel.</span>
+
+<span class="sd">        - Source for fluids O2, H2O and CO2: :cite:`CODATA1989`</span>
+<span class="sd">        - Source for all other fluids: :cite:`CRCHandbook2021`</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        f : str</span>
+<span class="sd">            Alias of the fuel.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        val : float</span>
+<span class="sd">            Lower heating value of the combustion chambers fuel.</span>
+
+<span class="sd">            .. math::</span>
+
+<span class="sd">                LHV = -\frac{\sum_i {\Delta H_f^0}_i -</span>
+<span class="sd">                \sum_j {\Delta H_f^0}_j }</span>
+<span class="sd">                {M_{fuel}}\\</span>
+<span class="sd">                \forall i \in \text{reation products},\\</span>
+<span class="sd">                \forall j \in \text{reation educts},\\</span>
+<span class="sd">                \Delta H_f^0: \text{molar formation enthalpy}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">hf</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">hf</span><span class="p">[</span><span class="s1">&#39;hydrogen&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">hf</span><span class="p">[</span><span class="s1">&#39;methane&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">74.6</span>
+        <span class="n">hf</span><span class="p">[</span><span class="s1">&#39;ethane&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">84.0</span>
+        <span class="n">hf</span><span class="p">[</span><span class="s1">&#39;propane&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">103.8</span>
+        <span class="n">hf</span><span class="p">[</span><span class="s1">&#39;butane&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">125.7</span>
+        <span class="n">hf</span><span class="p">[</span><span class="s1">&#39;nDodecane&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">289.4</span>
+        <span class="n">hf</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">o2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">hf</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">co2</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">393.51</span>
+        <span class="c1"># water (gaseous)</span>
+        <span class="n">hf</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">h2o</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">241.826</span>
+
+        <span class="n">key</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">hf</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span>
+                <span class="nb">set</span><span class="p">([</span><span class="n">a</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                     <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">CP</span><span class="o">.</span><span class="n">get_aliases</span><span class="p">(</span><span class="n">f</span><span class="p">)]))</span>
+
+        <span class="n">val</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fuels</span><span class="p">[</span><span class="n">f</span><span class="p">][</span><span class="s1">&#39;H&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">hf</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">h2o</span><span class="p">]</span> <span class="o">+</span>
+                 <span class="bp">self</span><span class="o">.</span><span class="n">fuels</span><span class="p">[</span><span class="n">f</span><span class="p">][</span><span class="s1">&#39;C&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">hf</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">co2</span><span class="p">]</span> <span class="o">-</span>
+                 <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">fuels</span><span class="p">[</span><span class="n">f</span><span class="p">][</span><span class="s1">&#39;C&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">fuels</span><span class="p">[</span><span class="n">f</span><span class="p">][</span><span class="s1">&#39;H&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">4</span><span class="p">)</span> <span class="o">*</span> <span class="n">hf</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">o2</span><span class="p">]</span> <span class="o">+</span>
+                  <span class="n">hf</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">key</span><span class="p">)[</span><span class="mi">0</span><span class="p">]]))</span> <span class="o">/</span>
+               <span class="n">molar_masses</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">val</span></div>
+
+<div class="viewcode-block" id="CombustionChamber.mass_flow_func"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber.mass_flow_func">[docs]</a>    <span class="k">def</span> <span class="nf">mass_flow_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the residual value for component&#39;s mass flow balance.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        residual : list</span>
+<span class="sd">            Vector with residual value for component&#39;s mass flow balance.</span>
+
+<span class="sd">            .. math::</span>
+
+<span class="sd">                0 = \dot{m}_{in,1} + \dot{m}_{in,2} - \dot{m}_{out,1}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CombustionChamber.mass_flow_func_doc"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber.mass_flow_func_doc">[docs]</a>    <span class="k">def</span> <span class="nf">mass_flow_func_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the residual value for component&#39;s mass flow balance.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        label : str</span>
+<span class="sd">            Label for equation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        latex : str</span>
+<span class="sd">            LaTeX code of equations applied.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">latex</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;0=\dot</span><span class="si">{m}</span><span class="s1">_\mathrm{in,1} + \dot</span><span class="si">{m}</span><span class="s1">_\mathrm{in,2} - &#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\dot</span><span class="si">{m}</span><span class="s1">_\mathrm{out,1}&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">generate_latex_eq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latex</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CombustionChamber.mass_flow_deriv"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber.mass_flow_deriv">[docs]</a>    <span class="k">def</span> <span class="nf">mass_flow_deriv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the partial derivatives for all mass flow balance equations.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        deriv : ndarray</span>
+<span class="sd">            Matrix with partial derivatives for the fluid equations.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">deriv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_nw_vars</span><span class="p">))</span>
+        <span class="n">deriv</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">deriv</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">deriv</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">return</span> <span class="n">deriv</span></div>
+
+<div class="viewcode-block" id="CombustionChamber.combustion_pressure_func"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber.combustion_pressure_func">[docs]</a>    <span class="k">def</span> <span class="nf">combustion_pressure_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Equations for reactor pressure balance.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        residual : list</span>
+<span class="sd">            Residual values of equations.</span>
+
+<span class="sd">            .. math::</span>
+
+<span class="sd">                0 = p_\mathrm{in,3} - p_\mathrm{out,3}\\</span>
+<span class="sd">                0 = p_\mathrm{in,3} - p_\mathrm{in,4}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">inl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="mi">2</span><span class="p">][::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">outl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="n">outl</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">val_SI</span><span class="p">,</span> <span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="n">inl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">val_SI</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="CombustionChamber.combustion_pressure_func_doc"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber.combustion_pressure_func_doc">[docs]</a>    <span class="k">def</span> <span class="nf">combustion_pressure_func_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Equations for reactor pressure balance.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        label : str</span>
+<span class="sd">            Label for equation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        latex : str</span>
+<span class="sd">            LaTeX code of equations applied.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">inl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="mi">2</span><span class="p">][::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">outl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">idx_out</span> <span class="o">=</span> <span class="n">outl</span><span class="o">.</span><span class="n">source_id</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;,&#39;</span> <span class="o">+</span> <span class="n">outl</span><span class="o">.</span><span class="n">source_id</span><span class="p">[</span><span class="mi">3</span><span class="p">:]</span>
+        <span class="n">idx_in1</span> <span class="o">=</span> <span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">target_id</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;,&#39;</span> <span class="o">+</span> <span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">target_id</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span>
+        <span class="n">idx_in2</span> <span class="o">=</span> <span class="n">inl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">target_id</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;,&#39;</span> <span class="o">+</span> <span class="n">inl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">target_id</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span>
+        <span class="n">latex</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;\begin</span><span class="si">{split}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;0 = &amp; p_\mathrm{&#39;</span> <span class="o">+</span> <span class="n">idx_in1</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;} - p_\mathrm{&#39;</span> <span class="o">+</span> <span class="n">idx_out</span> <span class="o">+</span>
+            <span class="sa">r</span><span class="s1">&#39;}</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;0 = &amp; p_\mathrm{&#39;</span> <span class="o">+</span> <span class="n">idx_in1</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;} - p_\mathrm{&#39;</span> <span class="o">+</span> <span class="n">idx_in2</span> <span class="o">+</span>
+            <span class="sa">r</span><span class="s1">&#39;}</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\end</span><span class="si">{split}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">generate_latex_eq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latex</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CombustionChamber.combustion_pressure_deriv"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber.combustion_pressure_deriv">[docs]</a>    <span class="k">def</span> <span class="nf">combustion_pressure_deriv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the partial derivatives for combustion pressure equations.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        deriv : ndarray</span>
+<span class="sd">            Matrix with partial derivatives for the fluid equations.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">inl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="mi">2</span><span class="p">][::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">outl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">deriv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span>
+            <span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_o</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_vars</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_nw_vars</span><span class="p">))</span>
+        <span class="n">idx_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">outl</span><span class="p">)</span>
+        <span class="n">idx_in1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">idx_in2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">inl</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">deriv</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">idx_in1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">deriv</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">idx_out</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">deriv</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">idx_in1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">deriv</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">idx_in2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">return</span> <span class="n">deriv</span></div>
+
+<div class="viewcode-block" id="CombustionChamber.stoichiometry_func"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber.stoichiometry_func">[docs]</a>    <span class="k">def</span> <span class="nf">stoichiometry_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Collect residual values for all fluids in stoichiometry.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        residual : list</span>
+<span class="sd">            Vector with residual values of equations.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># calculate equations</span>
+        <span class="n">residual</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">fluid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">residual</span> <span class="o">+=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">stoichiometry</span><span class="p">(</span><span class="n">fluid</span><span class="p">)]</span>
+
+        <span class="k">return</span> <span class="n">residual</span></div>
+
+<div class="viewcode-block" id="CombustionChamber.stoichiometry"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber.stoichiometry">[docs]</a>    <span class="k">def</span> <span class="nf">stoichiometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fluid</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the reaction balance for one fluid.</span>
+
+<span class="sd">        - determine molar mass flows of fuel and oxygen</span>
+<span class="sd">        - calculate mole number of carbon and hydrogen atoms in fuel</span>
+<span class="sd">        - calculate molar oxygen flow for stoichiometric combustion</span>
+<span class="sd">        - calculate residual value for the corresponding fluid</span>
+
+<span class="sd">        for excess fuel</span>
+
+<span class="sd">        - calculate excess carbon and hydrogen in fuels</span>
+<span class="sd">        - calculate excess fuel shares</span>
+
+<span class="sd">        General equations</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            res = \sum_i \left(x_{fluid,i} \cdot \dot{m}_{i}\right) -</span>
+<span class="sd">            \sum_j \left(x_{fluid,j} \cdot \dot{m}_{j}\right)\\</span>
+<span class="sd">            \forall i \in \text{combustion inlets}\\</span>
+<span class="sd">            \forall j \in text{flue gas outlet}</span>
+
+<span class="sd">            \dot{m}_{fluid,m} = \sum_i \frac{x_{fluid,i} \cdot \dot{m}_{i}}</span>
+<span class="sd">            {M_{fluid}}\\</span>
+<span class="sd">            \forall i \in \text{combustion inlets}</span>
+
+<span class="sd">            \dot{m}_{O_2,m,stoich}=\frac{\dot{m}_{H_m}}{4} + \dot{m}_{C_m}</span>
+
+<span class="sd">            \lambda = \frac{\dot{m}_{O_2,m}}{\dot{m}_{O_2,m,stoich}}</span>
+
+<span class="sd">        Excess carbon and hydrogen</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">           \dot{m}_{H_{exc,m}} = \begin{cases}</span>
+<span class="sd">           0 &amp; \lambda \geq 1\\</span>
+<span class="sd">           4 \cdot \left( \dot{m}_{O_2,m,stoich} -</span>
+<span class="sd">           \dot{m}_{O_2,m}\right) &amp; \lambda &lt; 1</span>
+<span class="sd">            \end{cases}</span>
+
+<span class="sd">           \dot{m}_{C_{exc,m}} = \begin{cases}</span>
+<span class="sd">           0 &amp; \lambda \geq 1\\</span>
+<span class="sd">           \dot{m}_{O_2,m,stoich} - \dot{m}_{O_2,m} &amp; \lambda &lt; 1</span>
+<span class="sd">            \end{cases}</span>
+
+<span class="sd">        Equation for fuels</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            0 = res - \left(\dot{m}_{f,m} - \dot{m}_{f,exc,m}\right)</span>
+<span class="sd">            \cdot M_{fuel}\\</span>
+
+<span class="sd">            \dot{m}_{f,exc,m} = \begin{cases}</span>
+<span class="sd">            0 &amp; \lambda \geq 1\\</span>
+<span class="sd">            \dot{m}_{f,m} - \frac{\dot{m}_{O_2,m}}</span>
+<span class="sd">            {n_{C,fuel} + 0.25 \cdot n_{H,fuel}}</span>
+<span class="sd">            \end{cases}</span>
+
+<span class="sd">        Equation for oxygen</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            0 = res - \begin{cases}</span>
+<span class="sd">            -\frac{\dot{m}_{O_2,m} \cdot M_{O_2}}{\lambda} &amp;</span>
+<span class="sd">            \lambda \geq 1\\</span>
+<span class="sd">            - \dot{m}_{O_2,m} \cdot M_{O_2} &amp; \lambda &lt; 1</span>
+<span class="sd">            \end{cases}</span>
+
+<span class="sd">        Equation for water</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            0 = res + \left( \dot{m}_{H_m} - \dot{m}_{H_{exc,m}} \right)</span>
+<span class="sd">            \cdot 0.5 \cdot M_{H_2O}</span>
+
+<span class="sd">        Equation for carbondioxide</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            0 = res + \left( \dot{m}_{C_m} - \dot{m}_{C_{exc,m}} \right)</span>
+<span class="sd">            \cdot M_{CO_2}</span>
+
+<span class="sd">        Equation for all other fluids</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            0 = res</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        fluid : str</span>
+<span class="sd">            Fluid to calculate residual value for.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        residual : float</span>
+<span class="sd">            Residual value for corresponding fluid.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># required to work with combustion chamber and engine</span>
+        <span class="n">inl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="mi">2</span><span class="p">][::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">outl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1">###################################################################</span>
+        <span class="c1"># molar mass flow for fuel and oxygen</span>
+        <span class="n">n_fuel</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">n_oxy_stoich</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">n_h</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">n_c</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fuel_list</span><span class="p">:</span>
+            <span class="n">n_fuel</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">inl</span><span class="p">:</span>
+                <span class="n">n</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="n">i</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">/</span> <span class="n">molar_masses</span><span class="p">[</span><span class="n">f</span><span class="p">]</span>
+                <span class="n">n_fuel</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">+=</span> <span class="n">n</span>
+                <span class="n">n_h</span> <span class="o">+=</span> <span class="n">n</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fuels</span><span class="p">[</span><span class="n">f</span><span class="p">][</span><span class="s1">&#39;H&#39;</span><span class="p">]</span>
+                <span class="n">n_c</span> <span class="o">+=</span> <span class="n">n</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fuels</span><span class="p">[</span><span class="n">f</span><span class="p">][</span><span class="s1">&#39;C&#39;</span><span class="p">]</span>
+
+            <span class="c1"># stoichiometric oxygen requirement for each fuel</span>
+            <span class="n">n_oxy_stoich</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_fuel</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fuels</span><span class="p">[</span><span class="n">f</span><span class="p">][</span><span class="s1">&#39;H&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">4</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">fuels</span><span class="p">[</span><span class="n">f</span><span class="p">][</span><span class="s1">&#39;C&#39;</span><span class="p">])</span>
+
+        <span class="n">n_oxygen</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">inl</span><span class="p">:</span>
+            <span class="n">n_oxygen</span> <span class="o">+=</span> <span class="p">(</span>
+                <span class="n">i</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="n">i</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">o2</span><span class="p">]</span> <span class="o">/</span> <span class="n">molar_masses</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">o2</span><span class="p">])</span>
+
+        <span class="c1">###################################################################</span>
+        <span class="c1"># calculate stoichiometric oxygen</span>
+        <span class="n">n_oxygen_stoich</span> <span class="o">=</span> <span class="n">n_h</span> <span class="o">/</span> <span class="mi">4</span> <span class="o">+</span> <span class="n">n_c</span>
+
+        <span class="c1">###################################################################</span>
+        <span class="c1"># calculate lambda if not set</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">lamb</span><span class="o">.</span><span class="n">is_set</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lamb</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="n">n_oxygen</span> <span class="o">/</span> <span class="n">n_oxygen_stoich</span>
+
+        <span class="c1">###################################################################</span>
+        <span class="c1"># calculate excess fuel if lambda is lower than 1</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lamb</span><span class="o">.</span><span class="n">val</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">n_h_exc</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_oxygen_stoich</span> <span class="o">-</span> <span class="n">n_oxygen</span><span class="p">)</span> <span class="o">*</span> <span class="mi">4</span>
+            <span class="n">n_c_exc</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_oxygen_stoich</span> <span class="o">-</span> <span class="n">n_oxygen</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">n_h_exc</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">n_c_exc</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1">###################################################################</span>
+        <span class="c1"># equation for carbondioxide</span>
+        <span class="k">if</span> <span class="n">fluid</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">co2</span><span class="p">:</span>
+            <span class="n">dm</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_c</span> <span class="o">-</span> <span class="n">n_c_exc</span><span class="p">)</span> <span class="o">*</span> <span class="n">molar_masses</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">co2</span><span class="p">]</span>
+
+        <span class="c1">###################################################################</span>
+        <span class="c1"># equation for water</span>
+        <span class="k">elif</span> <span class="n">fluid</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">h2o</span><span class="p">:</span>
+            <span class="n">dm</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_h</span> <span class="o">-</span> <span class="n">n_h_exc</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">molar_masses</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">h2o</span><span class="p">]</span>
+
+        <span class="c1">###################################################################</span>
+        <span class="c1"># equation for oxygen</span>
+        <span class="k">elif</span> <span class="n">fluid</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">o2</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lamb</span><span class="o">.</span><span class="n">val</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">dm</span> <span class="o">=</span> <span class="o">-</span><span class="n">n_oxygen</span> <span class="o">*</span> <span class="n">molar_masses</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">o2</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dm</span> <span class="o">=</span> <span class="o">-</span><span class="n">n_oxygen</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">lamb</span><span class="o">.</span><span class="n">val</span> <span class="o">*</span> <span class="n">molar_masses</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">o2</span><span class="p">]</span>
+
+        <span class="c1">###################################################################</span>
+        <span class="c1"># equation for fuel</span>
+        <span class="k">elif</span> <span class="n">fluid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fuel_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lamb</span><span class="o">.</span><span class="n">val</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">n_fuel_exc</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="o">-</span><span class="p">(</span><span class="n">n_oxygen</span> <span class="o">/</span> <span class="n">n_oxygen_stoich</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span>
+                    <span class="n">n_oxy_stoich</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">fuels</span><span class="p">[</span><span class="n">fluid</span><span class="p">][</span><span class="s1">&#39;H&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">4</span> <span class="o">+</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">fuels</span><span class="p">[</span><span class="n">fluid</span><span class="p">][</span><span class="s1">&#39;C&#39;</span><span class="p">]))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">n_fuel_exc</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">dm</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">n_fuel</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span> <span class="o">-</span> <span class="n">n_fuel_exc</span><span class="p">)</span> <span class="o">*</span> <span class="n">molar_masses</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span>
+
+        <span class="c1">###################################################################</span>
+        <span class="c1"># equation for other fluids</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dm</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="n">res</span> <span class="o">=</span> <span class="n">dm</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">inl</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">+=</span> <span class="n">i</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span> <span class="o">*</span> <span class="n">i</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span>
+        <span class="n">res</span> <span class="o">-=</span> <span class="n">outl</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span> <span class="o">*</span> <span class="n">outl</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span>
+        <span class="k">return</span> <span class="n">res</span></div>
+
+<div class="viewcode-block" id="CombustionChamber.stoichiometry_func_doc"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber.stoichiometry_func_doc">[docs]</a>    <span class="k">def</span> <span class="nf">stoichiometry_func_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate stoichiometry LaTeX equations.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        label : str</span>
+<span class="sd">            Label for equation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        latex : str</span>
+<span class="sd">            LaTeX code of equations applied.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">idx_in1</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">idx_in2</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">idx_out</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">in1</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;\dot</span><span class="si">{m}</span><span class="s1">_\mathrm{in,&#39;</span> <span class="o">+</span> <span class="n">idx_in1</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;} \cdot &#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;x_\mathrm{fluid,in,&#39;</span> <span class="o">+</span> <span class="n">idx_in1</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;} &#39;</span><span class="p">)</span>
+        <span class="n">in2</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;\dot</span><span class="si">{m}</span><span class="s1">_\mathrm{in,&#39;</span> <span class="o">+</span> <span class="n">idx_in2</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;} \cdot &#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;x_\mathrm{fluid,in,&#39;</span> <span class="o">+</span> <span class="n">idx_in2</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;}&#39;</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;\dot</span><span class="si">{m}</span><span class="s1">_\mathrm{out,&#39;</span> <span class="o">+</span> <span class="n">idx_out</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;} \cdot &#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;x_\mathrm{fluid,out,&#39;</span> <span class="o">+</span> <span class="n">idx_out</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;}&#39;</span><span class="p">)</span>
+
+        <span class="n">equations</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">fluid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">fluid</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">o2</span><span class="p">:</span>
+                <span class="n">latex</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="sa">r</span><span class="s1">&#39;0=\Delta\dot</span><span class="si">{m}</span><span class="s1">_\mathrm{&#39;</span> <span class="o">+</span> <span class="n">fluid</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;}-&#39;</span>
+                    <span class="sa">r</span><span class="s1">&#39;\dot</span><span class="si">{m}</span><span class="s1">_\mathrm{&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">o2</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;,m,stoich} \cdot &#39;</span>
+                    <span class="sa">r</span><span class="s1">&#39;M_\mathrm{&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">o2</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;}&#39;</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">fluid</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">co2</span><span class="p">:</span>
+                <span class="n">latex</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="sa">r</span><span class="s1">&#39;0=\Delta \dot</span><span class="si">{m}</span><span class="s1">_\mathrm{&#39;</span> <span class="o">+</span> <span class="n">fluid</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;} + &#39;</span>
+                    <span class="sa">r</span><span class="s1">&#39;\dot</span><span class="si">{m}</span><span class="s1">_\mathrm{C,m} \cdot M_\mathrm{&#39;</span> <span class="o">+</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">co2</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;} &#39;</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">fluid</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">h2o</span><span class="p">:</span>
+                <span class="n">latex</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="sa">r</span><span class="s1">&#39;0=\Delta \dot</span><span class="si">{m}</span><span class="s1">_\mathrm{&#39;</span> <span class="o">+</span> <span class="n">fluid</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;} + &#39;</span>
+                    <span class="sa">r</span><span class="s1">&#39;\frac{\dot</span><span class="si">{m}</span><span class="s1">_\mathrm{H,m}}</span><span class="si">{2}</span><span class="s1"> \cdot M_\mathrm{&#39;</span> <span class="o">+</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">h2o</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;} &#39;</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">fluid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fuel_list</span><span class="p">:</span>
+                <span class="n">latex</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="sa">r</span><span class="s1">&#39;0=\Delta\dot</span><span class="si">{m}</span><span class="s1">_\mathrm{&#39;</span> <span class="o">+</span> <span class="n">fluid</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;}-&#39;</span>
+                    <span class="sa">r</span><span class="s1">&#39;\dot</span><span class="si">{m}</span><span class="s1">_\mathrm{&#39;</span> <span class="o">+</span> <span class="n">fluid</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;,m} \cdot M_\mathrm{&#39;</span> <span class="o">+</span>
+                    <span class="n">fluid</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;}&#39;</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">latex</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;0 = \Delta \dot</span><span class="si">{m}</span><span class="s1">_\mathrm{&#39;</span> <span class="o">+</span> <span class="n">fluid</span> <span class="o">+</span> <span class="s1">&#39;}&#39;</span>
+
+            <span class="k">if</span> <span class="n">fluid</span> <span class="o">==</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">)):</span>
+                <span class="n">balance</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="sa">r</span><span class="s1">&#39;\Delta \dot</span><span class="si">{m}</span><span class="s1">_\mathrm</span><span class="si">{fluid}</span><span class="s1"> = &#39;</span> <span class="o">+</span> <span class="n">in1</span> <span class="o">+</span>
+                    <span class="s1">&#39;+&#39;</span> <span class="o">+</span> <span class="n">in2</span> <span class="o">+</span> <span class="s1">&#39;-&#39;</span> <span class="o">+</span> <span class="n">out</span><span class="p">)</span>
+                <span class="n">m_fluid_molar</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="sa">r</span><span class="s1">&#39;\dot</span><span class="si">{m}</span><span class="s1">_\mathrm{fluid,m} = \frac{&#39;</span> <span class="o">+</span> <span class="n">in1</span> <span class="o">+</span> <span class="s1">&#39;+&#39;</span> <span class="o">+</span>
+                    <span class="n">in2</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;}{M_\mathrm</span><span class="si">{fluid}</span><span class="s1">}&#39;</span><span class="p">)</span>
+                <span class="n">m_o2_molar_stoich</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="sa">r</span><span class="s1">&#39;\dot</span><span class="si">{m}</span><span class="s1">_\mathrm{&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">o2</span> <span class="o">+</span> <span class="s1">&#39;,m,stoich}=&#39;</span>
+                    <span class="sa">r</span><span class="s1">&#39;\frac{\dot</span><span class="si">{m}</span><span class="s1">_\mathrm{H,m}}</span><span class="si">{4}</span><span class="s1"> + \dot</span><span class="si">{m}</span><span class="s1">_\mathrm{C,m}&#39;</span><span class="p">)</span>
+                <span class="n">m_H_molar</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\dot</span><span class="si">{m}</span><span class="s1">_\mathrm{H,m}=&#39;</span>
+                <span class="n">m_C_molar</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\dot</span><span class="si">{m}</span><span class="s1">_\mathrm{C,m}=&#39;</span>
+                <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fuel_list</span><span class="p">:</span>
+                    <span class="n">m_H_molar</span> <span class="o">+=</span> <span class="p">(</span>
+                        <span class="sa">r</span><span class="s1">&#39;\dot</span><span class="si">{m}</span><span class="s1">_\mathrm{&#39;</span> <span class="o">+</span> <span class="n">f</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;,m} \cdot &#39;</span> <span class="o">+</span>
+                        <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fuels</span><span class="p">[</span><span class="n">f</span><span class="p">][</span><span class="s1">&#39;H&#39;</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;+&#39;</span><span class="p">)</span>
+                    <span class="n">m_C_molar</span> <span class="o">+=</span> <span class="p">(</span>
+                        <span class="sa">r</span><span class="s1">&#39;\dot</span><span class="si">{m}</span><span class="s1">_\mathrm{&#39;</span> <span class="o">+</span> <span class="n">f</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;,m} \cdot &#39;</span> <span class="o">+</span>
+                        <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fuels</span><span class="p">[</span><span class="n">f</span><span class="p">][</span><span class="s1">&#39;C&#39;</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;+&#39;</span><span class="p">)</span>
+                <span class="n">m_H_molar</span> <span class="o">=</span> <span class="n">m_H_molar</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">m_C_molar</span> <span class="o">=</span> <span class="n">m_C_molar</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">latex_general_eq</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="sa">r</span><span class="s1">&#39;\begin</span><span class="si">{split}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+                    <span class="sa">r</span><span class="s1">&#39;&amp;&#39;</span> <span class="o">+</span> <span class="n">balance</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+                    <span class="sa">r</span><span class="s1">&#39;&amp;&#39;</span> <span class="o">+</span> <span class="n">m_fluid_molar</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+                    <span class="sa">r</span><span class="s1">&#39;&amp;&#39;</span> <span class="o">+</span> <span class="n">m_H_molar</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+                    <span class="sa">r</span><span class="s1">&#39;&amp;&#39;</span> <span class="o">+</span> <span class="n">m_C_molar</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+                    <span class="sa">r</span><span class="s1">&#39;&amp;&#39;</span> <span class="o">+</span> <span class="n">m_o2_molar_stoich</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+                    <span class="sa">r</span><span class="s1">&#39;\end</span><span class="si">{split}</span><span class="s1">&#39;</span>
+                <span class="p">)</span>
+                <span class="n">equations</span> <span class="o">+=</span> <span class="p">(</span>
+                    <span class="n">generate_latex_eq</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="p">,</span> <span class="n">latex_general_eq</span><span class="p">,</span> <span class="n">label</span> <span class="o">+</span> <span class="s1">&#39;_general_eq&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
+                    <span class="n">generate_latex_eq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latex</span><span class="p">,</span> <span class="n">label</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">fluid</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">equations</span> <span class="o">+=</span> <span class="p">(</span>
+                    <span class="n">generate_latex_eq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latex</span><span class="p">,</span> <span class="n">label</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">fluid</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="c1"># remove last newline</span>
+        <span class="k">return</span> <span class="n">equations</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="CombustionChamber.stoichiometry_deriv"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber.stoichiometry_deriv">[docs]</a>    <span class="k">def</span> <span class="nf">stoichiometry_deriv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">increment_filter</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate partial derivatives of the reaction balance.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        increment_filter : ndarray</span>
+<span class="sd">            Matrix for filtering non-changing variables.</span>
+
+<span class="sd">        k : int</span>
+<span class="sd">            Position of equation in Jacobian matrix.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># required to work with combustion chamber and engine</span>
+        <span class="n">inl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="mi">2</span><span class="p">][::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">outl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stoichiometry</span>
+        <span class="k">for</span> <span class="n">fluid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nw_fluids</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">conn</span> <span class="ow">in</span> <span class="n">inl</span> <span class="o">+</span> <span class="p">[</span><span class="n">outl</span><span class="p">]:</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inl</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">increment_filter</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span>
+                        <span class="n">f</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">fluid</span><span class="o">=</span><span class="n">fluid</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">increment_filter</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">3</span><span class="p">:]):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="mi">3</span><span class="p">:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span>
+                        <span class="n">f</span><span class="p">,</span> <span class="s1">&#39;fluid&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">fluid</span><span class="o">=</span><span class="n">fluid</span><span class="p">)</span>
+            <span class="n">k</span> <span class="o">+=</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="CombustionChamber.energy_balance_func"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber.energy_balance_func">[docs]</a>    <span class="k">def</span> <span class="nf">energy_balance_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the energy balance of the adiabatic combustion chamber.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        residual : float</span>
+<span class="sd">            Residual value of equation.</span>
+
+<span class="sd">            .. math::</span>
+
+<span class="sd">                \begin{split}</span>
+<span class="sd">                0 = &amp; \sum_i \dot{m}_{in,i} \cdot</span>
+<span class="sd">                \left( h_{in,i} - h_{in,i,ref} \right)\\</span>
+<span class="sd">                &amp; -\dot{m}_{out,2}\cdot\left( h_{out,1}-h_{out,1,ref} \right)\\</span>
+<span class="sd">                &amp; + LHV_{fuel} \cdot\left(\sum_i\dot{m}_{in,i}\cdot</span>
+<span class="sd">                x_{fuel,in,i}- \dot{m}_{out,1} \cdot x_{fuel} \right)</span>
+<span class="sd">                \end{split}\\</span>
+
+<span class="sd">                \forall i \in \text{inlets}</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        The temperature for the reference state is set to 25 °C, thus</span>
+<span class="sd">        the water may be liquid. In order to make sure, the state is</span>
+<span class="sd">        referring to the lower heating value, the state of the water in the</span>
+<span class="sd">        flue gas is fored to gaseous.</span>
+
+<span class="sd">        - Reference temperature: 298.15 K.</span>
+<span class="sd">        - Reference pressure: 1 bar.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">T_ref</span> <span class="o">=</span> <span class="mf">298.15</span>
+        <span class="n">p_ref</span> <span class="o">=</span> <span class="mf">1e5</span>
+
+        <span class="n">res</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">+=</span> <span class="n">i</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="n">h_mix_pT</span><span class="p">(</span>
+                <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">p_ref</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">],</span> <span class="n">T_ref</span><span class="p">,</span> <span class="n">force_gas</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">-=</span> <span class="n">o</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="n">h_mix_pT</span><span class="p">(</span>
+                <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">p_ref</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">o</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">],</span> <span class="n">T_ref</span><span class="p">,</span> <span class="n">force_gas</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+
+        <span class="n">res</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_ti</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">res</span></div>
+
+<div class="viewcode-block" id="CombustionChamber.energy_balance_func_doc"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber.energy_balance_func_doc">[docs]</a>    <span class="k">def</span> <span class="nf">energy_balance_func_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the energy balance of the adiabatic combustion chamber.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        label : str</span>
+<span class="sd">            Label for equation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        latex : str</span>
+<span class="sd">            LaTeX code of equations applied.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">latex</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;\begin</span><span class="si">{split}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;0 = &amp; \sum_i \dot</span><span class="si">{m}</span><span class="s1">_{\mathrm{in,}i} \cdot\left( &#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;h_{\mathrm{in,}i} - h_{\mathrm{in,}i\mathrm{,ref}} \right) -&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\dot</span><span class="si">{m}</span><span class="s1">_\mathrm{out,1}\cdot\left( h_\mathrm{out,1}&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39; - h_\mathrm{out,1,ref}\right)</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;&amp; + LHV_</span><span class="si">{fuel}</span><span class="s1"> \cdot \left(\sum_i \dot</span><span class="si">{m}</span><span class="s1">_{\mathrm{in,}i} &#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\cdot x_{fuel\mathrm{,in,}i} - \dot</span><span class="si">{m}</span><span class="s1">_\mathrm{out,1} &#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\cdot x_{fuel\mathrm{,out,1}} \right)</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;&amp; \forall i \in \text</span><span class="si">{inlets}</span><span class="se">\\</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;&amp; T_\mathrm</span><span class="si">{ref}</span><span class="s1">=\unit[298.15]</span><span class="si">{K}</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\;p_\mathrm</span><span class="si">{ref}</span><span class="s1">=\unit[10^5]</span><span class="si">{Pa}</span><span class="se">\\</span><span class="s1">&#39;</span>
+            <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;\end</span><span class="si">{split}</span><span class="s1">&#39;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">generate_latex_eq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latex</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CombustionChamber.energy_balance_deriv"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber.energy_balance_deriv">[docs]</a>    <span class="k">def</span> <span class="nf">energy_balance_deriv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">increment_filter</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate partial derivatives of energy balance function.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        increment_filter : ndarray</span>
+<span class="sd">            Matrix for filtering non-changing variables.</span>
+
+<span class="sd">        k : int</span>
+<span class="sd">            Position of equation in Jacobian matrix.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_balance_func</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">increment_filter</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">increment_filter</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_i</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inl</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">)[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inl</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">)[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span></div>
+
+<div class="viewcode-block" id="CombustionChamber.lambda_func"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber.lambda_func">[docs]</a>    <span class="k">def</span> <span class="nf">lambda_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the residual for specified lambda.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        residual : float</span>
+<span class="sd">            Residual value of equation.</span>
+
+<span class="sd">            .. math::</span>
+
+<span class="sd">                0 = \frac{\dot{m}_{f,m}}{\dot{m}_{O_2,m} \cdot</span>
+<span class="sd">                \left(n_{C,fuel} + 0.25 \cdot n_{H,fuel}\right)} - \lambda</span>
+
+<span class="sd">                \dot{m}_{fluid,m} = \sum_i \frac{x_{fluid,i} \cdot \dot{m}_{i}}</span>
+<span class="sd">                {M_{fluid}}\\ \forall i \in inlets</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># required to work with combustion chamber and engine</span>
+        <span class="n">inl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="mi">2</span><span class="p">][::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">n_h</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">n_c</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fuel_list</span><span class="p">:</span>
+            <span class="n">n_fuel</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">inl</span><span class="p">:</span>
+                <span class="n">n_fuel</span> <span class="o">+=</span> <span class="n">i</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="n">i</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">/</span> <span class="n">molar_masses</span><span class="p">[</span><span class="n">f</span><span class="p">]</span>
+                <span class="n">n_h</span> <span class="o">+=</span> <span class="n">n_fuel</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fuels</span><span class="p">[</span><span class="n">f</span><span class="p">][</span><span class="s1">&#39;H&#39;</span><span class="p">]</span>
+                <span class="n">n_c</span> <span class="o">+=</span> <span class="n">n_fuel</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fuels</span><span class="p">[</span><span class="n">f</span><span class="p">][</span><span class="s1">&#39;C&#39;</span><span class="p">]</span>
+
+        <span class="n">n_oxygen</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">inl</span><span class="p">:</span>
+            <span class="n">n_oxygen</span> <span class="o">+=</span> <span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="n">i</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">o2</span><span class="p">]</span> <span class="o">/</span>
+                         <span class="n">molar_masses</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">o2</span><span class="p">])</span>
+
+        <span class="n">n_oxygen_stoich</span> <span class="o">=</span> <span class="n">n_h</span> <span class="o">/</span> <span class="mi">4</span> <span class="o">+</span> <span class="n">n_c</span>
+
+        <span class="k">return</span> <span class="n">n_oxygen</span> <span class="o">/</span> <span class="n">n_oxygen_stoich</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">lamb</span><span class="o">.</span><span class="n">val</span></div>
+
+<div class="viewcode-block" id="CombustionChamber.lambda_func_doc"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber.lambda_func_doc">[docs]</a>    <span class="k">def</span> <span class="nf">lambda_func_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the residual for specified lambda.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        label : str</span>
+<span class="sd">            Label for equation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        latex : str</span>
+<span class="sd">            LaTeX code of equations applied.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">latex</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;\begin</span><span class="si">{split}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;0 = \frac{\dot</span><span class="si">{m}</span><span class="s1">_\mathrm{fuel,m}}{\dot</span><span class="si">{m}</span><span class="s1">_\mathrm{O_2,m} &#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\cdot \left(n_\mathrm{C,fuel} + 0.25 \cdot n_\mathrm{H,fuel}&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\right)} - \lambda </span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\dot</span><span class="si">{m}</span><span class="s1">_\mathrm{fluid,m} = \frac{x_\mathrm</span><span class="si">{fluid}</span><span class="s1"> \cdot &#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\dot</span><span class="si">{m}</span><span class="s1">}{M_\mathrm</span><span class="si">{fluid}</span><span class="s1">}</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\end</span><span class="si">{split}</span><span class="s1">&#39;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">generate_latex_eq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latex</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CombustionChamber.lambda_deriv"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber.lambda_deriv">[docs]</a>    <span class="k">def</span> <span class="nf">lambda_deriv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">increment_filter</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate partial derivatives of lambda function.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        increment_filter : ndarray</span>
+<span class="sd">            Matrix for filtering non-changing variables.</span>
+
+<span class="sd">        k : int</span>
+<span class="sd">            Position of equation in Jacobian matrix.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># required to work with combustion chamber and engine</span>
+        <span class="n">inl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="mi">2</span><span class="p">][::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lambda_func</span>
+        <span class="k">for</span> <span class="n">conn</span> <span class="ow">in</span> <span class="n">inl</span><span class="p">:</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inl</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">increment_filter</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">increment_filter</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">3</span><span class="p">:]):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="mi">3</span><span class="p">:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;fluid&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CombustionChamber.ti_func"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber.ti_func">[docs]</a>    <span class="k">def</span> <span class="nf">ti_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the residual for specified thermal input.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        residual : float</span>
+<span class="sd">            Residual value of function.</span>
+
+<span class="sd">            .. math::</span>
+
+<span class="sd">                0 = ti - \dot{m}_{fuel} \cdot LHV</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ti</span><span class="o">.</span><span class="n">val</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_ti</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CombustionChamber.ti_func_doc"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber.ti_func_doc">[docs]</a>    <span class="k">def</span> <span class="nf">ti_func_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the residual for specified thermal input.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        label : str</span>
+<span class="sd">            Label for equation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        latex : str</span>
+<span class="sd">            LaTeX code of equations applied.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">latex</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;\begin</span><span class="si">{split}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;0 = &amp; ti - LHV_\mathrm</span><span class="si">{fuel}</span><span class="s1"> \cdot \left[\sum_i \left(&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\dot</span><span class="si">{m}</span><span class="s1">_{\mathrm{in,}i}\cdot x_{\mathrm{fuel,in,}i}\right)-&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39; \dot</span><span class="si">{m}</span><span class="s1">_\mathrm{out,&#39;</span> <span class="o">+</span> <span class="n">idx</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;}\cdot &#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;x_{\mathrm{fuel,out,}&#39;</span> <span class="o">+</span> <span class="n">idx</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;} \right]</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;&amp; \forall i \in \text{combustion inlets}</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\end</span><span class="si">{split}</span><span class="s1">&#39;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">generate_latex_eq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latex</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CombustionChamber.ti_deriv"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber.ti_deriv">[docs]</a>    <span class="k">def</span> <span class="nf">ti_deriv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">increment_filter</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate partial derivatives of thermal input function.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        increment_filter : ndarray</span>
+<span class="sd">            Matrix for filtering non-changing variables.</span>
+
+<span class="sd">        k : int</span>
+<span class="sd">            Position of equation in Jacobian matrix.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fuel_list</span><span class="p">:</span>
+            <span class="n">pos</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">nw_fluids</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="n">lhv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fuels</span><span class="p">[</span><span class="n">f</span><span class="p">][</span><span class="s1">&#39;LHV&#39;</span><span class="p">]</span>
+
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">*</span> <span class="n">lhv</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">pos</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="n">lhv</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">*</span> <span class="n">lhv</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">pos</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="n">lhv</span></div>
+
+<div class="viewcode-block" id="CombustionChamber.calc_ti"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber.calc_ti">[docs]</a>    <span class="k">def</span> <span class="nf">calc_ti</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the thermal input of the combustion chamber.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ti : float</span>
+<span class="sd">            Thermal input.</span>
+
+<span class="sd">            .. math::</span>
+
+<span class="sd">                ti = LHV \cdot \left[\sum_i \left(\dot{m}_{in,i}</span>
+<span class="sd">                \cdot x_{fuel,in,i}</span>
+<span class="sd">                \right) - \dot{m}_{out,1} \cdot x_{fuel,out,1} \right]</span>
+<span class="sd">                \; \forall i \in [1,2]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ti</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fuel_list</span><span class="p">:</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">:</span>
+                <span class="n">m</span> <span class="o">+=</span> <span class="n">i</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="n">i</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">f</span><span class="p">]</span>
+
+            <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">:</span>
+                <span class="n">m</span> <span class="o">-=</span> <span class="n">o</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="n">o</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">f</span><span class="p">]</span>
+
+            <span class="n">ti</span> <span class="o">+=</span> <span class="n">m</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fuels</span><span class="p">[</span><span class="n">f</span><span class="p">][</span><span class="s1">&#39;LHV&#39;</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">ti</span></div>
+
+<div class="viewcode-block" id="CombustionChamber.bus_func"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber.bus_func">[docs]</a>    <span class="k">def</span> <span class="nf">bus_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bus</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the value of the bus function.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        bus : tespy.connections.bus.Bus</span>
+<span class="sd">            TESPy bus object.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        val : float</span>
+<span class="sd">            Value of energy transfer :math:`\dot{E}`. This value is passed to</span>
+<span class="sd">            :py:meth:`tespy.components.component.Component.calc_bus_value`</span>
+<span class="sd">            for value manipulation according to the specified characteristic</span>
+<span class="sd">            line of the bus.</span>
+
+<span class="sd">            .. math::</span>
+
+<span class="sd">                \dot{E} = LHV \cdot \dot{m}_{f}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_ti</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CombustionChamber.bus_func_doc"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber.bus_func_doc">[docs]</a>    <span class="k">def</span> <span class="nf">bus_func_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bus</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return LaTeX string of the bus function.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        bus : tespy.connections.bus.Bus</span>
+<span class="sd">            TESPy bus object.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        latex : str</span>
+<span class="sd">            LaTeX string of bus function.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;LHV_\mathrm</span><span class="si">{fuel}</span><span class="s1"> \cdot \left[\sum_i \left(&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\dot</span><span class="si">{m}</span><span class="s1">_{\mathrm{in,}i}\cdot x_{\mathrm{fuel,in,}i}\right)-&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39; \dot</span><span class="si">{m}</span><span class="s1">_\mathrm{out,&#39;</span> <span class="o">+</span> <span class="n">idx</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;}\cdot &#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;x_{\mathrm{fuel,out,}&#39;</span> <span class="o">+</span> <span class="n">idx</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;} \right]&#39;</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="CombustionChamber.bus_deriv"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber.bus_deriv">[docs]</a>    <span class="k">def</span> <span class="nf">bus_deriv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bus</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the matrix of partial derivatives of the bus function.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        bus : tespy.connections.bus.Bus</span>
+<span class="sd">            TESPy bus object.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        deriv : ndarray</span>
+<span class="sd">            Matrix of partial derivatives.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">deriv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_nw_vars</span><span class="p">))</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_bus_value</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+            <span class="n">deriv</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">bus</span><span class="o">=</span><span class="n">bus</span><span class="p">)</span>
+            <span class="n">deriv</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="mi">3</span><span class="p">:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;fluid&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">bus</span><span class="o">=</span><span class="n">bus</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">deriv</span></div>
+
+<div class="viewcode-block" id="CombustionChamber.initialise_fluids"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber.initialise_fluids">[docs]</a>    <span class="k">def</span> <span class="nf">initialise_fluids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate reaction balance for generic starting values at outlet.&quot;&quot;&quot;</span>
+        <span class="n">N_2</span> <span class="o">=</span> <span class="mf">0.7655</span>
+        <span class="n">O_2</span> <span class="o">=</span> <span class="mf">0.2345</span>
+
+        <span class="n">n_fuel</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">lamb</span> <span class="o">=</span> <span class="mi">3</span>
+
+        <span class="n">fact_fuel</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">sum_fuel</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fuel_list</span><span class="p">:</span>
+            <span class="n">fact_fuel</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">:</span>
+                <span class="n">fact_fuel</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">+=</span> <span class="n">i</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span>
+            <span class="n">sum_fuel</span> <span class="o">+=</span> <span class="n">fact_fuel</span><span class="p">[</span><span class="n">f</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fuel_list</span><span class="p">:</span>
+            <span class="n">fact_fuel</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">/=</span> <span class="n">sum_fuel</span>
+
+        <span class="n">m_co2</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">m_h2o</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">m_fuel</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fuel_list</span><span class="p">:</span>
+            <span class="n">m_co2</span> <span class="o">+=</span> <span class="p">(</span><span class="n">n_fuel</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fuels</span><span class="p">[</span><span class="n">f</span><span class="p">][</span><span class="s1">&#39;C&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">molar_masses</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">co2</span><span class="p">]</span> <span class="o">*</span>
+                      <span class="n">fact_fuel</span><span class="p">[</span><span class="n">f</span><span class="p">])</span>
+            <span class="n">m_h2o</span> <span class="o">+=</span> <span class="p">(</span><span class="n">n_fuel</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fuels</span><span class="p">[</span><span class="n">f</span><span class="p">][</span><span class="s1">&#39;H&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span>
+                      <span class="n">molar_masses</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">h2o</span><span class="p">]</span> <span class="o">*</span> <span class="n">fact_fuel</span><span class="p">[</span><span class="n">f</span><span class="p">])</span>
+            <span class="n">m_fuel</span> <span class="o">+=</span> <span class="n">n_fuel</span> <span class="o">*</span> <span class="n">molar_masses</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">*</span> <span class="n">fact_fuel</span><span class="p">[</span><span class="n">f</span><span class="p">]</span>
+
+        <span class="n">n_o2</span> <span class="o">=</span> <span class="p">(</span><span class="n">m_co2</span> <span class="o">/</span> <span class="n">molar_masses</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">co2</span><span class="p">]</span> <span class="o">+</span>
+                <span class="mf">0.5</span> <span class="o">*</span> <span class="n">m_h2o</span> <span class="o">/</span> <span class="n">molar_masses</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">h2o</span><span class="p">])</span> <span class="o">*</span> <span class="n">lamb</span>
+
+        <span class="n">m_air</span> <span class="o">=</span> <span class="n">n_o2</span> <span class="o">*</span> <span class="n">molar_masses</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">o2</span><span class="p">]</span> <span class="o">/</span> <span class="n">O_2</span>
+        <span class="n">m_fg</span> <span class="o">=</span> <span class="n">m_air</span> <span class="o">+</span> <span class="n">m_fuel</span>
+
+        <span class="n">m_o2</span> <span class="o">=</span> <span class="n">n_o2</span> <span class="o">*</span> <span class="n">molar_masses</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">o2</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">lamb</span><span class="p">)</span>
+        <span class="n">m_n2</span> <span class="o">=</span> <span class="n">N_2</span> <span class="o">*</span> <span class="n">m_air</span>
+
+        <span class="n">fg</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n2</span><span class="p">:</span> <span class="n">m_n2</span> <span class="o">/</span> <span class="n">m_fg</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">co2</span><span class="p">:</span> <span class="n">m_co2</span> <span class="o">/</span> <span class="n">m_fg</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">o2</span><span class="p">:</span> <span class="n">m_o2</span> <span class="o">/</span> <span class="n">m_fg</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">h2o</span><span class="p">:</span> <span class="n">m_h2o</span> <span class="o">/</span> <span class="n">m_fg</span>
+        <span class="p">}</span>
+
+        <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">fluid</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">o</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">o</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val_set</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span> <span class="ow">and</span> <span class="n">fluid</span> <span class="ow">in</span> <span class="n">fg</span><span class="p">:</span>
+                    <span class="n">o</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span> <span class="o">=</span> <span class="n">fg</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span>
+            <span class="n">o</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">propagate_fluid_to_target</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">o</span><span class="o">.</span><span class="n">target</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CombustionChamber.convergence_check"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber.convergence_check">[docs]</a>    <span class="k">def</span> <span class="nf">convergence_check</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform a convergence check.</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        Manipulate enthalpies/pressure at inlet and outlet if not specified</span>
+<span class="sd">        by user to match physically feasible constraints, keep fluid</span>
+<span class="sd">        composition within feasible range and then propagates it towards the</span>
+<span class="sd">        outlet.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># required to work with combustion chamber and engine</span>
+        <span class="n">inl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="mi">2</span><span class="p">][::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">outl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">m</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">inl</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">i</span><span class="o">.</span><span class="n">good_starting_values</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">i</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_set</span><span class="p">:</span>
+                    <span class="n">i</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">=</span> <span class="mf">0.01</span>
+                <span class="n">m</span> <span class="o">+=</span> <span class="n">i</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span>
+
+        <span class="c1">######################################################################</span>
+        <span class="c1"># check fluid composition</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">outl</span><span class="o">.</span><span class="n">good_starting_values</span><span class="p">:</span>
+            <span class="n">fluids</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">outl</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+                      <span class="k">if</span> <span class="ow">not</span> <span class="n">outl</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val_set</span><span class="p">[</span><span class="n">f</span><span class="p">]]</span>
+            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fluids</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">f</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">o2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">co2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h2o</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">fuel_list</span><span class="p">:</span>
+                    <span class="n">m_f</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">inl</span><span class="p">:</span>
+                        <span class="n">m_f</span> <span class="o">+=</span> <span class="n">i</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">*</span> <span class="n">i</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span>
+
+                    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">outl</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">-</span> <span class="n">m_f</span> <span class="o">/</span> <span class="n">m</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.03</span><span class="p">:</span>
+                        <span class="n">outl</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="n">m_f</span> <span class="o">/</span> <span class="n">m</span>
+
+                <span class="k">elif</span> <span class="n">f</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">o2</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">outl</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.25</span><span class="p">:</span>
+                        <span class="n">outl</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
+                    <span class="k">if</span> <span class="n">outl</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.001</span><span class="p">:</span>
+                        <span class="n">outl</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.05</span>
+
+                <span class="k">elif</span> <span class="n">f</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">co2</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">outl</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.1</span><span class="p">:</span>
+                        <span class="n">outl</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.075</span>
+                    <span class="k">if</span> <span class="n">outl</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.001</span><span class="p">:</span>
+                        <span class="n">outl</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.02</span>
+
+                <span class="k">elif</span> <span class="n">f</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">h2o</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">outl</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.1</span><span class="p">:</span>
+                        <span class="n">outl</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.075</span>
+                    <span class="k">if</span> <span class="n">outl</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.001</span><span class="p">:</span>
+                        <span class="n">outl</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.02</span>
+
+                <span class="k">elif</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fuel_list</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">outl</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">outl</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1">######################################################################</span>
+        <span class="c1"># flue gas propagation</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">outl</span><span class="o">.</span><span class="n">good_starting_values</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">outl</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">outl</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_set</span><span class="p">:</span>
+                <span class="n">outl</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">=</span> <span class="mi">10</span>
+            <span class="n">outl</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">propagate_fluid_to_target</span><span class="p">(</span><span class="n">outl</span><span class="p">,</span> <span class="n">outl</span><span class="o">.</span><span class="n">target</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">outl</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">&lt;</span> <span class="mf">7.5e5</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">outl</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_set</span><span class="p">:</span>
+                <span class="n">outl</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">=</span> <span class="mf">1e6</span>
+
+        <span class="c1">######################################################################</span>
+        <span class="c1"># additional checks for performance improvement</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lamb</span><span class="o">.</span><span class="n">val</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">lamb</span><span class="o">.</span><span class="n">is_set</span><span class="p">:</span>
+            <span class="c1"># search fuel and air inlet</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">inl</span><span class="p">:</span>
+                <span class="n">fuel_found</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">i</span><span class="o">.</span><span class="n">good_starting_values</span><span class="p">:</span>
+                    <span class="n">fuel</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fuel_list</span><span class="p">:</span>
+                        <span class="n">fuel</span> <span class="o">+=</span> <span class="n">i</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">f</span><span class="p">]</span>
+                    <span class="c1"># found the fuel inlet</span>
+                    <span class="k">if</span> <span class="n">fuel</span> <span class="o">&gt;</span> <span class="mf">0.75</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">i</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_set</span><span class="p">:</span>
+                        <span class="n">fuel_found</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="n">fuel_inlet</span> <span class="o">=</span> <span class="n">i</span>
+
+                    <span class="c1"># found the air inlet</span>
+                    <span class="k">if</span> <span class="n">fuel</span> <span class="o">&lt;</span> <span class="mf">0.75</span><span class="p">:</span>
+                        <span class="n">air_tmp</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span>
+
+            <span class="k">if</span> <span class="n">fuel_found</span><span class="p">:</span>
+                <span class="n">fuel_inlet</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">=</span> <span class="n">air_tmp</span> <span class="o">/</span> <span class="mi">25</span></div>
+
+<div class="viewcode-block" id="CombustionChamber.initialise_source"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber.initialise_source">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">initialise_source</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a starting value for pressure and enthalpy at outlet.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        c : tespy.connections.connection.Connection</span>
+<span class="sd">            Connection to perform initialisation on.</span>
+
+<span class="sd">        key : str</span>
+<span class="sd">            Fluid property to retrieve.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        val : float</span>
+<span class="sd">            Starting value for pressure/enthalpy in SI units.</span>
+
+<span class="sd">            .. math::</span>
+
+<span class="sd">                val = \begin{cases}</span>
+<span class="sd">                5 \cdot 10^5 &amp; \text{key = &#39;p&#39;}\\</span>
+<span class="sd">                10^6 &amp; \text{key = &#39;h&#39;}</span>
+<span class="sd">                \end{cases}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;p&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">5e5</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;h&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">10e5</span></div>
+
+<div class="viewcode-block" id="CombustionChamber.initialise_target"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber.initialise_target">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">initialise_target</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a starting value for pressure and enthalpy at inlet.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        c : tespy.connections.connection.Connection</span>
+<span class="sd">            Connection to perform initialisation on.</span>
+
+<span class="sd">        key : str</span>
+<span class="sd">            Fluid property to retrieve.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        val : float</span>
+<span class="sd">            Starting value for pressure/enthalpy in SI units.</span>
+
+<span class="sd">            .. math::</span>
+
+<span class="sd">                val = \begin{cases}</span>
+<span class="sd">                5  \cdot 10^5 &amp; \text{key = &#39;p&#39;}\\</span>
+<span class="sd">                5 \cdot 10^5 &amp; \text{key = &#39;h&#39;}</span>
+<span class="sd">                \end{cases}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;p&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">5e5</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;h&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">5e5</span></div>
+
+<div class="viewcode-block" id="CombustionChamber.propagate_fluid_to_target"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber.propagate_fluid_to_target">[docs]</a>    <span class="k">def</span> <span class="nf">propagate_fluid_to_target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inconn</span><span class="p">,</span> <span class="n">start</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fluid propagation to target stops here.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        inconn : tespy.connections.connection.Connection</span>
+<span class="sd">            Connection to initialise.</span>
+
+<span class="sd">        start : tespy.components.component.Component</span>
+<span class="sd">            This component is the fluid propagation starting point.</span>
+<span class="sd">            The starting component is saved to prevent infinite looping.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="CombustionChamber.propagate_fluid_to_source"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber.propagate_fluid_to_source">[docs]</a>    <span class="k">def</span> <span class="nf">propagate_fluid_to_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outconn</span><span class="p">,</span> <span class="n">start</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fluid propagation to source stops here.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        outconn : tespy.connections.connection.Connection</span>
+<span class="sd">            Connection to initialise.</span>
+
+<span class="sd">        start : tespy.components.component.Component</span>
+<span class="sd">            This component is the fluid propagation starting point.</span>
+<span class="sd">            The starting component is saved to prevent infinite looping.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="CombustionChamber.calc_parameters"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber.calc_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">calc_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Postprocessing parameter calculation.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ti</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_ti</span><span class="p">()</span>
+
+        <span class="n">n_h</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">n_c</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fuel_list</span><span class="p">:</span>
+            <span class="n">n_fuel</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">:</span>
+                <span class="n">n_fuel</span> <span class="o">+=</span> <span class="n">i</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="n">i</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">/</span> <span class="n">molar_masses</span><span class="p">[</span><span class="n">f</span><span class="p">]</span>
+                <span class="n">n_h</span> <span class="o">+=</span> <span class="n">n_fuel</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fuels</span><span class="p">[</span><span class="n">f</span><span class="p">][</span><span class="s1">&#39;H&#39;</span><span class="p">]</span>
+                <span class="n">n_c</span> <span class="o">+=</span> <span class="n">n_fuel</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fuels</span><span class="p">[</span><span class="n">f</span><span class="p">][</span><span class="s1">&#39;C&#39;</span><span class="p">]</span>
+
+        <span class="n">n_oxygen</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">:</span>
+            <span class="n">n_oxygen</span> <span class="o">+=</span> <span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="n">i</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">o2</span><span class="p">]</span> <span class="o">/</span>
+                         <span class="n">molar_masses</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">o2</span><span class="p">])</span>
+
+        <span class="n">n_oxygen_stoich</span> <span class="o">=</span> <span class="n">n_h</span> <span class="o">/</span> <span class="mi">4</span> <span class="o">+</span> <span class="n">n_c</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">lamb</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="n">n_oxygen</span> <span class="o">/</span> <span class="n">n_oxygen_stoich</span></div>
+
+<div class="viewcode-block" id="CombustionChamber.entropy_balance"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.combustion.base.CombustionChamber.entropy_balance">[docs]</a>    <span class="k">def</span> <span class="nf">entropy_balance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate entropy balance of combustion chamber.</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        The entropy balance makes the following parameter available:</span>
+
+<span class="sd">        - :code:`T_mcomb`: Thermodynamic temperature of heat of combustion</span>
+<span class="sd">        - :code:`S_comb`: Entropy production due to combustion</span>
+<span class="sd">        - :code:`S_irr`: Entropy production due to irreversibilty</span>
+
+<span class="sd">        The methodology for entropy analysis of combustion processes is derived</span>
+<span class="sd">        from :cite:`Tuschy2001`. Similar to the energy balance of a combustion</span>
+<span class="sd">        reaction, we need to define the same reference state for the entropy</span>
+<span class="sd">        balance of the combustion. The temperature for the reference state is</span>
+<span class="sd">        set to 25 °C and reference pressure is 1 bar. As the water in the flue</span>
+<span class="sd">        gas may be liquid but the thermodynmic temperature of heat of</span>
+<span class="sd">        combustion refers to the lower heating value, the water is forced to</span>
+<span class="sd">        gas at the reference point by considering evaporation.</span>
+
+<span class="sd">        - Reference temperature: 298.15 K.</span>
+<span class="sd">        - Reference pressure: 1 bar.</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            T_\mathrm{m,comb}= \frac{\dot{m}_\mathrm{fuel} \cdot LHV}</span>
+<span class="sd">            {\dot{S}_\mathrm{comb}}\\</span>
+<span class="sd">            \dot{S}_\mathrm{comb}= \dot{m}_\mathrm{fluegas} \cdot</span>
+<span class="sd">            \left(s_\mathrm{fluegas}-s_\mathrm{fluegas,ref}\right)</span>
+<span class="sd">            - \sum_{i=1}^2 \dot{m}_{\mathrm{in,}i} \cdot</span>
+<span class="sd">            \left( s_{\mathrm{in,}i} - s_{\mathrm{in,ref,}i} \right)\\</span>
+<span class="sd">            \dot{S}_\mathrm{irr}= 0\\</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">T_ref</span> <span class="o">=</span> <span class="mf">298.15</span>
+        <span class="n">p_ref</span> <span class="o">=</span> <span class="mf">1e5</span>
+        <span class="n">o</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">S_comb</span> <span class="o">=</span> <span class="n">o</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="p">(</span>
+            <span class="n">o</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span>
+            <span class="n">s_mix_pT</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">p_ref</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">o</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">],</span> <span class="n">T_ref</span><span class="p">,</span> <span class="n">force_gas</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">S_comb</span> <span class="o">-=</span> <span class="n">c</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="p">(</span>
+                <span class="n">c</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span>
+                <span class="n">s_mix_pT</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">p_ref</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">],</span> <span class="n">T_ref</span><span class="p">,</span> <span class="n">force_gas</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">S_irr</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">T_mcomb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_ti</span><span class="p">()</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">S_comb</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2020, Francesco Witte.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

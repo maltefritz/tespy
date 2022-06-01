@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>v0.0.5 (October, 25, 2018) &mdash; tespy 0.6.0 - Colored Chemicals documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> tespy
+            <img src="../_static/logo_tespy_mid.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.6.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Thermal Engineering Systems in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../first_steps.html">First steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials_examples.html">Examples and Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tespy_modules.html">TESPy modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tespy_analyses.html">Thermodynamic analyses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developing_tespy.html">Developing TESPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zliterature.html">Literature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">tespy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>v0.0.5 (October, 25, 2018)</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/whats_new/v0-0-5.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="v0-0-5-october-25-2018">
+<h1>v0.0.5 (October, 25, 2018)<a class="headerlink" href="#v0-0-5-october-25-2018" title="Permalink to this headline">¶</a></h1>
+<section id="new-features">
+<h2>New Features<a class="headerlink" href="#new-features" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>added new component: motoric cogeneration unit (<a class="reference external" href="https://github.com/oemof/tespy/commit/79a1177d5db130465676907d9a51b680005bdc7a">79a1177</a>).
+An example is provided <a class="reference external" href="https://github.com/oemof/oemof-examples/tree/master/oemof_examples/tespy/combustion">here</a>.</p></li>
+<li><p>improved fluid property checks (<a class="reference external" href="https://github.com/oemof/tespy/commit/8adc76c25ef976ed90ac6fba0d8c2f94e43ca7c5">8adc76c</a>).</p></li>
+<li><p>added bus characteristics for modeling variable efficiencys (e.g. for generator, motor, boiler) (<a class="reference external" href="https://github.com/oemof/tespy/commit/79a1177d5db130465676907d9a51b680005bdc7a">79a1177</a>).</p></li>
+<li><p>isentropic efficiency characteristic for compressor linked to pressure ratio (<a class="reference external" href="https://github.com/oemof/tespy/commit/85d317dea8cce8b7f6d149cca90317e6595a2485">85d317d</a>).</p></li>
+<li><p>added volumetric flow specification (<a class="reference external" href="https://github.com/oemof/tespy/commit/63db64de7fc5a26eb4d36b94bdd67fc3a4f7f715">63db64d</a>).</p></li>
+</ul>
+</section>
+<section id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>adapted documentation and (<a class="reference external" href="https://github.com/oemof/oemof-examples/tree/master/oemof_examples/tespy/">example code</a>)
+in regard of new features.</p></li>
+<li><p>fixed some typos in documentation.</p></li>
+</ul>
+</section>
+<section id="parameter-renaming">
+<h2>Parameter renaming<a class="headerlink" href="#parameter-renaming" title="Permalink to this headline">¶</a></h2>
+<p><strong>compressor</strong>
+- vigv -&gt; igva (inlet guide vane angle)</p>
+<p><strong>simple heat exchanger</strong>
+- t_a -&gt; Tamb (ambient temperature)</p>
+<p><strong>solar collector</strong>
+- t_a -&gt; Tamb (ambient temperature)</p>
+</section>
+<section id="testing">
+<h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="bug-fixes">
+<h2>Bug fixes<a class="headerlink" href="#bug-fixes" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>fixed a bug in the function v_mix_ph (specific volume for gas mixtures) (<a class="reference external" href="https://github.com/oemof/tespy/commit/d48738163c402c17456193a17d4bce60782258d0">d487381</a>).</p></li>
+<li><p>fixed compressor derivatives for usage with custom variables (<a class="reference external" href="https://github.com/oemof/tespy/commit/71cae481a2dabfdd92334f23bf87433fb4a571f7">71cae48</a>).</p></li>
+<li><p>adjusted error messages (<a class="reference external" href="https://github.com/oemof/tespy/commit/cccd89c6b1648be3e1819deccecc0df69ca92ba4">cccd89c</a>).</p></li>
+<li><p>removed unecessary loop (<a class="reference external" href="https://github.com/oemof/tespy/commit/187505ba73b4749df6451e4d5464fc909c4f63ed">187505b</a>).</p></li>
+<li><p>fixed attribute handling in subsystem: condenser with subcooler (<a class="reference external" href="https://github.com/oemof/tespy/commit/2c926bb5cb9b9c04d5f767a2c866bba00efcf5aa">2c926bb</a>).</p></li>
+</ul>
+</section>
+<section id="other-changes">
+<h2>Other changes<a class="headerlink" href="#other-changes" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>remodeled the characteristic map for compressors: if not specified, igva is assumed to be 0° (<a class="reference external" href="https://github.com/oemof/tespy/commit/2425a774309655f8577c5a460403e02282db0135">2425a77</a>).</p></li>
+<li><p>redesigned the printouts for component parameters (<a class="reference external" href="https://github.com/oemof/tespy/commit/9465be65fc74403c6f4d07c068a4727ef4149e77">9465be6</a>,
+<a class="reference external" href="https://github.com/oemof/tespy/commit/b2c08977d10b11c370089f87d5838fd4ff59c906">b2c0897</a>,
+<a class="reference external" href="https://github.com/oemof/tespy/commit/cbbc1a1438d250074b1a556df4ec21424eb53d34">cbbc1a1</a>,
+<a class="reference external" href="https://github.com/oemof/tespy/commit/1e55e36b5aa9bbfda15537cc305379f5198edeca">1e55e36</a>,
+<a class="reference external" href="https://github.com/oemof/tespy/commit/2e795c2af35a9b6ad3af1834cfc9b7c01f9da3a4">2e795c2</a>)</p></li>
+<li><dl class="simple">
+<dt>custom variables are available for (<a class="reference external" href="https://github.com/oemof/tespy/commit/977a5be7f8441c1d67ff83feeabd13645cb51052">977a5be</a>):</dt><dd><ul>
+<li><p>turbomachines,</p></li>
+<li><p>vessels,</p></li>
+<li><p>simple heat exchangers (as well as pipes and solar collctors) and</p></li>
+<li><p>cogeneration unit.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</section>
+<section id="contributors">
+<h2>Contributors<a class="headerlink" href="#contributors" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Francesco Witte</p></li>
+<li><p>Paul Hansen</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2020, Francesco Witte.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tespy.tools.helpers &mdash; tespy 0.6.0 - Colored Chemicals documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> tespy
+            <img src="../../../_static/logo_tespy_mid.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.6.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../introduction.html">Thermal Engineering Systems in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../first_steps.html">First steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials_examples.html">Examples and Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tespy_modules.html">TESPy modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tespy_analyses.html">Thermodynamic analyses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developing_tespy.html">Developing TESPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../zliterature.html">Literature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">tespy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>tespy.tools.helpers</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for tespy.tools.helpers</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8</span>
+
+<span class="sd">&quot;&quot;&quot;Module for helper functions used by several other modules.</span>
+
+<span class="sd">This file is part of project TESPy (github.com/oemof/tespy). It&#39;s copyrighted</span>
+<span class="sd">by the contributors recorded in the version control history of the file,</span>
+<span class="sd">available from its original location tespy/tools/helpers.py</span>
+
+<span class="sd">SPDX-License-Identifier: MIT</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Mapping</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+
+<span class="kn">import</span> <span class="nn">CoolProp</span> <span class="k">as</span> <span class="nn">CP</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">tespy.tools.global_vars</span> <span class="kn">import</span> <span class="n">err</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.global_vars</span> <span class="kn">import</span> <span class="n">fluid_property_data</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.global_vars</span> <span class="kn">import</span> <span class="n">molar_masses</span>
+
+
+<div class="viewcode-block" id="merge_dicts"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.helpers.merge_dicts">[docs]</a><span class="k">def</span> <span class="nf">merge_dicts</span><span class="p">(</span><span class="n">dict1</span><span class="p">,</span> <span class="n">dict2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return a new dictionary by merging two dictionaries recursively.&quot;&quot;&quot;</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">dict1</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">dict2</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">merge_dicts</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">{}),</span> <span class="n">value</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">dict2</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">result</span></div>
+
+
+<div class="viewcode-block" id="nested_OrderedDict"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.helpers.nested_OrderedDict">[docs]</a><span class="k">def</span> <span class="nf">nested_OrderedDict</span><span class="p">(</span><span class="n">dictionary</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create a nested OrderedDict from a nested dict.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dictionary : dict</span>
+<span class="sd">        Nested dict.</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dictionary : collections.OrderedDict</span>
+<span class="sd">        Nested OrderedDict.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dictionary</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span><span class="n">dictionary</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">dictionary</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">dictionary</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">nested_OrderedDict</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">dictionary</span></div>
+
+
+<div class="viewcode-block" id="TESPyNetworkError"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.helpers.TESPyNetworkError">[docs]</a><span class="k">class</span> <span class="nc">TESPyNetworkError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Custom message for network related errors.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="TESPyConnectionError"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.helpers.TESPyConnectionError">[docs]</a><span class="k">class</span> <span class="nc">TESPyConnectionError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Custom message for connection related errors.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="TESPyComponentError"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.helpers.TESPyComponentError">[docs]</a><span class="k">class</span> <span class="nc">TESPyComponentError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Custom message for component related errors.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="convert_to_SI"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.helpers.convert_to_SI">[docs]</a><span class="k">def</span> <span class="nf">convert_to_SI</span><span class="p">(</span><span class="nb">property</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">unit</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert a value to its SI value.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    property : str</span>
+<span class="sd">        Fluid property to convert.</span>
+
+<span class="sd">    value : float</span>
+<span class="sd">        Value to convert.</span>
+
+<span class="sd">    unit : str</span>
+<span class="sd">        Unit of the value.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    SI_value : float</span>
+<span class="sd">        Specified fluid property in SI value.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">property</span> <span class="o">==</span> <span class="s1">&#39;T&#39;</span><span class="p">:</span>
+        <span class="n">converters</span> <span class="o">=</span> <span class="n">fluid_property_data</span><span class="p">[</span><span class="s1">&#39;T&#39;</span><span class="p">][</span><span class="s1">&#39;units&#39;</span><span class="p">][</span><span class="n">unit</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">value</span> <span class="o">+</span> <span class="n">converters</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">converters</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">value</span> <span class="o">*</span> <span class="n">fluid_property_data</span><span class="p">[</span><span class="nb">property</span><span class="p">][</span><span class="s1">&#39;units&#39;</span><span class="p">][</span><span class="n">unit</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="convert_from_SI"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.helpers.convert_from_SI">[docs]</a><span class="k">def</span> <span class="nf">convert_from_SI</span><span class="p">(</span><span class="nb">property</span><span class="p">,</span> <span class="n">SI_value</span><span class="p">,</span> <span class="n">unit</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get a value in the network&#39;s unit system from SI value.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    property : str</span>
+<span class="sd">        Fluid property to convert.</span>
+
+<span class="sd">    SI_value : float</span>
+<span class="sd">        SI value to convert.</span>
+
+<span class="sd">    unit : str</span>
+<span class="sd">        Unit of the value.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    value : float</span>
+<span class="sd">        Specified fluid property value in network&#39;s unit system.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">property</span> <span class="o">==</span> <span class="s1">&#39;T&#39;</span><span class="p">:</span>
+        <span class="n">converters</span> <span class="o">=</span> <span class="n">fluid_property_data</span><span class="p">[</span><span class="s1">&#39;T&#39;</span><span class="p">][</span><span class="s1">&#39;units&#39;</span><span class="p">][</span><span class="n">unit</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">SI_value</span> <span class="o">/</span> <span class="n">converters</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">converters</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">SI_value</span> <span class="o">/</span> <span class="n">fluid_property_data</span><span class="p">[</span><span class="nb">property</span><span class="p">][</span><span class="s1">&#39;units&#39;</span><span class="p">][</span><span class="n">unit</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="latex_unit"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.helpers.latex_unit">[docs]</a><span class="k">def</span> <span class="nf">latex_unit</span><span class="p">(</span><span class="n">unit</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert unit to LaTeX.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    unit : str</span>
+<span class="sd">        Value of unit for input, e.g. :code:`m3 / kg`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    unit : str</span>
+<span class="sd">        Value of unit for output, e.g. :code:`$\unitfrac{m3}{kg}$`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="s1">&#39;/&#39;</span> <span class="ow">in</span> <span class="n">unit</span><span class="p">:</span>
+        <span class="n">numerator</span> <span class="o">=</span> <span class="n">unit</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">denominator</span> <span class="o">=</span> <span class="n">unit</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="sa">r</span><span class="s1">&#39;$\unitfrac[]{&#39;</span> <span class="o">+</span> <span class="n">numerator</span> <span class="o">+</span> <span class="s1">&#39;}{&#39;</span> <span class="o">+</span> <span class="n">denominator</span> <span class="o">+</span> <span class="s1">&#39;}$&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">unit</span> <span class="o">==</span> <span class="s1">&#39;C&#39;</span> <span class="ow">or</span> <span class="n">unit</span> <span class="o">==</span> <span class="s1">&#39;F&#39;</span><span class="p">:</span>
+            <span class="n">unit</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;^\circ &#39;</span> <span class="o">+</span> <span class="n">unit</span>
+        <span class="k">return</span> <span class="sa">r</span><span class="s1">&#39;$\unit[]{&#39;</span> <span class="o">+</span> <span class="n">unit</span> <span class="o">+</span> <span class="s1">&#39;}$&#39;</span></div>
+
+
+<div class="viewcode-block" id="UserDefinedEquation"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.helpers.UserDefinedEquation">[docs]</a><span class="k">class</span> <span class="nc">UserDefinedEquation</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">deriv</span><span class="p">,</span> <span class="n">conns</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">{},</span>
+                 <span class="n">latex</span><span class="o">=</span><span class="p">{}):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A UserDefinedEquation allows use of generic user specified equations.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        label : str</span>
+<span class="sd">            Label of the user defined function.</span>
+
+<span class="sd">        func : function</span>
+<span class="sd">            Equation to evaluate.</span>
+
+<span class="sd">        deriv : function</span>
+<span class="sd">            Partial derivatives of the equation.</span>
+
+<span class="sd">        conns : list</span>
+<span class="sd">            List of connections used by the function.</span>
+
+<span class="sd">        params : dict</span>
+<span class="sd">            Dictionary containing keyword arguments required by the function</span>
+<span class="sd">            and/or derivative.</span>
+
+<span class="sd">        latex : dict</span>
+<span class="sd">            Dictionary holding LaTeX string of the equation as well as</span>
+<span class="sd">            CharLine and CharMap instances applied in the equation for the</span>
+<span class="sd">            automatic model documentation module.</span>
+
+<span class="sd">        Example</span>
+<span class="sd">        -------</span>
+<span class="sd">        Consider a pipeline transporting hot water with measurement data on</span>
+<span class="sd">        temperature reduction in the pipeline as function of volumetric flow.</span>
+<span class="sd">        First, we set up the TESPy model. Additionally, we will import the</span>
+<span class="sd">        :py:class:`tespy.tools.helpers.UserDefinedEquation` class as well as</span>
+<span class="sd">        some fluid property functions. We specify fluid property information</span>
+<span class="sd">        for the inflow and assume that no pressure losses occur in the</span>
+<span class="sd">        pipeline.</span>
+
+<span class="sd">        &gt;&gt;&gt; from tespy.components import Source, Sink, Pipe</span>
+<span class="sd">        &gt;&gt;&gt; from tespy.networks import Network</span>
+<span class="sd">        &gt;&gt;&gt; from tespy.connections import Connection</span>
+<span class="sd">        &gt;&gt;&gt; from tespy.tools.helpers import UserDefinedEquation</span>
+<span class="sd">        &gt;&gt;&gt; from tespy.tools import CharLine</span>
+<span class="sd">        &gt;&gt;&gt; from tespy.tools.fluid_properties import T_mix_ph, v_mix_ph</span>
+<span class="sd">        &gt;&gt;&gt; nw = Network(fluids=[&#39;water&#39;], p_unit=&#39;bar&#39;, T_unit=&#39;C&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; nw.set_attr(iterinfo=False)</span>
+<span class="sd">        &gt;&gt;&gt; so = Source(&#39;source&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; si = Sink(&#39;sink&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; pipeline = Pipe(&#39;pipeline&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; inflow = Connection(so, &#39;out1&#39;, pipeline, &#39;in1&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; outflow = Connection(pipeline, &#39;out1&#39;, si, &#39;in1&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; nw.add_conns(inflow, outflow)</span>
+<span class="sd">        &gt;&gt;&gt; inflow.set_attr(T=120, p=10, v=1, fluid={&#39;water&#39;: 1})</span>
+<span class="sd">        &gt;&gt;&gt; pipeline.set_attr(pr=1)</span>
+
+<span class="sd">        Let&#39;s assume, the temperature reduction is measured from inflow and</span>
+<span class="sd">        outflow temperature. The mathematical description of the relation</span>
+<span class="sd">        we want the model to follow therefore is:</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            0 = T_{in} - T_{out} + f \left( \dot{m}_{in} \cdot v_{in} \right)</span>
+
+<span class="sd">        We can define a function, describing exactly that relation using a</span>
+<span class="sd">        :py:class:`tespy.tools.characteristics.CharLine` object with volumetric</span>
+<span class="sd">        flow as input values and temperature drop as output values. The</span>
+<span class="sd">        function should look like this:</span>
+
+<span class="sd">        &gt;&gt;&gt; def myfunc(ude):</span>
+<span class="sd">        ...    char = ude.params[&#39;char&#39;]</span>
+<span class="sd">        ...    return (</span>
+<span class="sd">        ...        T_mix_ph(ude.conns[0].get_flow()) -</span>
+<span class="sd">        ...        T_mix_ph(ude.conns[1].get_flow()) - char.evaluate(</span>
+<span class="sd">        ...            ude.conns[0].m.val_SI *</span>
+<span class="sd">        ...            v_mix_ph(ude.conns[0].get_flow()))</span>
+<span class="sd">        ...    )</span>
+
+<span class="sd">        The function does only take one parameter, we name it :code:`ude` in</span>
+<span class="sd">        this case. This parameter will hold all relevant information you pass</span>
+<span class="sd">        to your UserDefinedEquation later, i.e. a list of the connections</span>
+<span class="sd">        (:code:`.conns`) required by the UserDefinedEquation as well as</span>
+<span class="sd">        a dictionary of arbitrary parameters required for your function</span>
+<span class="sd">        (:code:`.params`). The index of the :code:`.conns` indicates the</span>
+<span class="sd">        position of the connection in the list of connections required for the</span>
+<span class="sd">        UserDefinedEquation (see below).</span>
+
+<span class="sd">        On top of the equation the solver requires its derivatives with respect</span>
+<span class="sd">        to all relevant primary variables of the network, which are mass flow</span>
+<span class="sd">        pressure, enthalpy and fluid composition. In this case, the derivatives</span>
+<span class="sd">        to the mass flow, pressure and enthalpy of the inflow as well as the</span>
+<span class="sd">        derivatives to the pressure and enthalpy of the outflow will be</span>
+<span class="sd">        required. Similar to the equation definition, define a function</span>
+<span class="sd">        returning the corresponding jacobian matrix. The jacobian is a</span>
+<span class="sd">        dictionary containing numpy arrays for every connection. Therefore</span>
+<span class="sd">        the first key is the connection you want to calculate the derivative</span>
+<span class="sd">        for and the second key is the index of the variable in the jacobian.</span>
+<span class="sd">        The indices correspond to</span>
+
+<span class="sd">        - 0: mass flow</span>
+<span class="sd">        - 1: pressure</span>
+<span class="sd">        - 2: enthalpy</span>
+<span class="sd">        - 3 until end (:code:`3:`): fluid composition</span>
+
+<span class="sd">        We can calculate the derivatives numerically, if an easy analytical</span>
+<span class="sd">        solution is not available. Simply use the :code:`numeric_deriv` method</span>
+<span class="sd">        passing the variable (&#39;m&#39;, &#39;p&#39;, &#39;h&#39;, &#39;fluid&#39;) as well as the</span>
+<span class="sd">        connection&#39;s index.</span>
+
+<span class="sd">        &gt;&gt;&gt; def myjacobian(ude):</span>
+<span class="sd">        ...    ude.jacobian[ude.conns[0]][0] = ude.numeric_deriv(&#39;m&#39;, 0)</span>
+<span class="sd">        ...    ude.jacobian[ude.conns[0]][1] = ude.numeric_deriv(&#39;p&#39;, 0)</span>
+<span class="sd">        ...    ude.jacobian[ude.conns[0]][2] = ude.numeric_deriv(&#39;h&#39;, 0)</span>
+<span class="sd">        ...    ude.jacobian[ude.conns[1]][1] = ude.numeric_deriv(&#39;p&#39;, 1)</span>
+<span class="sd">        ...    ude.jacobian[ude.conns[1]][2] = ude.numeric_deriv(&#39;h&#39;, 1)</span>
+<span class="sd">        ...    return ude.jacobian</span>
+
+<span class="sd">        After that, we only need to th specify the characteristic line we want</span>
+<span class="sd">        out temperature drop to follow as well as create the</span>
+<span class="sd">        UserDefinedEquation instance and add it to the network. Its equation</span>
+<span class="sd">        is automatically applied. We apply extrapolation for the characteristic</span>
+<span class="sd">        line as it helps with convergence, in case a paramter</span>
+
+<span class="sd">        &gt;&gt;&gt; char = CharLine(</span>
+<span class="sd">        ...    x=[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 2.0, 3.0],</span>
+<span class="sd">        ...    y=[17, 12, 9, 6.5, 4.5, 3, 2, 1.5, 1.25, 1.125, 1.1, 1.05],</span>
+<span class="sd">        ...    extrapolate=True)</span>
+<span class="sd">        &gt;&gt;&gt; my_ude = UserDefinedEquation(</span>
+<span class="sd">        ...    &#39;myudelabel&#39;, myfunc, myjacobian, [inflow, outflow],</span>
+<span class="sd">        ...    params={&#39;char&#39;: char})</span>
+<span class="sd">        &gt;&gt;&gt; nw.add_ude(my_ude)</span>
+<span class="sd">        &gt;&gt;&gt; nw.solve(&#39;design&#39;)</span>
+
+<span class="sd">        Clearly the result is obvious here as the volumetric flow is exactly</span>
+<span class="sd">        at one of the supporting points.</span>
+
+<span class="sd">        &gt;&gt;&gt; round(inflow.T.val - outflow.T.val, 3)</span>
+<span class="sd">        1.125</span>
+
+<span class="sd">        So now, let&#39;s say, we want to calculate the volumetric flow necessary</span>
+<span class="sd">        to at least maintain a specific temperature at the outflow.</span>
+
+<span class="sd">        &gt;&gt;&gt; inflow.set_attr(v=None)</span>
+<span class="sd">        &gt;&gt;&gt; outflow.set_attr(T=110)</span>
+<span class="sd">        &gt;&gt;&gt; nw.solve(&#39;design&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; round(inflow.v.val, 3)</span>
+<span class="sd">        0.267</span>
+
+<span class="sd">        Or calculate volumetric flow and/or temperature drop corresponding to a</span>
+<span class="sd">        specified heat loss.</span>
+
+<span class="sd">        &gt;&gt;&gt; outflow.set_attr(T=None)</span>
+<span class="sd">        &gt;&gt;&gt; pipeline.set_attr(Q=-5e6)</span>
+<span class="sd">        &gt;&gt;&gt; nw.solve(&#39;design&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; round(inflow.v.val, 3)</span>
+<span class="sd">        0.067</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">label</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Label of UserDefinedEquation object must be of type String.&#39;</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conns</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">conns</span> <span class="o">=</span> <span class="n">conns</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s1">&#39;Parameter conns must be a list of &#39;</span>
+                <span class="s1">&#39;tespy.connections.connection.Connection objects.&#39;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">func</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deriv</span> <span class="o">=</span> <span class="n">deriv</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">params</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;The parameter params must be passed as dictionary.&#39;</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">latex</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;equation&#39;</span><span class="p">:</span> <span class="sa">r</span><span class="s1">&#39;\text{equation string not available}&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;lines&#39;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s1">&#39;maps&#39;</span><span class="p">:</span> <span class="p">[]</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">latex</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">latex</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">latex</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;The parameter latex must be passed as dictionary.&#39;</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+<div class="viewcode-block" id="UserDefinedEquation.numeric_deriv"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.helpers.UserDefinedEquation.numeric_deriv">[docs]</a>    <span class="k">def</span> <span class="nf">numeric_deriv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate partial derivative of the function func to dx numerically.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        param : str</span>
+<span class="sd">            Parameter to calculate partial derivative for.</span>
+
+<span class="sd">        idx : int</span>
+<span class="sd">            Position of the connection to calculate the partial derivative for</span>
+<span class="sd">            within the list of the connections :code:`conns`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        deriv : float/list</span>
+<span class="sd">            Partial derivative(s) of the function :math:`f` to variable(s)</span>
+<span class="sd">            :math:`x`.</span>
+
+<span class="sd">            .. math::</span>
+
+<span class="sd">                \frac{\partial f}{\partial x}=\frac{f(x+d)+f(x-d)}{2\cdot d}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">param</span> <span class="o">==</span> <span class="s1">&#39;fluid&#39;</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="mf">1e-5</span>
+            <span class="n">deriv</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">conns</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conns</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">f</span><span class="p">]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">conns</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">+</span> <span class="n">d</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">conns</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">+=</span> <span class="n">d</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">conns</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">exp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">conns</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">d</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">conns</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">d</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">conns</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">exp</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">conns</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+
+                <span class="n">deriv</span> <span class="o">+=</span> <span class="p">[</span><span class="n">exp</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">d</span><span class="p">)]</span>
+
+        <span class="k">elif</span> <span class="n">param</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">]:</span>
+
+            <span class="k">if</span> <span class="n">param</span> <span class="o">==</span> <span class="s1">&#39;m&#39;</span><span class="p">:</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="mf">1e-4</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="mf">1e-1</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">conns</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">get_attr</span><span class="p">(</span><span class="n">param</span><span class="p">)</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">+=</span> <span class="n">d</span>
+            <span class="n">exp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">conns</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">get_attr</span><span class="p">(</span><span class="n">param</span><span class="p">)</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">d</span>
+            <span class="n">exp</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">conns</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">get_attr</span><span class="p">(</span><span class="n">param</span><span class="p">)</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">+=</span> <span class="n">d</span>
+
+            <span class="n">deriv</span> <span class="o">=</span> <span class="n">exp</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">d</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s1">&#39;Can only calculate numerical derivative to primary variables.&#39;</span>
+                <span class="s1">&#39;Please specify &quot;m&quot;, &quot;p&quot;, &quot;h&quot; or &quot;fluid&quot; as param.&#39;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">deriv</span></div></div>
+
+
+<div class="viewcode-block" id="newton"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.helpers.newton">[docs]</a><span class="k">def</span> <span class="nf">newton</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">deriv</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Find zero crossings with 1-D newton algorithm.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    func : function</span>
+<span class="sd">        Function to find zero crossing in,</span>
+<span class="sd">        :math:`0=y-func\left(x,\text{params}\right)`.</span>
+
+<span class="sd">    deriv : function</span>
+<span class="sd">        First derivative of the function.</span>
+
+<span class="sd">    params : list</span>
+<span class="sd">        Additional parameters for function, optional.</span>
+
+<span class="sd">    y : float</span>
+<span class="sd">        Target function value.</span>
+
+<span class="sd">    val0 : float</span>
+<span class="sd">        Starting value, default: val0=300.</span>
+
+<span class="sd">    valmin : float</span>
+<span class="sd">        Lower value boundary, default: valmin=70.</span>
+
+<span class="sd">    valmax : float</span>
+<span class="sd">        Upper value boundary, default: valmax=3000.</span>
+
+<span class="sd">    max_iter : int</span>
+<span class="sd">        Maximum number of iterations, default: max_iter=10.</span>
+
+<span class="sd">    tol_rel : float</span>
+<span class="sd">        Maximum relative tolerance :math:`|\frac{y - f(x)}{f(x)}|`, default</span>
+<span class="sd">        value: 1e-6.</span>
+
+<span class="sd">    tol_abs : float</span>
+<span class="sd">        Maximum absolute tolerance :math:`|y - f(x)|`, default value: 1e-6.</span>
+
+<span class="sd">    tol_mode : str</span>
+<span class="sd">        Check for relative, absolute or both tolerances:</span>
+
+<span class="sd">        - :code:`tol_mode=&#39;abs&#39;` (default)</span>
+<span class="sd">        - :code:`tol_mode=&#39;rel&#39;`</span>
+<span class="sd">        - :code:`tol_mode=&#39;both&#39;`</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    val : float</span>
+<span class="sd">        x-value of zero crossing.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    Algorithm</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        x_{i+1} = x_{i} - \frac{f(x_{i})}{\frac{df}{dx}(x_{i})}\\</span>
+<span class="sd">        f(x_{i}) \leq \epsilon</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># default valaues</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;val0&#39;</span><span class="p">,</span> <span class="mi">300</span><span class="p">)</span>
+    <span class="n">valmin</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;valmin&#39;</span><span class="p">,</span> <span class="mi">70</span><span class="p">)</span>
+    <span class="n">valmax</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;valmax&#39;</span><span class="p">,</span> <span class="mi">3000</span><span class="p">)</span>
+    <span class="n">max_iter</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;max_iter&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+    <span class="n">tol_rel</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;tol_rel&#39;</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+    <span class="n">tol_abs</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;tol_abs&#39;</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+    <span class="n">tol_mode</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;tol_mode&#39;</span><span class="p">,</span> <span class="s1">&#39;abs&#39;</span><span class="p">)</span>
+
+    <span class="c1"># start newton loop</span>
+    <span class="n">expr</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">expr</span><span class="p">:</span>
+        <span class="c1"># calculate function residual and new value</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="n">func</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">+=</span> <span class="n">res</span> <span class="o">/</span> <span class="n">deriv</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+
+        <span class="c1"># check for value ranges</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">valmin</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">valmin</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="n">valmax</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">valmax</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="n">max_iter</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Newton algorithm was not able to find a feasible value &#39;</span>
+                   <span class="s1">&#39;for function &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">func</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;. Current value with x=&#39;</span> <span class="o">+</span>
+                   <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; is &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">func</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span> <span class="o">+</span>
+                   <span class="s1">&#39;, target value is &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+            <span class="k">break</span>
+        <span class="k">if</span> <span class="n">tol_mode</span> <span class="o">==</span> <span class="s1">&#39;abs&#39;</span><span class="p">:</span>
+            <span class="n">expr</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">tol_abs</span>
+        <span class="k">elif</span> <span class="n">tol_mode</span> <span class="o">==</span> <span class="s1">&#39;rel&#39;</span><span class="p">:</span>
+            <span class="n">expr</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">res</span> <span class="o">/</span> <span class="n">y</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">tol_rel</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">expr</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">res</span> <span class="o">/</span> <span class="n">y</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">tol_rel</span> <span class="ow">or</span> <span class="nb">abs</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">tol_abs</span>
+
+    <span class="k">return</span> <span class="n">x</span></div>
+
+<span class="c1"># %%</span>
+
+
+<div class="viewcode-block" id="reverse_2d"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.helpers.reverse_2d">[docs]</a><span class="k">def</span> <span class="nf">reverse_2d</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the residual value of an inverse function.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    params : list</span>
+<span class="sd">        Variable function parameters.</span>
+
+<span class="sd">    y : float</span>
+<span class="sd">        Function value of function :math:`y = f \left( x_1, x_2 \right)`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    deriv : float</span>
+<span class="sd">        Residual value of inverse function :math:`x_2 - f\left(x_1, y \right)`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">func</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">params</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">params</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">x2</span> <span class="o">-</span> <span class="n">func</span><span class="o">.</span><span class="n">ev</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="reverse_2d_deriv"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.helpers.reverse_2d_deriv">[docs]</a><span class="k">def</span> <span class="nf">reverse_2d_deriv</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate derivative of an inverse function.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    params : list</span>
+<span class="sd">        Variable function parameters.</span>
+
+<span class="sd">    y : float</span>
+<span class="sd">        Function value of function :math:`y = f \left( x_1, x_2 \right)`,</span>
+<span class="sd">        so that :math:`x_2 - f\left(x_1, y \right) = 0`</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    deriv : float</span>
+<span class="sd">        Partial derivative :math:`\frac{\partial f}{\partial y}`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">func</span><span class="p">,</span> <span class="n">x1</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">params</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="o">-</span> <span class="n">func</span><span class="o">.</span><span class="n">ev</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="bus_char_evaluation"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.helpers.bus_char_evaluation">[docs]</a><span class="k">def</span> <span class="nf">bus_char_evaluation</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">bus_value</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the value of a bus.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    comp_value : float</span>
+<span class="sd">        Value of the energy transfer at the component.</span>
+
+<span class="sd">    reference_value : float</span>
+<span class="sd">        Value of the bus in reference state.</span>
+
+<span class="sd">    char_func : tespy.tools.characteristics.char_line</span>
+<span class="sd">        Characteristic function of the bus.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    residual : float</span>
+<span class="sd">        Residual of the equation.</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            residual = \dot{E}_\mathrm{bus} - \frac{\dot{E}_\mathrm{component}}</span>
+<span class="sd">            {f\left(\frac{\dot{E}_\mathrm{bus}}</span>
+<span class="sd">            {\dot{E}_\mathrm{bus,ref}}\right)}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">comp_value</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">reference_value</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">char_func</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">bus_value</span> <span class="o">-</span> <span class="n">comp_value</span> <span class="o">/</span> <span class="n">char_func</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+        <span class="n">bus_value</span> <span class="o">/</span> <span class="n">reference_value</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="bus_char_derivative"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.helpers.bus_char_derivative">[docs]</a><span class="k">def</span> <span class="nf">bus_char_derivative</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">bus_value</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate derivative for bus char evaluation.&quot;&quot;&quot;</span>
+    <span class="n">reference_value</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">char_func</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="mf">1e-3</span>
+    <span class="k">return</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="p">(</span>
+        <span class="mi">1</span> <span class="o">/</span> <span class="n">char_func</span><span class="o">.</span><span class="n">evaluate</span><span class="p">((</span><span class="n">bus_value</span> <span class="o">+</span> <span class="n">d</span><span class="p">)</span> <span class="o">/</span> <span class="n">reference_value</span><span class="p">)</span> <span class="o">-</span>
+        <span class="mi">1</span> <span class="o">/</span> <span class="n">char_func</span><span class="o">.</span><span class="n">evaluate</span><span class="p">((</span><span class="n">bus_value</span> <span class="o">-</span> <span class="n">d</span><span class="p">)</span> <span class="o">/</span> <span class="n">reference_value</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">d</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="molar_mass_flow"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.helpers.molar_mass_flow">[docs]</a><span class="k">def</span> <span class="nf">molar_mass_flow</span><span class="p">(</span><span class="n">flow</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate molar mass flow.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    flow : list</span>
+<span class="sd">        Fluid property vector containing mass flow, pressure, enthalpy and</span>
+<span class="sd">        fluid composition.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    m_m : float</span>
+<span class="sd">        Molar mass flow m_m / (mol/s).</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            \dot{m}_\mathrm{m} = \sum_{i} \left( \frac{x_{i}}{M_{i}} \right)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mm</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">fluid</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">flow</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">mm</span> <span class="o">+=</span> <span class="n">x</span> <span class="o">/</span> <span class="n">molar_masses</span><span class="p">[</span><span class="n">fluid</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">mm</span></div>
+
+<span class="c1"># %%</span>
+
+
+<div class="viewcode-block" id="num_fluids"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.helpers.num_fluids">[docs]</a><span class="k">def</span> <span class="nf">num_fluids</span><span class="p">(</span><span class="n">fluids</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return number of fluids in fluid mixture.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fluids : dict</span>
+<span class="sd">        Fluid mass fractions.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    n : int</span>
+<span class="sd">        Number of fluids in fluid mixture n / 1.</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            n = \sum_{i} \left( \begin{cases}</span>
+<span class="sd">            0 &amp; x_{i} &lt; \epsilon \\</span>
+<span class="sd">            1 &amp; x_{i} \geq \epsilon</span>
+<span class="sd">            \end{cases} \right)\;</span>
+<span class="sd">            \forall i \in \text{network fluids}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">fluid</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">fluids</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">n</span></div>
+
+<span class="c1"># %%</span>
+
+
+<div class="viewcode-block" id="single_fluid"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.helpers.single_fluid">[docs]</a><span class="k">def</span> <span class="nf">single_fluid</span><span class="p">(</span><span class="n">fluids</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return the name of the pure fluid in a fluid vector.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fluids : dict</span>
+<span class="sd">        Fluid mass fractions.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    fluid : str</span>
+<span class="sd">        Name of the single fluid or None in case of mixtures.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">num_fluids</span><span class="p">(</span><span class="n">fluids</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">fluid</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">fluids</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="n">err</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">fluid</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<span class="c1"># %%</span>
+
+
+<div class="viewcode-block" id="fluid_structure"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.helpers.fluid_structure">[docs]</a><span class="k">def</span> <span class="nf">fluid_structure</span><span class="p">(</span><span class="n">fluid</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return the checmical formula of fluid.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fluid : str</span>
+<span class="sd">        Name of the fluid.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    parts : dict</span>
+<span class="sd">        Dictionary of the chemical base elements as keys and the number of</span>
+<span class="sd">        atoms in a molecule as values.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    Get the chemical formula of methane.</span>
+
+<span class="sd">    &gt;&gt;&gt; from tespy.tools.helpers import fluid_structure</span>
+<span class="sd">    &gt;&gt;&gt; elements = fluid_structure(&#39;methane&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; elements[&#39;C&#39;], elements[&#39;H&#39;]</span>
+<span class="sd">    (1, 4)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">parts</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">CP</span><span class="o">.</span><span class="n">CoolProp</span><span class="o">.</span><span class="n">get_fluid_param_string</span><span class="p">(</span>
+            <span class="n">fluid</span><span class="p">,</span> <span class="s1">&#39;formula&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;}&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">element</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">el</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_{&#39;</span><span class="p">)</span>
+            <span class="n">parts</span><span class="p">[</span><span class="n">el</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">el</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">parts</span></div>
+
+<span class="c1"># %%</span>
+
+
+<div class="viewcode-block" id="darcy_friction_factor"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.helpers.darcy_friction_factor">[docs]</a><span class="k">def</span> <span class="nf">darcy_friction_factor</span><span class="p">(</span><span class="n">re</span><span class="p">,</span> <span class="n">ks</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the Darcy friction factor.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    re : float</span>
+<span class="sd">        Reynolds number re / 1.</span>
+
+<span class="sd">    ks : float</span>
+<span class="sd">        Pipe roughness ks / m.</span>
+
+<span class="sd">    d : float</span>
+<span class="sd">        Pipe diameter/characteristic lenght d / m.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    darcy_friction_factor : float</span>
+<span class="sd">        Darcy friction factor :math:`\lambda` / 1</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    **Laminar flow** (:math:`re \leq 2320`)</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \lambda = \frac{64}{re}</span>
+
+<span class="sd">    **turbulent flow** (:math:`re &gt; 2320`)</span>
+
+<span class="sd">    *hydraulically smooth:* :math:`\frac{re \cdot k_{s}}{d} &lt; 65`</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \lambda = \begin{cases}</span>
+<span class="sd">        0.03164 \cdot re^{-0.25} &amp; re \leq 10^4\\</span>
+<span class="sd">        \left(1.8 \cdot \log \left(re\right) -1.5 \right)^{-2} &amp;</span>
+<span class="sd">        10^4 &lt; re &lt; 10^6\\</span>
+<span class="sd">        solve \left(0 = 2 \cdot \log\left(re \cdot \sqrt{\lambda} \right) -0.8</span>
+<span class="sd">        - \frac{1}{\sqrt{\lambda}}\right) &amp; re \geq 10^6\\</span>
+<span class="sd">        \end{cases}</span>
+
+<span class="sd">    *transition zone and hydraulically rough:*</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \lambda = solve \left( 0 = 2 \cdot \log \left( \frac{2.51}{re \cdot</span>
+<span class="sd">        \sqrt{\lambda}} + \frac{k_{s}}{d \cdot 3.71} \right) -</span>
+<span class="sd">        \frac{1}{\sqrt{\lambda}} \right)</span>
+
+<span class="sd">    Reference: :cite:`Nirschl2018`.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    Calculate the Darcy friction factor at different hydraulic states.</span>
+
+<span class="sd">    &gt;&gt;&gt; from tespy.tools.helpers import darcy_friction_factor</span>
+<span class="sd">    &gt;&gt;&gt; ks = 5e-5</span>
+<span class="sd">    &gt;&gt;&gt; d = 0.05</span>
+<span class="sd">    &gt;&gt;&gt; re_laminar = 2000</span>
+<span class="sd">    &gt;&gt;&gt; re_turb_smooth = 5000</span>
+<span class="sd">    &gt;&gt;&gt; re_turb_trans = 70000</span>
+<span class="sd">    &gt;&gt;&gt; re_high = 1000000</span>
+<span class="sd">    &gt;&gt;&gt; d_high = 0.8</span>
+<span class="sd">    &gt;&gt;&gt; re_very_high = 6000000</span>
+<span class="sd">    &gt;&gt;&gt; d_very_high = 1</span>
+<span class="sd">    &gt;&gt;&gt; ks_low = 1e-5</span>
+<span class="sd">    &gt;&gt;&gt; ks_rough = 1e-3</span>
+<span class="sd">    &gt;&gt;&gt; darcy_friction_factor(re_laminar, ks, d)</span>
+<span class="sd">    0.032</span>
+<span class="sd">    &gt;&gt;&gt; round(darcy_friction_factor(re_turb_smooth, ks, d), 3)</span>
+<span class="sd">    0.038</span>
+<span class="sd">    &gt;&gt;&gt; round(darcy_friction_factor(re_turb_trans, ks, d), 3)</span>
+<span class="sd">    0.023</span>
+<span class="sd">    &gt;&gt;&gt; round(darcy_friction_factor(re_turb_trans, ks_rough, d), 3)</span>
+<span class="sd">    0.049</span>
+<span class="sd">    &gt;&gt;&gt; round(darcy_friction_factor(re_high, ks, d_high), 3)</span>
+<span class="sd">    0.012</span>
+<span class="sd">    &gt;&gt;&gt; round(darcy_friction_factor(re_very_high, ks_low, d_very_high), 3)</span>
+<span class="sd">    0.009</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">re</span> <span class="o">&lt;=</span> <span class="mi">2320</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">64</span> <span class="o">/</span> <span class="n">re</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">re</span> <span class="o">*</span> <span class="n">ks</span> <span class="o">/</span> <span class="n">d</span> <span class="o">&lt;</span> <span class="mi">65</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">re</span> <span class="o">&lt;=</span> <span class="mf">1e4</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">blasius</span><span class="p">(</span><span class="n">re</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">re</span> <span class="o">&lt;</span> <span class="mf">1e6</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">hanakov</span><span class="p">(</span><span class="n">re</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">l0</span> <span class="o">=</span> <span class="mf">0.02</span>
+                <span class="k">return</span> <span class="n">newton</span><span class="p">(</span>
+                    <span class="n">prandtl_karman</span><span class="p">,</span> <span class="n">prandtl_karman_derivative</span><span class="p">,</span> <span class="p">[</span><span class="n">re</span><span class="p">],</span>
+                    <span class="mi">0</span><span class="p">,</span> <span class="n">val0</span><span class="o">=</span><span class="n">l0</span><span class="p">,</span> <span class="n">valmin</span><span class="o">=</span><span class="mf">0.00001</span><span class="p">,</span> <span class="n">valmax</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">l0</span> <span class="o">=</span> <span class="mf">0.002</span>
+            <span class="k">return</span> <span class="n">newton</span><span class="p">(</span>
+                <span class="n">colebrook</span><span class="p">,</span> <span class="n">colebrook_derivative</span><span class="p">,</span> <span class="p">[</span><span class="n">re</span><span class="p">,</span> <span class="n">ks</span><span class="p">,</span> <span class="n">d</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="n">val0</span><span class="o">=</span><span class="n">l0</span><span class="p">,</span> <span class="n">valmin</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">,</span> <span class="n">valmax</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="blasius"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.helpers.blasius">[docs]</a><span class="k">def</span> <span class="nf">blasius</span><span class="p">(</span><span class="n">re</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate friction coefficient according to Blasius.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    re : float</span>
+<span class="sd">        Reynolds number.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    darcy_friction_factor : float</span>
+<span class="sd">        Darcy friction factor.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="mf">0.3164</span> <span class="o">*</span> <span class="n">re</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.25</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="hanakov"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.helpers.hanakov">[docs]</a><span class="k">def</span> <span class="nf">hanakov</span><span class="p">(</span><span class="n">re</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate friction coefficient according to Hanakov.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    re : float</span>
+<span class="sd">        Reynolds number.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    darcy_friction_factor : float</span>
+<span class="sd">        Darcy friction factor.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="mf">1.8</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">re</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.5</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="prandtl_karman"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.helpers.prandtl_karman">[docs]</a><span class="k">def</span> <span class="nf">prandtl_karman</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">darcy_friction_factor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate friction coefficient according to Prandtl and v. Kármán.</span>
+
+<span class="sd">    Applied in smooth conditions.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    re : float</span>
+<span class="sd">        Reynolds number.</span>
+
+<span class="sd">    darcy_friction_factor : float</span>
+<span class="sd">        Darcy friction factor.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    darcy_friction_factor : float</span>
+<span class="sd">        Darcy friction factor.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">re</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">re</span> <span class="o">*</span> <span class="n">darcy_friction_factor</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.8</span> <span class="o">-</span>
+        <span class="mi">1</span> <span class="o">/</span> <span class="n">darcy_friction_factor</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="prandtl_karman_derivative"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.helpers.prandtl_karman_derivative">[docs]</a><span class="k">def</span> <span class="nf">prandtl_karman_derivative</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">darcy_friction_factor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate derivative for Prandtl and v. Kármán equation.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">darcy_friction_factor</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span> <span class="o">+</span>
+        <span class="mi">1</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">darcy_friction_factor</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mf">1.5</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="colebrook"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.helpers.colebrook">[docs]</a><span class="k">def</span> <span class="nf">colebrook</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">darcy_friction_factor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate friction coefficient accroding to Colebrook-White equation.</span>
+
+<span class="sd">    Applied in transition zone and rough conditions.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    re : float</span>
+<span class="sd">        Reynolds number.</span>
+
+<span class="sd">    ks : float</span>
+<span class="sd">        Equivalent sand roughness.</span>
+
+<span class="sd">    d : float</span>
+<span class="sd">        Pipe&#39;s diameter.</span>
+
+<span class="sd">    darcy_friction_factor : float</span>
+<span class="sd">        Darcy friction factor.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    darcy_friction_factor : float</span>
+<span class="sd">        Darcy friction factor.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">re</span><span class="p">,</span> <span class="n">ks</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">params</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">params</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span>
+            <span class="mf">2.51</span> <span class="o">/</span> <span class="p">(</span><span class="n">re</span> <span class="o">*</span> <span class="n">darcy_friction_factor</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">+</span> <span class="n">ks</span> <span class="o">/</span> <span class="p">(</span><span class="mf">3.71</span> <span class="o">*</span> <span class="n">d</span><span class="p">))</span> <span class="o">+</span>
+        <span class="mi">1</span> <span class="o">/</span> <span class="n">darcy_friction_factor</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="colebrook_derivative"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.helpers.colebrook_derivative">[docs]</a><span class="k">def</span> <span class="nf">colebrook_derivative</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">darcy_friction_factor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate derivative for Colebrook-White equation.&quot;&quot;&quot;</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="mf">0.001</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">colebrook</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">darcy_friction_factor</span> <span class="o">+</span> <span class="n">d</span><span class="p">)</span> <span class="o">-</span>
+            <span class="n">colebrook</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">darcy_friction_factor</span> <span class="o">-</span> <span class="n">d</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">d</span><span class="p">)</span></div>
+
+<span class="c1"># %%</span>
+
+
+<div class="viewcode-block" id="modify_path_os"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.helpers.modify_path_os">[docs]</a><span class="k">def</span> <span class="nf">modify_path_os</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Modify a path according the os.</span>
+
+<span class="sd">    Also detects weather the path specification is absolute or relative and</span>
+<span class="sd">    adjusts the path respectively.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path : str</span>
+<span class="sd">        Path to modify.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    path : str</span>
+<span class="sd">        Modified path.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;nt&#39;</span><span class="p">:</span>
+        <span class="c1"># windows</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="ow">and</span> <span class="n">path</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;:&#39;</span> <span class="ow">and</span> <span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;.&#39;</span><span class="p">:</span>
+            <span class="c1"># relative path</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="s1">&#39;.</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">path</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># linux, mac</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;/&#39;</span> <span class="ow">and</span> <span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;.&#39;</span><span class="p">:</span>
+            <span class="c1"># relative path</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="s1">&#39;./&#39;</span> <span class="o">+</span> <span class="n">path</span>
+
+    <span class="k">return</span> <span class="n">path</span></div>
+
+<span class="c1"># %%</span>
+
+
+<div class="viewcode-block" id="get_basic_path"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.helpers.get_basic_path">[docs]</a><span class="k">def</span> <span class="nf">get_basic_path</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return the basic tespy path and creates it if necessary.</span>
+
+<span class="sd">    The basic path is the &#39;.tespy&#39; folder in the $HOME directory.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">basicpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">),</span> <span class="s1">&#39;.tespy&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">basicpath</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">basicpath</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">basicpath</span></div>
+
+
+<div class="viewcode-block" id="extend_basic_path"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.helpers.extend_basic_path">[docs]</a><span class="k">def</span> <span class="nf">extend_basic_path</span><span class="p">(</span><span class="n">subfolder</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a path based on the basic tespy path and creates it if necessary.</span>
+
+<span class="sd">    The subfolder is the name of the path extension.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">extended_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">get_basic_path</span><span class="p">(),</span> <span class="n">subfolder</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">extended_path</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">extended_path</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">extended_path</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2020, Francesco Witte.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

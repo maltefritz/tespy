@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>v0.3.0 - Mayer’s Merit (May, 21, 2020) &mdash; tespy 0.6.0 - Colored Chemicals documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> tespy
+            <img src="../_static/logo_tespy_mid.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.6.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Thermal Engineering Systems in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../first_steps.html">First steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials_examples.html">Examples and Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tespy_modules.html">TESPy modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tespy_analyses.html">Thermodynamic analyses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developing_tespy.html">Developing TESPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zliterature.html">Literature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">tespy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>v0.3.0 - Mayer’s Merit (May, 21, 2020)</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/whats_new/v0-3-0.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="v0-3-0-mayer-s-merit-may-21-2020">
+<h1>v0.3.0 - Mayer’s Merit (May, 21, 2020)<a class="headerlink" href="#v0-3-0-mayer-s-merit-may-21-2020" title="Permalink to this headline">¶</a></h1>
+<p>TESPy version 0.3.0 -
+<a class="reference external" href="https://en.wikipedia.org/wiki/Julius_von_Mayer">Mayer’s Merit</a> comes with a
+lot of new features and a publication in the Journal of Open Source Software.
+The paper is available at the website of the
+<a class="reference external" href="https://joss.theoj.org/papers/590b0b4767606bce4d0ebe397d4b7a4f">JOSS</a>.</p>
+<p>BibTeX citation:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@article</span><span class="p">{</span><span class="n">Witte2020</span><span class="p">,</span>
+    <span class="n">doi</span> <span class="o">=</span> <span class="p">{</span><span class="mf">10.21105</span><span class="o">/</span><span class="n">joss</span><span class="mf">.02178</span><span class="p">}</span>
+    <span class="n">year</span> <span class="o">=</span> <span class="p">{</span><span class="mi">2020</span><span class="p">},</span>
+    <span class="n">publisher</span> <span class="o">=</span> <span class="p">{</span><span class="n">The</span> <span class="n">Open</span> <span class="n">Journal</span><span class="p">},</span>
+    <span class="n">volume</span> <span class="o">=</span> <span class="p">{</span><span class="mi">5</span><span class="p">},</span>
+    <span class="n">number</span> <span class="o">=</span> <span class="p">{</span><span class="mi">49</span><span class="p">},</span>
+    <span class="n">pages</span> <span class="o">=</span> <span class="p">{</span><span class="mi">2178</span><span class="p">},</span>
+    <span class="n">author</span> <span class="o">=</span> <span class="p">{</span><span class="n">Francesco</span> <span class="n">Witte</span> <span class="ow">and</span> <span class="n">Ilja</span> <span class="n">Tuschy</span><span class="p">},</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="p">{{</span><span class="n">TESPy</span><span class="p">}:</span> <span class="p">{</span><span class="n">T</span><span class="p">}</span><span class="n">hermal</span> <span class="p">{</span><span class="n">E</span><span class="p">}</span><span class="n">ngineering</span> <span class="p">{</span><span class="n">S</span><span class="p">}</span><span class="n">ystems</span> <span class="ow">in</span> <span class="p">{</span><span class="n">P</span><span class="p">}</span><span class="n">ython</span><span class="p">},</span>
+    <span class="n">journal</span> <span class="o">=</span> <span class="p">{</span><span class="n">Journal</span> <span class="n">of</span> <span class="n">Open</span> <span class="n">Source</span> <span class="n">Software</span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<section id="new-features">
+<h2>New Features<a class="headerlink" href="#new-features" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Make entropy <code class="code docutils literal notranslate"><span class="pre">myconn.s.val</span></code> or <code class="code docutils literal notranslate"><span class="pre">myconn.s.val_SI</span></code> and specific
+volume <code class="code docutils literal notranslate"><span class="pre">myconn.vol.val</span></code> or <code class="code docutils literal notranslate"><span class="pre">myconn.vol.val_SI</span></code> respectively
+available after simulation
+(<a class="reference external" href="https://github.com/oemof/tespy/pull/172">PR #172</a>).</p></li>
+<li><p>Connections, components and busses are now easily accessible on every
+network. Connections now have a label, which can be specified individually,
+the default value of the label is given by the following logic.
+<code class="code docutils literal notranslate"><span class="pre">source:source_id_target:target_id</span></code>, where source and target are the
+labels of the connected components.</p>
+<p>Access the objects with:</p>
+<ul class="simple">
+<li><p>mynetwork.busses[‘mybuslabel’]</p></li>
+<li><p>mynetwork.components[‘mycomponentlabel’]</p></li>
+<li><p>mynetwork.connections[‘myconnectionlabel’]</p></li>
+</ul>
+<p>(<a class="reference external" href="https://github.com/oemof/tespy/pull/173">PR #173</a>)</p>
+</li>
+<li><p>Specification of the CoolProp back end is now possible. You can specify the
+back end by adding it in front of the fluid’s name on creating a network, for
+example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tespy.networks</span> <span class="kn">import</span> <span class="n">network</span>
+<span class="n">fluid_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;air&#39;</span><span class="p">,</span> <span class="s1">&#39;BICUBIC::water&#39;</span><span class="p">,</span> <span class="s1">&#39;INCOMP::DowQ&#39;</span><span class="p">]</span>
+<span class="n">network</span><span class="p">(</span><span class="n">fluids</span><span class="o">=</span><span class="n">fluid_list</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If you do not specify a back end <code class="code docutils literal notranslate"><span class="pre">HEOS</span></code> will be applied (as for
+<code class="code docutils literal notranslate"><span class="pre">air</span></code> in this example). This has been the case until now as well, thus
+no further changes are required to match an 0.2.x application to the
+0.3.x API. For all back ends available please refer to the
+<a class="reference internal" href="../tespy_modules.html#tespy-fluid-properties-label"><span class="std std-ref">fluid properties section</span></a>. To specify
+the fluid vector on a connection leave out the back end specification, e.g.:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">myconnection</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">fluid</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;DowQ&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;water&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;air&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>(<a class="reference external" href="https://github.com/oemof/tespy/pull/174">PR #174</a>).</p>
+</li>
+<li><p>Unsetting a value is now also possible using <code class="code docutils literal notranslate"><span class="pre">None</span></code> instead of
+<code class="code docutils literal notranslate"><span class="pre">np.nan</span></code> (<a class="reference external" href="https://github.com/oemof/tespy/pull/178">PR #178</a>).</p></li>
+<li><p>It is possible to choose a base for your components when adding them to a
+bus:</p>
+<blockquote>
+<div><ul>
+<li><p><code class="code docutils literal notranslate"><span class="pre">'component'</span></code>: This means, the efficiency definition of the bus is</p>
+<div class="math">
+<p><img src="../_images/math/d3dd1c78c4bd44feb57164ac606ab2b8ec5a78b3.png" alt="\eta=\frac{\dot{E}_\mathrm{bus}}{\dot{E}_\mathrm{component}}"/></p>
+</div></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">'bus'</span></code>: This means, the efficiency definition of the bus is</p>
+<div class="math">
+<p><img src="../_images/math/32ca69f671d568fbfa741e67ef703346537711f4.png" alt="\eta=\frac{\dot{E}_\mathrm{component}}{\dot{E}_\mathrm{bus}}"/></p>
+</div></li>
+</ul>
+</div></blockquote>
+<p>These definitions also apply to the characteristic line usage. The default
+setting (if you do not specify the base) uses <code class="code docutils literal notranslate"><span class="pre">'base':</span> <span class="pre">'component'</span></code>.
+You therefore do not need do adapt your scripts regarding this change. For
+an example of the bus usage see the examples section below
+(<a class="reference external" href="https://github.com/oemof/tespy/pull/157">PR #157</a>).</p>
+</li>
+<li><p>Within the busses’ printouts the efficiency of every component on the
+respective bus is displayed. Additionally, it is possible to get the
+bus value and the efficiency of a specific component on a specific bus.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>to get the bus value use <code class="code docutils literal notranslate"><span class="pre">mycomp.calc_bus_value(mybus)</span></code> and</p></li>
+<li><p>to get the efficiency use <code class="code docutils literal notranslate"><span class="pre">mycomp.calc_bus_efficiency(mybus)</span></code></p></li>
+</ul>
+</div></blockquote>
+<p>where <code class="code docutils literal notranslate"><span class="pre">mycomp</span></code> is a component object and <code class="code docutils literal notranslate"><span class="pre">mybus</span></code> is a bus the
+component has been added to
+(<a class="reference external" href="https://github.com/oemof/tespy/pull/157">PR #157</a>).</p>
+</li>
+<li><p>New component <a class="reference internal" href="../api/tespy.components.html#module-tespy.components.nodes.droplet_separator" title="tespy.components.nodes.droplet_separator"><code class="xref py py-class docutils literal notranslate"><span class="pre">tespy.components.nodes.droplet_separator</span></code></a> for
+separation of a single fluid in two phase state into saturated gas and
+saturated liquid phase. An example is given in the docstrings of the class
+documentation (<a class="reference external" href="https://github.com/oemof/tespy/pull/186">PR #186</a>).</p></li>
+<li><p>New component <a class="reference internal" href="../api/tespy.components.html#module-tespy.components.heat_exchangers.parabolic_trough" title="tespy.components.heat_exchangers.parabolic_trough"><code class="xref py py-class docutils literal notranslate"><span class="pre">tespy.components.heat_exchangers.parabolic_trough</span></code></a>
+for concentrated solar power simulation. An example is given in the
+docstrings of the class documentation
+(<a class="reference external" href="https://github.com/oemof/tespy/pull/191">PR #191</a>).</p></li>
+<li><p>New property <code class="code docutils literal notranslate"><span class="pre">min_iter</span></code> of the
+<code class="xref py py-class docutils literal notranslate"><span class="pre">tespy.networks.networks.network</span></code> class, allowing to specify the
+minimum amount of iterations before a solution is accepted
+(<a class="reference external" href="https://github.com/oemof/tespy/pull/197">PR #197</a>).</p></li>
+</ul>
+</section>
+<section id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Documentation has been updated according to the API-changes.</p></li>
+<li><p>Fixed many typos on the online-documentation.</p></li>
+</ul>
+</section>
+<section id="parameter-renaming">
+<h2>Parameter renaming<a class="headerlink" href="#parameter-renaming" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Adding components to a bus now requires <code class="code docutils literal notranslate"><span class="pre">'comp'</span></code> instead of <code class="code docutils literal notranslate"><span class="pre">'c'</span></code>
+and <code class="code docutils literal notranslate"><span class="pre">'param'</span></code> instead of <code class="code docutils literal notranslate"><span class="pre">'p'</span></code>
+(<a class="reference external" href="https://github.com/oemof/tespy/pull/157">PR #157</a>).</p></li>
+<li><p>The former parameter <code class="code docutils literal notranslate"><span class="pre">kA</span></code> has been renamed to <code class="code docutils literal notranslate"><span class="pre">kA_char</span></code> as the
+behavior in offdesign was following a characteristic instead of a constant
+value. Additionally a new parameter <code class="code docutils literal notranslate"><span class="pre">kA</span></code> has been implemented, which
+represents a specified constant value for <code class="code docutils literal notranslate"><span class="pre">kA</span></code> in both design and
+offdesign cases (<a class="reference external" href="https://github.com/oemof/tespy/pull/199">PR #199</a>).</p></li>
+</ul>
+</section>
+<section id="testing">
+<h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Move from nose to pytest
+(<a class="reference external" href="https://github.com/oemof/tespy/pull/165">PR #165</a>).</p></li>
+<li><p>Add fluid property test for a mixture of a tespy_fluid with a third
+fluid and a mixture of the same individual fluids
+(<a class="reference external" href="https://github.com/oemof/tespy/pull/174">PR #174</a>).</p></li>
+<li><p>Add a gasturbine model test for comparison of the stoichiometric combustion
+chamber with the standard combustion chamber
+(<a class="reference external" href="https://github.com/oemof/tespy/pull/174">PR #174</a>).</p></li>
+<li><p>Add bus tests for efficiency definitions
+(<a class="reference external" href="https://github.com/oemof/tespy/pull/157">PR #157</a>).</p></li>
+<li><p>Add Python 3.8, PEP and documentation build tests
+(<a class="reference external" href="https://github.com/oemof/tespy/pull/201">PR #201</a>).</p></li>
+</ul>
+</section>
+<section id="bug-fixes">
+<h2>Bug fixes<a class="headerlink" href="#bug-fixes" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Increase the number of support points for tespy_fluid tabular data creation
+in order to lift accuracy to a more acceptable value
+(<a class="reference external" href="https://github.com/oemof/tespy/pull/174">PR #174</a>).</p></li>
+<li><p>Fix the default characteristic line for compressor isentropic efficiency: The
+line did not have an intersection with the point 1/1
+(<a class="reference external" href="https://github.com/oemof/tespy/pull/196">PR #196</a>).</p></li>
+<li><p>If a temperature value of a mixture was not found within the maximum number
+of newton iterations in the <a class="reference internal" href="../api/tespy.tools.html#module-tespy.tools.fluid_properties" title="tespy.tools.fluid_properties"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tespy.tools.fluid_properties</span></code></a> module,
+the wrong value was still displayed in the output without a warning. In this
+case, the value will be <code class="code docutils literal notranslate"><span class="pre">nan</span></code> in the future and a warning message is
+displayed (<a class="reference external" href="https://github.com/oemof/tespy/pull/200">PR #200</a>).</p></li>
+</ul>
+</section>
+<section id="other-changes">
+<h2>Other changes<a class="headerlink" href="#other-changes" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Improve naming in networks, components and connections modules
+(<a class="reference external" href="https://github.com/oemof/tespy/pull/172">PR #172</a>,
+<a class="reference external" href="https://github.com/oemof/tespy/pull/175">PR #175</a>).</p></li>
+<li><p>The Parameter <code class="code docutils literal notranslate"><span class="pre">T_range</span></code> of networks is deprecated. The fluid property
+calls for mixtures have been modified to prevent errors when the temperature
+of the mixture is below the minimum or above the maximum temperature limit of
+a component of the mixture
+(<a class="reference external" href="https://github.com/oemof/tespy/pull/200">PR #200</a>).</p></li>
+<li><p>Restructure package skeleton
+(<a class="reference external" href="https://github.com/oemof/tespy/pull/201">PR #201</a>).</p></li>
+</ul>
+</section>
+<section id="changes-in-the-api">
+<h2>Changes in the API<a class="headerlink" href="#changes-in-the-api" title="Permalink to this headline">¶</a></h2>
+<p>The changes affect</p>
+<ul class="simple">
+<li><p>reading design point information from the <code class="code docutils literal notranslate"><span class="pre">design_path</span></code></p></li>
+<li><p>reading starting value information from the <code class="code docutils literal notranslate"><span class="pre">init_path</span></code></p></li>
+<li><p>and loading networks with the network reader’s
+<a class="reference internal" href="../api/tespy.networks.html#tespy.networks.network_reader.load_network" title="tespy.networks.network_reader.load_network"><code class="xref py py-meth docutils literal notranslate"><span class="pre">tespy.networks.network_reader.load_network()</span></code></a> method.</p></li>
+</ul>
+<p>Data generated in older versions of TESPy can not be imported. In order to fix
+this follow the steps below.</p>
+<ul class="simple">
+<li><p>rename the <code class="code docutils literal notranslate"><span class="pre">comps</span></code> folder to <code class="code docutils literal notranslate"><span class="pre">components</span></code></p></li>
+<li><p>rename the <code class="code docutils literal notranslate"><span class="pre">conns.csv</span></code> file to <code class="code docutils literal notranslate"><span class="pre">connections.csv</span></code></p></li>
+</ul>
+<p>and within the file rename the columns</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">s</span></code> to <code class="code docutils literal notranslate"><span class="pre">source</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">s_id</span></code> to <code class="code docutils literal notranslate"><span class="pre">source_id</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">t</span></code> to <code class="code docutils literal notranslate"><span class="pre">target</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">t_id</span></code> to <code class="code docutils literal notranslate"><span class="pre">target_id</span></code></p></li>
+</ul>
+<p>If you want to use the network reader,</p>
+<ul class="simple">
+<li><p>create a <code class="code docutils literal notranslate"><span class="pre">network.json</span></code> file.</p></li>
+<li><p>add the desired contents as listed below.</p></li>
+</ul>
+<p>The fluids are represented in a dictionary containing the fluid’s names as keys
+and the CoolProp back end as value. <code class="code docutils literal notranslate"><span class="pre">&quot;HEOS&quot;</span></code> is the default back end,
+which has been used until version 0.2.x in TESPy.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;fluids&quot;</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;CO2&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;TTSE&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;O2&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;HEOS&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;N2&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;BICUBIC&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;T_unit&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;C&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;h_unit&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;kJ / kg&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;m_unit&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;kg / s&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;h_range&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">150</span><span class="p">,</span><span class="w"> </span><span class="mi">3000</span><span class="p">]</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Due to the addition of the CoolProp back end selection the
+<code class="xref py py-class docutils literal notranslate"><span class="pre">tespy.components.combustion.stoichiometric</span></code> API changed
+as well. Please refer to the
+<span class="xref std std-ref">combustion chamber tutorial</span> for the
+new implementation.</p>
+<p>If you are having trouble applying these changes, you are welcome to open an
+issue on our <a class="reference external" href="https://github.com/oemof/tespy/issues">github repository</a>.</p>
+</section>
+<section id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<p>We have added a code example below to underline the changes regarding the bus
+usage. Simply, a pump is connected to a source and a sink. The pump’s
+efficiency and pressure rise are defined. We define three different busses
+and add the pump to these busses with a given efficiency value of <code class="code docutils literal notranslate"><span class="pre">0.95</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="n">pump</span><span class="p">,</span> <span class="n">sink</span><span class="p">,</span> <span class="n">source</span>
+<span class="kn">from</span> <span class="nn">tespy.connections</span> <span class="kn">import</span> <span class="n">bus</span><span class="p">,</span> <span class="n">connection</span>
+<span class="kn">from</span> <span class="nn">tespy.networks</span> <span class="kn">import</span> <span class="n">network</span>
+
+<span class="n">nw</span> <span class="o">=</span> <span class="n">network</span><span class="p">(</span><span class="n">fluids</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;H2O&#39;</span><span class="p">],</span> <span class="n">p_unit</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="n">T_unit</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">)</span>
+
+<span class="n">si</span> <span class="o">=</span> <span class="n">sink</span><span class="p">(</span><span class="s1">&#39;sink&#39;</span><span class="p">)</span>
+<span class="n">so</span> <span class="o">=</span> <span class="n">source</span><span class="p">(</span><span class="s1">&#39;source&#39;</span><span class="p">)</span>
+<span class="n">pu</span> <span class="o">=</span> <span class="n">pump</span><span class="p">(</span><span class="s1">&#39;pump&#39;</span><span class="p">)</span>
+
+<span class="n">so_pu</span> <span class="o">=</span> <span class="n">connection</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">pu</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+<span class="n">pu_si</span> <span class="o">=</span> <span class="n">connection</span><span class="p">(</span><span class="n">pu</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">si</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+
+<span class="n">nw</span><span class="o">.</span><span class="n">add_conns</span><span class="p">(</span><span class="n">so_pu</span><span class="p">,</span> <span class="n">pu_si</span><span class="p">)</span>
+
+<span class="n">bus1</span> <span class="o">=</span> <span class="n">bus</span><span class="p">(</span><span class="s1">&#39;bus 1&#39;</span><span class="p">)</span>
+<span class="n">bus1</span><span class="o">.</span><span class="n">add_comps</span><span class="p">({</span><span class="s1">&#39;comp&#39;</span><span class="p">:</span> <span class="n">pu</span><span class="p">,</span> <span class="s1">&#39;char&#39;</span><span class="p">:</span> <span class="mf">0.95</span><span class="p">,</span> <span class="s1">&#39;base&#39;</span><span class="p">:</span> <span class="s1">&#39;bus&#39;</span><span class="p">})</span>
+
+<span class="c1"># this yields a bus value smaller than the component value!!</span>
+<span class="n">bus2</span> <span class="o">=</span> <span class="n">bus</span><span class="p">(</span><span class="s1">&#39;bus 2&#39;</span><span class="p">)</span>
+<span class="n">bus2</span><span class="o">.</span><span class="n">add_comps</span><span class="p">({</span><span class="s1">&#39;comp&#39;</span><span class="p">:</span> <span class="n">pu</span><span class="p">,</span> <span class="s1">&#39;char&#39;</span><span class="p">:</span> <span class="mf">0.95</span><span class="p">,</span> <span class="s1">&#39;base&#39;</span><span class="p">:</span> <span class="s1">&#39;component&#39;</span><span class="p">})</span>
+
+<span class="n">bus3</span> <span class="o">=</span> <span class="n">bus</span><span class="p">(</span><span class="s1">&#39;bus 3&#39;</span><span class="p">)</span>
+<span class="n">bus3</span><span class="o">.</span><span class="n">add_comps</span><span class="p">({</span><span class="s1">&#39;comp&#39;</span><span class="p">:</span> <span class="n">pu</span><span class="p">,</span> <span class="s1">&#39;char&#39;</span><span class="p">:</span> <span class="mi">1</span> <span class="o">/</span> <span class="mf">0.95</span><span class="p">,</span> <span class="s1">&#39;base&#39;</span><span class="p">:</span> <span class="s1">&#39;component&#39;</span><span class="p">})</span>
+
+<span class="n">nw</span><span class="o">.</span><span class="n">add_busses</span><span class="p">(</span><span class="n">bus1</span><span class="p">,</span> <span class="n">bus2</span><span class="p">,</span> <span class="n">bus3</span><span class="p">)</span>
+
+<span class="n">so_pu</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">fluid</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;H2O&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span> <span class="n">m</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">pu_si</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="n">pu</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">eta_s</span><span class="o">=</span><span class="mf">0.75</span><span class="p">)</span>
+
+<span class="n">nw</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="s1">&#39;design&#39;</span><span class="p">)</span>
+<span class="n">nw</span><span class="o">.</span><span class="n">print_results</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>As you can see, the components value of the bus will always be the same. Due to
+the efficiency definitions as mentioned in the new features, the bus value of
+bus3 and bus1 are identical. bus3 implements the method applied so far (in case
+of a motor at least) and bus1 implements the new efficiency definition based on
+the bus value. For bus2 the efficiency definition is based on the component,
+thus the bus value is lower than the component value (which would be great in
+case of a motor, but unfortunately some thermodynamic experts may have issues
+with that…).</p>
+</section>
+<section id="contributors">
+<h2>Contributors<a class="headerlink" href="#contributors" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Francesco Witte (<a class="reference external" href="https://github.com/fwitte">&#64;fwitte</a>)</p></li>
+<li><p><a class="reference external" href="https://github.com/jfreissmann">&#64;jfreissmann</a></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2020, Francesco Witte.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

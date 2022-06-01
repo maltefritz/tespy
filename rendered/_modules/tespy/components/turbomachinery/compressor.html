@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tespy.components.turbomachinery.compressor &mdash; tespy 0.6.0 - Colored Chemicals documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../../index.html" class="icon icon-home"> tespy
+            <img src="../../../../_static/logo_tespy_mid.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.6.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../introduction.html">Thermal Engineering Systems in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installation and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../first_steps.html">First steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials_examples.html">Examples and Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tespy_modules.html">TESPy modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tespy_analyses.html">Thermodynamic analyses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../developing_tespy.html">Developing TESPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../zliterature.html">Literature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">tespy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+      <li>tespy.components.turbomachinery.compressor</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for tespy.components.turbomachinery.compressor</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8</span>
+
+<span class="sd">&quot;&quot;&quot;Module of class Compressor.</span>
+
+
+<span class="sd">This file is part of project TESPy (github.com/oemof/tespy). It&#39;s copyrighted</span>
+<span class="sd">by the contributors recorded in the version control history of the file,</span>
+<span class="sd">available from its original location</span>
+<span class="sd">tespy/components/turbomachinery/compressor.py</span>
+
+<span class="sd">SPDX-License-Identifier: MIT</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">tespy.components.component</span> <span class="kn">import</span> <span class="n">Component</span>
+<span class="kn">from</span> <span class="nn">tespy.components.turbomachinery.base</span> <span class="kn">import</span> <span class="n">Turbomachine</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.data_containers</span> <span class="kn">import</span> <span class="n">ComponentCharacteristicMaps</span> <span class="k">as</span> <span class="n">dc_cm</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.data_containers</span> <span class="kn">import</span> <span class="n">ComponentCharacteristics</span> <span class="k">as</span> <span class="n">dc_cc</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.data_containers</span> <span class="kn">import</span> <span class="n">ComponentProperties</span> <span class="k">as</span> <span class="n">dc_cp</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.data_containers</span> <span class="kn">import</span> <span class="n">GroupedComponentProperties</span> <span class="k">as</span> <span class="n">dc_gcp</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.document_models</span> <span class="kn">import</span> <span class="n">generate_latex_eq</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.fluid_properties</span> <span class="kn">import</span> <span class="n">T_mix_ph</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.fluid_properties</span> <span class="kn">import</span> <span class="n">isentropic</span>
+
+
+<div class="viewcode-block" id="Compressor"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.turbomachinery.compressor.Compressor">[docs]</a><span class="k">class</span> <span class="nc">Compressor</span><span class="p">(</span><span class="n">Turbomachine</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for axial or radial compressor.</span>
+
+<span class="sd">    **Mandatory Equations**</span>
+
+<span class="sd">    - :py:meth:`tespy.components.component.Component.fluid_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.component.Component.mass_flow_func`</span>
+
+<span class="sd">    **Optional Equations**</span>
+
+<span class="sd">    - :py:meth:`tespy.components.component.Component.pr_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.turbomachinery.base.Turbomachine.energy_balance_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.turbomachinery.compressor.Compressor.eta_s_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.turbomachinery.compressor.Compressor.eta_s_char_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.turbomachinery.compressor.Compressor.char_map_eta_s_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.turbomachinery.compressor.Compressor.char_map_pr_func`</span>
+
+<span class="sd">    Inlets/Outlets</span>
+
+<span class="sd">    - in1</span>
+<span class="sd">    - out1</span>
+
+<span class="sd">    Image</span>
+
+<span class="sd">    .. image:: _images/Compressor.svg</span>
+<span class="sd">       :alt: alternative text</span>
+<span class="sd">       :align: center</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    label : str</span>
+<span class="sd">        The label of the component.</span>
+
+<span class="sd">    design : list</span>
+<span class="sd">        List containing design parameters (stated as String).</span>
+
+<span class="sd">    offdesign : list</span>
+<span class="sd">        List containing offdesign parameters (stated as String).</span>
+
+<span class="sd">    design_path : str</span>
+<span class="sd">        Path to the components design case.</span>
+
+<span class="sd">    local_offdesign : boolean</span>
+<span class="sd">        Treat this component in offdesign mode in a design calculation.</span>
+
+<span class="sd">    local_design : boolean</span>
+<span class="sd">        Treat this component in design mode in an offdesign calculation.</span>
+
+<span class="sd">    char_warnings : boolean</span>
+<span class="sd">        Ignore warnings on default characteristics usage for this component.</span>
+
+<span class="sd">    printout : boolean</span>
+<span class="sd">        Include this component in the network&#39;s results printout.</span>
+
+<span class="sd">    P : float, dict</span>
+<span class="sd">        Power, :math:`P/\text{W}`</span>
+
+<span class="sd">    eta_s : float, dict</span>
+<span class="sd">        Isentropic efficiency, :math:`\eta_s/1`</span>
+
+<span class="sd">    pr : float, dict, :code:`&quot;var&quot;`</span>
+<span class="sd">        Outlet to inlet pressure ratio, :math:`pr/1`</span>
+
+<span class="sd">    eta_s_char : tespy.tools.characteristics.CharLine, dict</span>
+<span class="sd">        Characteristic curve for isentropic efficiency, provide CharLine as</span>
+<span class="sd">        function :code:`func`.</span>
+
+<span class="sd">    char_map : tespy.tools.characteristics.CharMap, dict</span>
+<span class="sd">        Characteristic map for pressure rise and isentropic efficiency vs.</span>
+<span class="sd">        nondimensional mass flow, see</span>
+<span class="sd">        :py:class:`tespy.tools.characteristics.CharMap` for further</span>
+<span class="sd">        information. Provide a CompressorMap as function :code:`func`.</span>
+
+<span class="sd">    igva : float, dict, :code:`&quot;var&quot;`</span>
+<span class="sd">        Inlet guide vane angle, :math:`igva/^\circ`.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    Create an air compressor model and calculate the power required for</span>
+<span class="sd">    compression of 50 l/s of ambient air to 5 bars. Using a generic compressor</span>
+<span class="sd">    map how does the efficiency change in different operation mode (e.g. 90 %</span>
+<span class="sd">    of nominal volumetric flow)?</span>
+
+<span class="sd">    &gt;&gt;&gt; from tespy.components import Sink, Source, Compressor</span>
+<span class="sd">    &gt;&gt;&gt; from tespy.connections import Connection</span>
+<span class="sd">    &gt;&gt;&gt; from tespy.networks import Network</span>
+<span class="sd">    &gt;&gt;&gt; import shutil</span>
+<span class="sd">    &gt;&gt;&gt; fluid_list = [&#39;air&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; nw = Network(fluids=fluid_list, p_unit=&#39;bar&#39;, T_unit=&#39;C&#39;,</span>
+<span class="sd">    ... h_unit=&#39;kJ / kg&#39;, v_unit=&#39;l / s&#39;, iterinfo=False)</span>
+<span class="sd">    &gt;&gt;&gt; si = Sink(&#39;sink&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; so = Source(&#39;source&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; comp = Compressor(&#39;compressor&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; comp.component()</span>
+<span class="sd">    &#39;compressor&#39;</span>
+<span class="sd">    &gt;&gt;&gt; inc = Connection(so, &#39;out1&#39;, comp, &#39;in1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; outg = Connection(comp, &#39;out1&#39;, si, &#39;in1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; nw.add_conns(inc, outg)</span>
+
+<span class="sd">    Specify the compressor parameters: nominal efficiency and pressure ratio.</span>
+<span class="sd">    For offdesign mode the characteristic map is selected instead of the</span>
+<span class="sd">    isentropic efficiency. For offdesign, the inlet guide vane angle should be</span>
+<span class="sd">    variable in order to maintain the same pressure ratio at a different</span>
+<span class="sd">    volumetric flow.</span>
+
+<span class="sd">    &gt;&gt;&gt; comp.set_attr(pr=5, eta_s=0.8, design=[&#39;eta_s&#39;],</span>
+<span class="sd">    ... offdesign=[&#39;char_map_pr&#39;, &#39;char_map_eta_s&#39;])</span>
+<span class="sd">    &gt;&gt;&gt; inc.set_attr(fluid={&#39;air&#39;: 1}, p=1, T=20, v=50)</span>
+<span class="sd">    &gt;&gt;&gt; nw.solve(&#39;design&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; nw.save(&#39;tmp&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; round(comp.P.val, 0)</span>
+<span class="sd">    12772.0</span>
+<span class="sd">    &gt;&gt;&gt; inc.set_attr(v=45)</span>
+<span class="sd">    &gt;&gt;&gt; comp.set_attr(igva=&#39;var&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; nw.solve(&#39;offdesign&#39;, design_path=&#39;tmp&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; round(comp.eta_s.val, 2)</span>
+<span class="sd">    0.77</span>
+<span class="sd">    &gt;&gt;&gt; shutil.rmtree(&#39;./tmp&#39;, ignore_errors=True)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Compressor.component"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.turbomachinery.compressor.Compressor.component">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">component</span><span class="p">():</span>
+        <span class="k">return</span> <span class="s1">&#39;compressor&#39;</span></div>
+
+<div class="viewcode-block" id="Compressor.get_variables"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.turbomachinery.compressor.Compressor.get_variables">[docs]</a>    <span class="k">def</span> <span class="nf">get_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;P&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(</span>
+                <span class="n">min_val</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_eq</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">deriv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">energy_balance_deriv</span><span class="p">,</span>
+                <span class="n">func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">energy_balance_func</span><span class="p">,</span>
+                <span class="n">latex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">energy_balance_func_doc</span><span class="p">),</span>
+            <span class="s1">&#39;eta_s&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(</span>
+                <span class="n">min_val</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_val</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_eq</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">deriv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">eta_s_deriv</span><span class="p">,</span>
+                <span class="n">func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">eta_s_func</span><span class="p">,</span> <span class="n">latex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">eta_s_func_doc</span><span class="p">),</span>
+            <span class="s1">&#39;eta_s_char&#39;</span><span class="p">:</span> <span class="n">dc_cc</span><span class="p">(</span>
+                <span class="n">param</span><span class="o">=</span><span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="n">num_eq</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">deriv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">eta_s_char_deriv</span><span class="p">,</span>
+                <span class="n">func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">eta_s_char_func</span><span class="p">,</span> <span class="n">latex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">eta_s_char_func_doc</span><span class="p">),</span>
+            <span class="s1">&#39;pr&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(</span>
+                <span class="n">min_val</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_eq</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">deriv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pr_deriv</span><span class="p">,</span>
+                <span class="n">func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pr_func</span><span class="p">,</span> <span class="n">func_params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;pr&#39;</span><span class="p">:</span> <span class="s1">&#39;pr&#39;</span><span class="p">},</span>
+                <span class="n">latex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pr_func_doc</span><span class="p">),</span>
+            <span class="s1">&#39;igva&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(</span><span class="n">min_val</span><span class="o">=-</span><span class="mi">90</span><span class="p">,</span> <span class="n">max_val</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+            <span class="s1">&#39;char_map_eta_s&#39;</span><span class="p">:</span> <span class="n">dc_cm</span><span class="p">(),</span>
+            <span class="s1">&#39;char_map_eta_s_group&#39;</span><span class="p">:</span> <span class="n">dc_gcp</span><span class="p">(</span>
+                <span class="n">elements</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;char_map_eta_s&#39;</span><span class="p">,</span> <span class="s1">&#39;igva&#39;</span><span class="p">],</span> <span class="n">num_eq</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">latex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">char_map_eta_s_func_doc</span><span class="p">,</span>
+                <span class="n">func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">char_map_eta_s_func</span><span class="p">,</span>
+                <span class="n">deriv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">char_map_eta_s_deriv</span><span class="p">),</span>
+            <span class="s1">&#39;char_map_pr&#39;</span><span class="p">:</span> <span class="n">dc_cm</span><span class="p">(),</span>
+            <span class="s1">&#39;char_map_pr_group&#39;</span><span class="p">:</span> <span class="n">dc_gcp</span><span class="p">(</span>
+                <span class="n">elements</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;char_map_pr&#39;</span><span class="p">,</span> <span class="s1">&#39;igva&#39;</span><span class="p">],</span>
+                <span class="n">deriv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">char_map_pr_deriv</span><span class="p">,</span> <span class="n">num_eq</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">char_map_pr_func</span><span class="p">,</span> <span class="n">latex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">char_map_pr_func_doc</span><span class="p">)</span>
+        <span class="p">}</span></div>
+
+<div class="viewcode-block" id="Compressor.eta_s_func"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.turbomachinery.compressor.Compressor.eta_s_func">[docs]</a>    <span class="k">def</span> <span class="nf">eta_s_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Equation for given isentropic efficiency of a compressor.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        residual : float</span>
+<span class="sd">            Residual value of equation.</span>
+
+<span class="sd">            .. math::</span>
+
+<span class="sd">                0 = -\left( h_{out} - h_{in} \right) \cdot \eta_{s} +</span>
+<span class="sd">                \left( h_{out,s} - h_{in} \right)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="o">-</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span> <span class="o">*</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">eta_s</span><span class="o">.</span><span class="n">val</span> <span class="o">+</span> <span class="p">(</span><span class="n">isentropic</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_flow</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_flow</span><span class="p">(),</span>
+                <span class="n">T0</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Compressor.eta_s_func_doc"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.turbomachinery.compressor.Compressor.eta_s_func_doc">[docs]</a>    <span class="k">def</span> <span class="nf">eta_s_func_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Equation for given isentropic efficiency of a compressor.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        label : str</span>
+<span class="sd">            Label for equation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        latex : str</span>
+<span class="sd">            LaTeX code of equations applied.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">latex</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;0 =-\left(h_\mathrm</span><span class="si">{out}</span><span class="s1">-h_\mathrm</span><span class="si">{in}</span><span class="s1">\right)\cdot&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\eta_\mathrm</span><span class="si">{s}</span><span class="s1">+\left(h_\mathrm{out,s}-h_\mathrm</span><span class="si">{in}</span><span class="s1">\right)&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">generate_latex_eq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latex</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Compressor.eta_s_deriv"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.turbomachinery.compressor.Compressor.eta_s_deriv">[docs]</a>    <span class="k">def</span> <span class="nf">eta_s_deriv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">increment_filter</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Partial derivatives for isentropic efficiency.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        increment_filter : ndarray</span>
+<span class="sd">            Matrix for filtering non-changing variables.</span>
+
+<span class="sd">        k : int</span>
+<span class="sd">            Position of derivatives in Jacobian matrix (k-th equation).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta_s_func</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">increment_filter</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">increment_filter</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">increment_filter</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">eta_s</span><span class="o">.</span><span class="n">val</span></div>
+
+<div class="viewcode-block" id="Compressor.eta_s_char_func"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.turbomachinery.compressor.Compressor.eta_s_char_func">[docs]</a>    <span class="k">def</span> <span class="nf">eta_s_char_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Equation for given isentropic efficiency characteristic.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        residual : float</span>
+<span class="sd">            Residual value of equation.</span>
+
+<span class="sd">            .. math::</span>
+
+<span class="sd">                0 = \left(h_{out}-h_{in}\right) \cdot \eta_{s,design}</span>
+<span class="sd">                \cdot f\left( expr \right) -\left( h_{out,s} - h_{in} \right)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta_s_char</span><span class="o">.</span><span class="n">param</span>
+        <span class="n">expr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_char_expr</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">eta_s_char</span><span class="o">.</span><span class="n">char_params</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">expr</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Please choose a valid parameter, you want to link the &#39;</span>
+                   <span class="s1">&#39;isentropic efficiency to at component &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">o</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">eta_s</span><span class="o">.</span><span class="n">design</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta_s_char</span><span class="o">.</span><span class="n">char_func</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span> <span class="o">*</span>
+            <span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="n">i</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">isentropic</span><span class="p">(</span>
+                <span class="n">i</span><span class="o">.</span><span class="n">get_flow</span><span class="p">(),</span> <span class="n">o</span><span class="o">.</span><span class="n">get_flow</span><span class="p">(),</span> <span class="n">T0</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span> <span class="o">-</span>
+                <span class="n">i</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Compressor.eta_s_char_func_doc"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.turbomachinery.compressor.Compressor.eta_s_char_func_doc">[docs]</a>    <span class="k">def</span> <span class="nf">eta_s_char_func_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Equation for given isentropic efficiency characteristic.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        label : str</span>
+<span class="sd">            Label for equation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        latex : str</span>
+<span class="sd">            LaTeX code of equations applied.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">latex</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;0=\left(h_\mathrm</span><span class="si">{out}</span><span class="s1">-h_\mathrm</span><span class="si">{in}</span><span class="s1">\right)\cdot&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\eta_\mathrm{s,design}\cdot f\left(X\right)-&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\left( h_{out,s} - h_</span><span class="si">{in}</span><span class="s1"> \right)&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">generate_latex_eq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latex</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Compressor.eta_s_char_deriv"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.turbomachinery.compressor.Compressor.eta_s_char_deriv">[docs]</a>    <span class="k">def</span> <span class="nf">eta_s_char_deriv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">increment_filter</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Partial derivatives for isentropic efficiency characteristic.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        increment_filter : ndarray</span>
+<span class="sd">            Matrix for filtering non-changing variables.</span>
+
+<span class="sd">        k : int</span>
+<span class="sd">            Position of derivatives in Jacobian matrix (k-th equation).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta_s_char_func</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">increment_filter</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">increment_filter</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">increment_filter</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">increment_filter</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">increment_filter</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Compressor.char_map_pr_func"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.turbomachinery.compressor.Compressor.char_map_pr_func">[docs]</a>    <span class="k">def</span> <span class="nf">char_map_pr_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate pressure ratio from characteristic map.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        residual : float</span>
+<span class="sd">            Residual value of equations.</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        - X: speedline index (rotational speed is constant)</span>
+<span class="sd">        - Y: nondimensional mass flow</span>
+<span class="sd">        - igva: variable inlet guide vane angle for value manipulation</span>
+<span class="sd">          according to :cite:`GasTurb2018`.</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            X = \sqrt{\frac{T_\mathrm{in,design}}{T_\mathrm{in}}}\\</span>
+<span class="sd">            Y = \frac{\dot{m}_\mathrm{in} \cdot p_\mathrm{in,design}}</span>
+<span class="sd">            {\dot{m}_\mathrm{in,design} \cdot p_\mathrm{in} \cdot X}\\</span>
+<span class="sd">            \vec{Y} = f\left(X,Y\right)\cdot\left(1-\frac{igva}{100}\right)\\</span>
+<span class="sd">            \vec{Z} = f\left(X,Y\right)\cdot\left(1-\frac{igva}{100}\right)\\</span>
+<span class="sd">            0 = \frac{p_{out} \cdot p_{in,design}}</span>
+<span class="sd">            {p_\mathrm{in} \cdot p_\mathrm{out,design}}-</span>
+<span class="sd">            f\left(Y,\vec{Y},\vec{Z}\right)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">o</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="n">T_mix_ph</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">get_flow</span><span class="p">(),</span> <span class="n">T0</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">design</span> <span class="o">/</span> <span class="n">T</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="n">i</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">design</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">design</span> <span class="o">*</span> <span class="n">i</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span>
+
+        <span class="n">yarr</span><span class="p">,</span> <span class="n">zarr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">char_map_pr</span><span class="o">.</span><span class="n">char_func</span><span class="o">.</span><span class="n">evaluate_x</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="c1"># value manipulation with igva</span>
+        <span class="n">yarr</span> <span class="o">*=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">igva</span><span class="o">.</span><span class="n">val</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="n">zarr</span> <span class="o">*=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">igva</span><span class="o">.</span><span class="n">val</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="n">pr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">char_map_pr</span><span class="o">.</span><span class="n">char_func</span><span class="o">.</span><span class="n">evaluate_y</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">yarr</span><span class="p">,</span> <span class="n">zarr</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">/</span> <span class="n">i</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">pr</span><span class="o">.</span><span class="n">design</span> <span class="o">-</span> <span class="n">pr</span></div>
+
+<div class="viewcode-block" id="Compressor.char_map_pr_func_doc"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.turbomachinery.compressor.Compressor.char_map_pr_func_doc">[docs]</a>    <span class="k">def</span> <span class="nf">char_map_pr_func_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get LaTeX equation for pressure ratio from characteristic map.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        label : str</span>
+<span class="sd">            Label for equation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        latex : str</span>
+<span class="sd">            LaTeX code of equations applied.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">latex</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;\begin</span><span class="si">{split}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;X = &amp;\sqrt{\frac{T_\mathrm{in,design}}{T_\mathrm</span><span class="si">{in}</span><span class="s1">}}</span><span class="se">\\</span><span class="s1">&#39;</span>
+            <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;Y = &amp;\frac{\dot</span><span class="si">{m}</span><span class="s1">_\mathrm</span><span class="si">{in}</span><span class="s1"> \cdot p_\mathrm{in,design}}&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;{\dot</span><span class="si">{m}</span><span class="s1">_\mathrm{in,design} \cdot p_\mathrm</span><span class="si">{in}</span><span class="s1"> \cdot X}</span><span class="se">\\</span><span class="s1">&#39;</span>
+            <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\vec</span><span class="si">{Y}</span><span class="s1"> = &amp;f\left(X,Y\right)\cdot\left(1-\frac</span><span class="si">{igva}{100}</span><span class="s1">\right)&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\vec</span><span class="si">{Z}</span><span class="s1"> = &amp;&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;f\left(X,Y\right)\cdot\left(1-\frac</span><span class="si">{igva}{100}</span><span class="s1">\right)</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;0 = &amp;\frac{p_\mathrm</span><span class="si">{out}</span><span class="s1"> \cdot p_\mathrm{in,design}}&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;{p_\mathrm</span><span class="si">{in}</span><span class="s1"> \cdot p_\mathrm{out,design}}-&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;f\left(Y,\vec</span><span class="si">{Y}</span><span class="s1">,\vec</span><span class="si">{Z}</span><span class="s1">\right)</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\end</span><span class="si">{split}</span><span class="s1">&#39;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">generate_latex_eq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latex</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Compressor.char_map_pr_deriv"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.turbomachinery.compressor.Compressor.char_map_pr_deriv">[docs]</a>    <span class="k">def</span> <span class="nf">char_map_pr_deriv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">increment_filter</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Partial derivatives for compressor map characteristic.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        increment_filter : ndarray</span>
+<span class="sd">            Matrix for filtering non-changing variables.</span>
+
+<span class="sd">        k : int</span>
+<span class="sd">            Position of derivatives in Jacobian matrix (k-th equation).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">char_map_pr_func</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">increment_filter</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">increment_filter</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">increment_filter</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">increment_filter</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">increment_filter</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">igva</span><span class="o">.</span><span class="n">is_var</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">igva</span><span class="o">.</span><span class="n">var_pos</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span>
+                <span class="n">f</span><span class="p">,</span> <span class="s1">&#39;igva&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Compressor.char_map_eta_s_func"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.turbomachinery.compressor.Compressor.char_map_eta_s_func">[docs]</a>    <span class="k">def</span> <span class="nf">char_map_eta_s_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate isentropic efficiency from characteristic map.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        residual : float</span>
+<span class="sd">            Residual value of equation.</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        - X: speedline index (rotational speed is constant)</span>
+<span class="sd">        - Y: nondimensional mass flow</span>
+<span class="sd">        - igva: variable inlet guide vane angle for value manipulation</span>
+<span class="sd">          according to :cite:`GasTurb2018`.</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            X = \sqrt{\frac{T_\mathrm{in,design}}{T_\mathrm{in}}}\\</span>
+<span class="sd">            Y = \frac{\dot{m}_\mathrm{in} \cdot p_\mathrm{in,design}}</span>
+<span class="sd">            {\dot{m}_\mathrm{in,design} \cdot p_\mathrm{in} \cdot X}\\</span>
+<span class="sd">            \vec{Y} = f\left(X,Y\right)\cdot\left(1-\frac{igva}{100}\right)\\</span>
+<span class="sd">            \vec{Z}=f\left(X,Y\right)\cdot\left(1-\frac{igva^2}{10000}\right)\\</span>
+<span class="sd">            0 = \frac{\eta_\mathrm{s}}{\eta_\mathrm{s,design}} -</span>
+<span class="sd">            f\left(Y,\vec{Y},\vec{Z}\right)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">o</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="n">T_mix_ph</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">get_flow</span><span class="p">(),</span> <span class="n">T0</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">design</span> <span class="o">/</span> <span class="n">T</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="n">i</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">design</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">design</span> <span class="o">*</span> <span class="n">i</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span>
+
+        <span class="n">yarr</span><span class="p">,</span> <span class="n">zarr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">char_map_eta_s</span><span class="o">.</span><span class="n">char_func</span><span class="o">.</span><span class="n">evaluate_x</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="c1"># value manipulation with igva</span>
+        <span class="n">yarr</span> <span class="o">*=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">igva</span><span class="o">.</span><span class="n">val</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="n">zarr</span> <span class="o">*=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">igva</span><span class="o">.</span><span class="n">val</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="mi">10000</span><span class="p">)</span>
+        <span class="n">eta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">char_map_eta_s</span><span class="o">.</span><span class="n">char_func</span><span class="o">.</span><span class="n">evaluate_y</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">yarr</span><span class="p">,</span> <span class="n">zarr</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">isentropic</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">get_flow</span><span class="p">(),</span> <span class="n">o</span><span class="o">.</span><span class="n">get_flow</span><span class="p">(),</span> <span class="n">T0</span><span class="o">=</span><span class="n">T</span><span class="p">)</span> <span class="o">-</span>
+             <span class="n">i</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="n">i</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta_s</span><span class="o">.</span><span class="n">design</span> <span class="o">-</span>
+            <span class="n">eta</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Compressor.char_map_eta_s_func_doc"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.turbomachinery.compressor.Compressor.char_map_eta_s_func_doc">[docs]</a>    <span class="k">def</span> <span class="nf">char_map_eta_s_func_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get LaTeX equation for isentropic efficiency from characteristic map.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        label : str</span>
+<span class="sd">            Label for equation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        latex : str</span>
+<span class="sd">            LaTeX code of equations applied.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">latex</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;\begin</span><span class="si">{split}</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;X = &amp;\sqrt{\frac{T_\mathrm{in,design}}{T_\mathrm</span><span class="si">{in}</span><span class="s1">}}</span><span class="se">\\</span><span class="s1">&#39;</span>
+            <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;Y = &amp;\frac{\dot</span><span class="si">{m}</span><span class="s1">_\mathrm</span><span class="si">{in}</span><span class="s1"> \cdot p_\mathrm{in,design}}&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;{\dot</span><span class="si">{m}</span><span class="s1">_\mathrm{in,design} \cdot p_\mathrm</span><span class="si">{in}</span><span class="s1"> \cdot X}</span><span class="se">\\</span><span class="s1">&#39;</span>
+            <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\vec</span><span class="si">{Y}</span><span class="s1"> = &amp;f\left(X,Y\right)\cdot\left(1-\frac</span><span class="si">{igva}{100}</span><span class="s1">\right)&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\vec</span><span class="si">{Z}</span><span class="s1"> = &amp;&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;f\left(X,Y\right)\cdot\left(1-\frac{igva^2}</span><span class="si">{10000}</span><span class="s1">\right)</span><span class="se">\\</span><span class="s1">&#39;</span>
+            <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;0 = &amp;\frac{\eta_\mathrm</span><span class="si">{s}</span><span class="s1">}{\eta_\mathrm{s,design}} -&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;f\left(Y,\vec</span><span class="si">{Y}</span><span class="s1">,\vec</span><span class="si">{Z}</span><span class="s1">\right)&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\end</span><span class="si">{split}</span><span class="s1">&#39;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">generate_latex_eq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latex</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Compressor.char_map_eta_s_deriv"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.turbomachinery.compressor.Compressor.char_map_eta_s_deriv">[docs]</a>    <span class="k">def</span> <span class="nf">char_map_eta_s_deriv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">increment_filter</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Partial derivatives for compressor map characteristic.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        increment_filter : ndarray</span>
+<span class="sd">            Matrix for filtering non-changing variables.</span>
+
+<span class="sd">        k : int</span>
+<span class="sd">            Position of derivatives in Jacobian matrix (k-th equation).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">char_map_eta_s_func</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">increment_filter</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">increment_filter</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">increment_filter</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">increment_filter</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">increment_filter</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">igva</span><span class="o">.</span><span class="n">is_var</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">igva</span><span class="o">.</span><span class="n">var_pos</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span>
+                <span class="n">f</span><span class="p">,</span> <span class="s1">&#39;igva&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Compressor.convergence_check"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.turbomachinery.compressor.Compressor.convergence_check">[docs]</a>    <span class="k">def</span> <span class="nf">convergence_check</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform a convergence check.</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        Manipulate enthalpies/pressure at inlet and outlet if not specified by</span>
+<span class="sd">        user to match physically feasible constraints.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">i</span><span class="p">,</span> <span class="n">o</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">val_set</span> <span class="ow">and</span> <span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">&lt;</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">val_SI</span><span class="p">:</span>
+            <span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">=</span> <span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="mf">1.1</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_set</span> <span class="ow">and</span> <span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">&lt;</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span><span class="p">:</span>
+            <span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">=</span> <span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="mf">1.1</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">val_set</span> <span class="ow">and</span> <span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">&lt;</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">val_SI</span><span class="p">:</span>
+            <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">=</span> <span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="mf">0.9</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_set</span> <span class="ow">and</span> <span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">&lt;</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span><span class="p">:</span>
+            <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">=</span> <span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="mf">0.9</span></div>
+
+<div class="viewcode-block" id="Compressor.initialise_Source"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.turbomachinery.compressor.Compressor.initialise_Source">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">initialise_Source</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a starting value for pressure and enthalpy at outlet.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        c : tespy.connections.connection.Connection</span>
+<span class="sd">            Connection to perform initialisation on.</span>
+
+<span class="sd">        key : str</span>
+<span class="sd">            Fluid property to retrieve.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        val : float</span>
+<span class="sd">            Starting value for pressure/enthalpy in SI units.</span>
+
+<span class="sd">            .. math::</span>
+
+<span class="sd">                val = \begin{cases}</span>
+<span class="sd">                10^6 &amp; \text{key = &#39;p&#39;}\\</span>
+<span class="sd">                6 \cdot 10^5 &amp; \text{key = &#39;h&#39;}</span>
+<span class="sd">                \end{cases}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;p&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">10e5</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;h&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">6e5</span></div>
+
+<div class="viewcode-block" id="Compressor.initialise_target"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.turbomachinery.compressor.Compressor.initialise_target">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">initialise_target</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a starting value for pressure and enthalpy at inlet.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        c : tespy.connections.connection.Connection</span>
+<span class="sd">            Connection to perform initialisation on.</span>
+
+<span class="sd">        key : str</span>
+<span class="sd">            Fluid property to retrieve.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        val : float</span>
+<span class="sd">            Starting value for pressure/enthalpy in SI units.</span>
+
+<span class="sd">            .. math::</span>
+
+<span class="sd">                val = \begin{cases}</span>
+<span class="sd">                10^5 &amp; \text{key = &#39;p&#39;}\\</span>
+<span class="sd">                4 \cdot 10^5 &amp; \text{key = &#39;h&#39;}</span>
+<span class="sd">                \end{cases}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;p&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">1e5</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;h&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">4e5</span></div>
+
+<div class="viewcode-block" id="Compressor.calc_parameters"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.turbomachinery.compressor.Compressor.calc_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">calc_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Postprocessing parameter calculation.&quot;&quot;&quot;</span>
+        <span class="n">Turbomachine</span><span class="o">.</span><span class="n">calc_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">eta_s</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">isentropic</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_flow</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_flow</span><span class="p">(),</span>
+                <span class="n">T0</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span> <span class="o">/</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Compressor.check_parameter_bounds"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.turbomachinery.compressor.Compressor.check_parameter_bounds">[docs]</a>    <span class="k">def</span> <span class="nf">check_parameter_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check parameter value limits.&quot;&quot;&quot;</span>
+        <span class="n">Component</span><span class="o">.</span><span class="n">check_parameter_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">char_map_pr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">char_map_eta_s</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">is_set</span><span class="p">:</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">design</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">design</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">design</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span>
+                <span class="n">yarr</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">char_func</span><span class="o">.</span><span class="n">get_domain_errors_x</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
+                <span class="n">yarr</span> <span class="o">*=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">igva</span><span class="o">.</span><span class="n">val</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span>
+                <span class="n">data</span><span class="o">.</span><span class="n">char_func</span><span class="o">.</span><span class="n">get_domain_errors_y</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">yarr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Compressor.exergy_balance"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.turbomachinery.compressor.Compressor.exergy_balance">[docs]</a>    <span class="k">def</span> <span class="nf">exergy_balance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">T0</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate exergy balance of a compressor.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        T0 : float</span>
+<span class="sd">            Ambient temperature T0 / K.</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        .. math::</span>
+
+<span class="sd">            \dot{E}_\mathrm{P} =</span>
+<span class="sd">            \begin{cases}</span>
+<span class="sd">            \dot{E}_\mathrm{out}^\mathrm{PH} - \dot{E}_\mathrm{in}^\mathrm{PH}</span>
+<span class="sd">            &amp; T_\mathrm{in}, T_\mathrm{out} \geq T_0\\</span>
+<span class="sd">            \dot{E}_\mathrm{out}^\mathrm{T} + \dot{E}_\mathrm{out}^\mathrm{M} -</span>
+<span class="sd">            \dot{E}_\mathrm{in}^\mathrm{M}</span>
+<span class="sd">            &amp; T_\mathrm{out} &gt; T_0 \leq T_\mathrm{in}\\</span>
+<span class="sd">            \dot{E}_\mathrm{out}^\mathrm{M} - \dot{E}_\mathrm{in}^\mathrm{M}</span>
+<span class="sd">            &amp; T_0 \geq T_\mathrm{in}, T_\mathrm{out}\\</span>
+<span class="sd">            \end{cases}</span>
+
+<span class="sd">            \dot{E}_\mathrm{F} =</span>
+<span class="sd">            \begin{cases}</span>
+<span class="sd">            P &amp; T_\mathrm{in}, T_\mathrm{out} \geq T_0\\</span>
+<span class="sd">            P + \dot{E}_\mathrm{in}^\mathrm{T}</span>
+<span class="sd">            &amp; T_\mathrm{out} &gt; T_0 \leq T_\mathrm{in}\\</span>
+<span class="sd">            P + \dot{E}_\mathrm{in}^\mathrm{T} -\dot{E}_\mathrm{out}^\mathrm{T}</span>
+<span class="sd">            &amp; T_0 \geq T_\mathrm{in}, T_\mathrm{out}\\</span>
+<span class="sd">            \end{cases}</span>
+
+<span class="sd">            \dot{E}_\mathrm{bus} = P</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">&gt;=</span> <span class="n">T0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">&gt;=</span> <span class="n">T0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">E_P</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_physical</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_physical</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">E_F</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">P</span><span class="o">.</span><span class="n">val</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">&lt;=</span> <span class="n">T0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">&gt;</span> <span class="n">T0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">E_P</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_therm</span> <span class="o">+</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_mech</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_mech</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">E_F</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">P</span><span class="o">.</span><span class="n">val</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_therm</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">&lt;=</span> <span class="n">T0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">&lt;=</span> <span class="n">T0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">E_P</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_mech</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_mech</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">E_F</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">P</span><span class="o">.</span><span class="n">val</span> <span class="o">+</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_therm</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_therm</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Exergy balance of a compressor, where outlet temperature &#39;</span>
+                   <span class="s1">&#39;is smaller than inlet temperature is not implmented.&#39;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">E_P</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">E_F</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">E_bus</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">P</span><span class="o">.</span><span class="n">val</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">E_D</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">E_F</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">E_P</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">E_P</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">E_F</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2020, Francesco Witte.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

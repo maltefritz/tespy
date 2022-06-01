@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Characteristics &mdash; tespy 0.6.0 - Colored Chemicals documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> tespy
+            <img src="../_static/logo_tespy_mid.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.6.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Thermal Engineering Systems in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../first_steps.html">First steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials_examples.html">Examples and Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tespy_modules.html">TESPy modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tespy_analyses.html">Thermodynamic analyses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developing_tespy.html">Developing TESPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zliterature.html">Literature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">tespy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Characteristics</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tespy_modules/characteristics.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="characteristics">
+<h1>Characteristics<a class="headerlink" href="#characteristics" title="Permalink to this headline">¶</a></h1>
+<p>In this part we give an introduction on the TESPy characteristics
+implementation. There two different types of characteristics available in
+TESPy: lines (<a class="reference internal" href="../api/tespy.tools.html#tespy.tools.characteristics.CharLine" title="tespy.tools.characteristics.CharLine"><code class="xref py py-class docutils literal notranslate"><span class="pre">CharLine</span></code></a>)
+and maps (<a class="reference internal" href="../api/tespy.tools.html#tespy.tools.characteristics.CharMap" title="tespy.tools.characteristics.CharMap"><code class="xref py py-class docutils literal notranslate"><span class="pre">CharMap</span></code></a>).
+The default characteristics available are to be found in the
+<a class="reference internal" href="../api/tespy.data.html#module-tespy.data" title="tespy.data"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tespy.data</span></code></a> module documentation.</p>
+<section id="characteristic-lines">
+<h2>Characteristic lines<a class="headerlink" href="#characteristic-lines" title="Permalink to this headline">¶</a></h2>
+<p>The characteristic lines use linear interpolation in order to determine the
+y-value given a x-value as input, where x is between the lower boundary
+<img class="math" src="../_images/math/ed7fb0260e58d3ca5851e823ff991dae4cde5671.png" alt="x_0"/> and the upper boundary <img class="math" src="../_images/math/5ea99039cd8359fa2e14317dbfae4497ebbc1360.png" alt="x_1"/>. <img class="math" src="../_images/math/c02d829cecb5c5b40b5a00db3dc936351b671e07.png" alt="y_0"/> and <img class="math" src="../_images/math/7a4a430067dab11b32cfcddbd7d7fd6b5f4d3070.png" alt="y_1"/> are
+the corresponding y-values.</p>
+<div class="math">
+<p><img src="../_images/math/d2f39b0c8f484e8f65e337dbcdf354cf83a89829.png" alt="y = y_0 + \frac{x-x_0}{x_1-x_0} \cdot \left(y_1-y_0 \right)"/></p>
+</div><p>It is possible to specify an <code class="code docutils literal notranslate"><span class="pre">extrapolate</span></code> parameter. If the value is
+<code class="code docutils literal notranslate"><span class="pre">False</span></code> (default state) and the x-value is above the maximum or below the
+minimum value of the characteristic line the y-value corresponding to the the
+maximum/minimum value is returned instead. If the <code class="code docutils literal notranslate"><span class="pre">extrapolate</span></code> is
+<code class="code docutils literal notranslate"><span class="pre">True</span></code> linear extrapolation is performed using the two lower most or
+upper most value pairs respectively.</p>
+</section>
+<section id="characteristic-maps">
+<h2>Characteristic maps<a class="headerlink" href="#characteristic-maps" title="Permalink to this headline">¶</a></h2>
+<p>The characteristic maps use linear interpolation as well. First step is
+interpolation on the x-dimension similar to the characteristic line
+functionality. As the y and z data are two-dimensional, <strong>each row of</strong>
+<strong>the data corresponds to one x value</strong>. Thus, the result of the first step is
+a vector for each dimension (y and z).</p>
+<div class="math">
+<p><img src="../_images/math/ce1ada96326f3c2e51dba9b1ee12931dc50b978d.png" alt="\vec{y} = \vec{y_0} + \frac{x-x_0}{x_1-x_0} \cdot \left(\vec{y_1}-
+\vec{y_0} \right)
+
+\vec{z} = \vec{z_0} + \frac{x-x_0}{x_1-x_0} \cdot \left(\vec{z_1}-
+\vec{z_0} \right)"/></p>
+</div><p>Using the y value as second input dimension the corresponding z values are
+calculated, again using linear interpolation.</p>
+<div class="math">
+<p><img src="../_images/math/cc5f18538dcc5fafd0981764c4081476e7ec3575.png" alt="z = z_0 + \frac{y-y_0}{y_1-y_0} \cdot \left(z_1-z_0 \right)"/></p>
+</div><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Using compressors map functions <img class="math" src="../_images/math/a97ade5554f751fe6d3de9db9892c75a19b1810a.png" alt="\vec{y}"/> and <img class="math" src="../_images/math/26169ee0e3152c0bdacb360597a5cbf8e8848f30.png" alt="\vec{z}"/> are
+manipulated with by the value of the inlet guide vane angle. Also see the
+corresponding methods
+<a class="reference internal" href="../api/tespy.components.html#tespy.components.turbomachinery.compressor.Compressor.char_map_eta_s_func" title="tespy.components.turbomachinery.compressor.Compressor.char_map_eta_s_func"><code class="xref py py-class docutils literal notranslate"><span class="pre">tespy.components.turbomachinery.compressor.Compressor.char_map_eta_s_func</span></code></a>
+and
+<a class="reference internal" href="../api/tespy.components.html#tespy.components.turbomachinery.compressor.Compressor.char_map_pr_func" title="tespy.components.turbomachinery.compressor.Compressor.char_map_pr_func"><code class="xref py py-class docutils literal notranslate"><span class="pre">tespy.components.turbomachinery.compressor.Compressor.char_map_pr_func</span></code></a>
+in the API documentation.</p>
+</div>
+</section>
+<section id="import-your-own-characteristics">
+<span id="import-custom-characteristics-label"></span><h2>Import your own characteristics<a class="headerlink" href="#import-your-own-characteristics" title="Permalink to this headline">¶</a></h2>
+<p>It is possible to import your own characteristic lines or maps instead of
+writing the x, y (and z) data into your python script, for example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tespy.tools.characteristics</span> <span class="kn">import</span> <span class="n">CharLine</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.characteristics</span> <span class="kn">import</span> <span class="n">load_custom_char</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.characteristics</span> <span class="kn">import</span> <span class="n">CharMap</span>
+
+<span class="n">gen_char</span> <span class="o">=</span> <span class="n">load_custom_char</span><span class="p">(</span><span class="s1">&#39;generator&#39;</span><span class="p">,</span> <span class="n">CharLine</span><span class="p">)</span>
+<span class="n">gen_char</span> <span class="o">=</span> <span class="n">load_custom_char</span><span class="p">(</span><span class="s1">&#39;custom_map&#39;</span><span class="p">,</span> <span class="n">CharMap</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For the imports to work in the way shown, navigate to your .tespy folder in
+your HOME directory <code class="code docutils literal notranslate"><span class="pre">HOME/.tespy</span></code>. Create a folder named <code class="code docutils literal notranslate"><span class="pre">data</span></code>, if
+it does not exist. In this folder, you can place two json-files for your
+characteristics.</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">char_lines.json</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">char_maps.json</span></code></p></li>
+</ul>
+<p>Your custom definitions of characteristic lines go into the
+<code class="code docutils literal notranslate"><span class="pre">char_lines.json</span></code> and your characteristic map definitions go into the
+<code class="code docutils literal notranslate"><span class="pre">char_maps.json</span></code> document.</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">char_lines.json</span></code> should have names for identification of the
+characteristic lines on the first level. On the second level the x and y data
+are assigned to the name of the characteristic line. The x and y data must be
+stated as list.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;name_of_char_line&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;x&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mf">1.5</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">],</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;y&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mf">0.8</span><span class="p">,</span><span class="w"> </span><span class="mf">0.9</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mf">1.1</span><span class="p">,</span><span class="w"> </span><span class="mf">1.2</span><span class="p">]</span><span class="w"></span>
+<span class="w">    </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;name_of_2nd_char_line&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;x&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mf">1.5</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">],</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;y&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mf">1.1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mf">1.2</span><span class="p">,</span><span class="w"> </span><span class="mf">1.7</span><span class="p">]</span><span class="w"></span>
+<span class="w">    </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;name_of_last_char_line&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;x&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mf">1.5</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">],</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;y&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mf">0.8</span><span class="p">,</span><span class="w"> </span><span class="mf">0.95</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mf">0.95</span><span class="p">,</span><span class="w"> </span><span class="mf">0.8</span><span class="p">]</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>The <code class="code docutils literal notranslate"><span class="pre">char_maps.json</span></code> should also have names for identification of the
+characteristic lines on the first level. On the second level we additionally
+need z data. The x data are a list of values, the y and z data are arrays with
+a list of values for each dimension of the x data. The example below has 3 x
+values, thus the y and z data must contain 3 sets of values.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;name_of_char_map&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;x&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mf">0.971</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mf">1.029</span><span class="p">],</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;y&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[[</span><span class="mf">0.93</span><span class="p">,</span><span class="w"> </span><span class="mf">0.943</span><span class="p">,</span><span class="w"> </span><span class="mf">0.953</span><span class="p">,</span><span class="w"> </span><span class="mf">0.961</span><span class="p">,</span><span class="w"> </span><span class="mf">0.962</span><span class="p">,</span><span class="w"> </span><span class="mf">0.963</span><span class="p">],</span><span class="w"></span>
+<span class="w">              </span><span class="p">[</span><span class="mf">0.987</span><span class="p">,</span><span class="w"> </span><span class="mf">0.995</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.002</span><span class="p">,</span><span class="w"> </span><span class="mf">1.005</span><span class="p">,</span><span class="w"> </span><span class="mf">1.005</span><span class="p">],</span><span class="w"></span>
+<span class="w">              </span><span class="p">[</span><span class="mf">1.02</span><span class="p">,</span><span class="w"> </span><span class="mf">1.023</span><span class="p">,</span><span class="w"> </span><span class="mf">1.026</span><span class="p">,</span><span class="mf">1.028</span><span class="p">,</span><span class="w"> </span><span class="mf">1.03</span><span class="p">,</span><span class="w"> </span><span class="mf">1.032</span><span class="p">]],</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;z&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[[</span><span class="mf">0.982</span><span class="p">,</span><span class="w"> </span><span class="mf">0.939</span><span class="p">,</span><span class="w"> </span><span class="mf">0.895</span><span class="p">,</span><span class="w"> </span><span class="mf">0.851</span><span class="p">,</span><span class="w"> </span><span class="mf">0.806</span><span class="p">,</span><span class="w"> </span><span class="mf">0.762</span><span class="p">],</span><span class="w"></span>
+<span class="w">               </span><span class="p">[</span><span class="mf">1.102</span><span class="p">,</span><span class="w"> </span><span class="mf">1.052</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.951</span><span class="p">,</span><span class="w"> </span><span class="mf">0.9</span><span class="p">,</span><span class="w"> </span><span class="mf">0.85</span><span class="p">],</span><span class="w"></span>
+<span class="w">               </span><span class="p">[</span><span class="mf">1.213</span><span class="p">,</span><span class="w"> </span><span class="mf">1.149</span><span class="p">,</span><span class="w"> </span><span class="mf">1.085</span><span class="p">,</span><span class="w"> </span><span class="mf">1.022</span><span class="p">,</span><span class="w"> </span><span class="mf">0.958</span><span class="p">,</span><span class="w"> </span><span class="mf">0.894</span><span class="p">]]</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2020, Francesco Witte.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tespy.tools.document_models &mdash; tespy 0.6.0 - Colored Chemicals documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> tespy
+            <img src="../../../_static/logo_tespy_mid.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.6.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../introduction.html">Thermal Engineering Systems in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../first_steps.html">First steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials_examples.html">Examples and Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tespy_modules.html">TESPy modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tespy_analyses.html">Thermodynamic analyses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developing_tespy.html">Developing TESPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../zliterature.html">Literature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">tespy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>tespy.tools.document_models</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for tespy.tools.document_models</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8</span>
+
+<span class="sd">&quot;&quot;&quot;Module for helper functions used by several other modules.</span>
+
+<span class="sd">This file is part of project TESPy (github.com/oemof/tespy). It&#39;s copyrighted</span>
+<span class="sd">by the contributors recorded in the version control history of the file,</span>
+<span class="sd">available from its original location tespy/tools/document_models.py</span>
+
+<span class="sd">SPDX-License-Identifier: MIT</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">date</span>
+
+<span class="kn">import</span> <span class="nn">CoolProp</span> <span class="k">as</span> <span class="nn">CP</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">tespy.tools</span> <span class="kn">import</span> <span class="n">helpers</span> <span class="k">as</span> <span class="n">hlp</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.data_containers</span> <span class="kn">import</span> <span class="n">ComponentCharacteristicMaps</span> <span class="k">as</span> <span class="n">dc_cm</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.data_containers</span> <span class="kn">import</span> <span class="n">ComponentCharacteristics</span> <span class="k">as</span> <span class="n">dc_cc</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.data_containers</span> <span class="kn">import</span> <span class="n">ComponentProperties</span> <span class="k">as</span> <span class="n">dc_cp</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.global_vars</span> <span class="kn">import</span> <span class="n">fluid_property_data</span> <span class="k">as</span> <span class="n">fpd</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.logger</span> <span class="kn">import</span> <span class="n">check_git_branch</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.logger</span> <span class="kn">import</span> <span class="n">check_version</span>
+
+
+<div class="viewcode-block" id="document_model"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.document_models.document_model">[docs]</a><span class="k">def</span> <span class="nf">document_model</span><span class="p">(</span><span class="n">nw</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s1">&#39;report&#39;</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s1">&#39;report.tex&#39;</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="p">{}):</span>
+    <span class="sd">&quot;&quot;&quot;Generate LaTeX documentation for a TESPy model.</span>
+
+<span class="sd">    - The documentation is stored at path/filename</span>
+<span class="sd">    - Generated figures are stored at path/figures/</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nw : tespy.networks.network.Network</span>
+<span class="sd">        Network instance to document.</span>
+
+<span class="sd">    path : str</span>
+<span class="sd">        Folder for the documentation, default :code:`report`.</span>
+
+<span class="sd">    filename : str</span>
+<span class="sd">        Desired filename for the LaTeX document, default :code:`report.tex`.</span>
+
+<span class="sd">    fmt : dict</span>
+<span class="sd">        Dictionary for formatting the report, for sample see respective</span>
+<span class="sd">        section in online documentation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># prepare filestructure</span>
+    <span class="k">if</span> <span class="n">path</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;/&#39;</span> <span class="ow">and</span> <span class="n">path</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">+=</span> <span class="s1">&#39;/&#39;</span>
+
+    <span class="n">path</span> <span class="o">=</span> <span class="n">hlp</span><span class="o">.</span><span class="n">modify_path_os</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">fig_path</span> <span class="o">=</span> <span class="n">hlp</span><span class="o">.</span><span class="n">modify_path_os</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="s1">&#39;figures/&#39;</span><span class="p">)</span>
+
+    <span class="c1"># create paths, if non existent</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">fig_path</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">fig_path</span><span class="p">)</span>
+
+    <span class="n">rpt</span> <span class="o">=</span> <span class="n">set_defaults</span><span class="p">(</span><span class="n">nw</span><span class="p">)</span>
+    <span class="n">rpt</span> <span class="o">=</span> <span class="n">hlp</span><span class="o">.</span><span class="n">merge_dicts</span><span class="p">(</span><span class="n">rpt</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
+
+    <span class="n">rpt</span><span class="p">[</span><span class="s1">&#39;path&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path</span>
+
+    <span class="n">latex</span> <span class="o">=</span> <span class="n">document_software_info</span><span class="p">(</span><span class="n">rpt</span><span class="p">)</span>
+    <span class="n">latex</span> <span class="o">+=</span> <span class="n">document_connections</span><span class="p">(</span><span class="n">nw</span><span class="p">,</span> <span class="n">rpt</span><span class="p">)</span>
+    <span class="n">latex</span> <span class="o">+=</span> <span class="n">document_ude</span><span class="p">(</span><span class="n">nw</span><span class="p">,</span> <span class="n">rpt</span><span class="p">[</span><span class="s1">&#39;path&#39;</span><span class="p">])</span>
+    <span class="n">latex</span> <span class="o">+=</span> <span class="n">document_components</span><span class="p">(</span><span class="n">nw</span><span class="p">,</span> <span class="n">rpt</span><span class="p">)</span>
+    <span class="n">latex</span> <span class="o">+=</span> <span class="n">document_busses</span><span class="p">(</span><span class="n">nw</span><span class="p">,</span> <span class="n">rpt</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">rpt</span><span class="p">[</span><span class="s1">&#39;latex_body&#39;</span><span class="p">]:</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\end</span><span class="si">{document}</span><span class="s1">&#39;</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">latex</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="set_defaults"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.document_models.set_defaults">[docs]</a><span class="k">def</span> <span class="nf">set_defaults</span><span class="p">(</span><span class="n">nw</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Set up defaults for report formatting.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nw : tespy.networks.network.Network</span>
+<span class="sd">        TESPy Network instance.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    rpt : dict</span>
+<span class="sd">        Dictionary containting the default formatting data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rpt</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;draft&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s1">&#39;latex_body&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s1">&#39;include_results&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s1">&#39;Bus&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;float_fmt&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{:,.2f}</span><span class="s1">&#39;</span><span class="p">},</span>
+        <span class="s1">&#39;Connection&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="n">key</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;documentation&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">fpd</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    <span class="p">}</span>
+
+    <span class="n">classes</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">nw</span><span class="o">.</span><span class="n">comps</span><span class="p">[</span><span class="n">nw</span><span class="o">.</span><span class="n">comps</span><span class="p">[</span><span class="s1">&#39;comp_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">cp</span><span class="p">][</span><span class="s1">&#39;object&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">cp</span> <span class="ow">in</span> <span class="n">nw</span><span class="o">.</span><span class="n">comps</span><span class="p">[</span><span class="s1">&#39;comp_type&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()]</span>
+
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">classes</span><span class="p">:</span>
+        <span class="n">rpt</span><span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;params&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+        <span class="n">rpt</span><span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+            <span class="n">param</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;float_fmt&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{:,.2f}</span><span class="s1">&#39;</span><span class="p">}</span>
+            <span class="k">for</span> <span class="n">param</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dc_cp</span><span class="p">)</span>
+        <span class="p">})</span>
+
+    <span class="n">rpt</span><span class="p">[</span><span class="s1">&#39;Connection&#39;</span><span class="p">][</span><span class="s1">&#39;fluid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;float_fmt&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{:.3f}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;include_results&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+    <span class="n">rpt</span><span class="p">[</span><span class="s1">&#39;Connection&#39;</span><span class="p">][</span><span class="s1">&#39;params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">rpt</span></div>
+
+
+<div class="viewcode-block" id="document_software_info"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.document_models.document_software_info">[docs]</a><span class="k">def</span> <span class="nf">document_software_info</span><span class="p">(</span><span class="n">rpt</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get software information.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    rpt : dict</span>
+<span class="sd">        Formatting data for the report.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    latex : str</span>
+<span class="sd">        LaTeX code for software information.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">latex</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">rpt</span><span class="p">[</span><span class="s1">&#39;latex_body&#39;</span><span class="p">]:</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;\documentclass[]</span><span class="si">{article}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\usepackage</span><span class="si">{geometry}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\geometry{a4paper, left=20mm, top=20mm,}&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\usepackage</span><span class="si">{graphicx}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\usepackage</span><span class="si">{float}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\usepackage</span><span class="si">{hyperref}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\usepackage</span><span class="si">{booktabs}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\usepackage</span><span class="si">{amsmath}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\usepackage</span><span class="si">{units}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\usepackage</span><span class="si">{cleveref}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\usepackage</span><span class="si">{longtable}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\newcommand{\iftab}{\fontshape</span><span class="si">{sl}</span><span class="s1">\selectfont}&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\newcommand{\bftab}{\fontseries</span><span class="si">{b}</span><span class="s1">\selectfont}&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\begin</span><span class="si">{document}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\section*{Software Information}&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+
+    <span class="k">if</span> <span class="n">rpt</span><span class="p">[</span><span class="s1">&#39;draft&#39;</span><span class="p">]:</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\begin</span><span class="si">{itemize}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;\item Please check, whether your inputs, the equations &#39;</span>
+            <span class="s1">&#39;applied and the charactersitics are displayed correctly.</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;\item You are welcome to send your feedback via &#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\url{https://github.com/oemof/tespy/issues}.&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\item \LaTeX packages required are:&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\begin</span><span class="si">{itemize}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\item graphicx&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\item float&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\item hyperref&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\item booktabs&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\item amsmath&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\item units&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\item cleveref&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\item longtable&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\end</span><span class="si">{itemize}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="p">(</span>
+            <span class="s1">&#39;Additionally, you will need to make the following &#39;</span>
+            <span class="s1">&#39;definitions:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\begin</span><span class="si">{itemize}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\item \textbackslash newcommand\{\textbackslash iftab\}&#39;</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\{\textbackslash fontshape\{sl\}\textbackslash selectfont\}&#39;</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\item \textbackslash newcommand\{\textbackslash bftab\}&#39;</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\{\textbackslash fontseries\{b\}\textbackslash selectfont\}&#39;</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\end</span><span class="si">{itemize}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;\item To suppress these messages, call the model &#39;</span>
+            <span class="s1">&#39;documentation with the keyword draft=False in the formatting &#39;</span>
+            <span class="s1">&#39;dict.</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\end</span><span class="si">{itemize}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+
+    <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\begin</span><span class="si">{table}</span><span class="s1">[H]&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\begin</span><span class="si">{tabular}{ll}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">version</span> <span class="o">=</span> <span class="n">check_version</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;\_&#39;</span><span class="p">)</span>
+    <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\bftab General information&amp;</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;&amp; </span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">latex</span> <span class="o">+=</span> <span class="s1">&#39;TESPy Version:&amp;&#39;</span> <span class="o">+</span> <span class="n">version</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">git</span> <span class="o">=</span> <span class="n">check_git_branch</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;\_&#39;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+        <span class="n">git</span> <span class="o">=</span> <span class="s1">&#39;Installation from git not found&#39;</span>
+    <span class="n">latex</span> <span class="o">+=</span> <span class="s1">&#39;Commit:&amp;&#39;</span> <span class="o">+</span> <span class="n">git</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">latex</span> <span class="o">+=</span> <span class="s1">&#39;CoolProp version:&amp;&#39;</span> <span class="o">+</span> <span class="n">CP</span><span class="o">.</span><span class="n">__version__</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">latex</span> <span class="o">+=</span> <span class="s1">&#39;Python version:&amp;&#39;</span> <span class="o">+</span> <span class="n">sys</span><span class="o">.</span><span class="n">version</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">timestamp</span> <span class="o">=</span> <span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%B </span><span class="si">%d</span><span class="s1">, %Y&#39;</span><span class="p">)</span>
+    <span class="n">latex</span> <span class="o">+=</span> <span class="s1">&#39;Documentation generated:&amp;&#39;</span> <span class="o">+</span> <span class="n">timestamp</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;&amp; </span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\bftab Parameter highlighting&amp;</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;&amp; </span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;Variable component parameters:&amp; \iftab italic</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="k">if</span> <span class="n">rpt</span><span class="p">[</span><span class="s1">&#39;include_results&#39;</span><span class="p">]:</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;Specified input parameter:&amp; \bftab bold</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;Results of simulation:&amp; normalfont </span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;&amp; </span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;\multicolumn</span><span class="si">{2}{l}</span><span class="s1">{\iftab Equations are displayed for input &#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;parameters only.}</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;Specified input parameter:&amp; normalfont </span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\end</span><span class="si">{tabular}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\end</span><span class="si">{table}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+
+    <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\newpage&#39;</span>
+    <span class="k">return</span> <span class="n">latex</span></div>
+
+
+<div class="viewcode-block" id="document_connections"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.document_models.document_connections">[docs]</a><span class="k">def</span> <span class="nf">document_connections</span><span class="p">(</span><span class="n">nw</span><span class="p">,</span> <span class="n">rpt</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Document connection specifications.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nw : tespy.networks.network.Network</span>
+<span class="sd">        TESPy model.</span>
+
+<span class="sd">    rpt : dict</span>
+<span class="sd">        Formatting data for the report.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    latex : str</span>
+<span class="sd">        LaTeX code for all connections.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">ref_data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;m&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;p&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;h&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;T&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+
+    <span class="n">cols</span> <span class="o">=</span> <span class="n">nw</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;Connection&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span>
+    <span class="n">conn_data</span> <span class="o">=</span> <span class="n">nw</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;Connection&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="o">~</span><span class="n">cols</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">nw</span><span class="o">.</span><span class="n">fluids</span><span class="p">)]</span>
+    <span class="n">fluid_data</span> <span class="o">=</span> <span class="n">nw</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;Connection&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">nw</span><span class="o">.</span><span class="n">fluids</span><span class="p">]</span>
+
+    <span class="n">specs</span> <span class="o">=</span> <span class="n">nw</span><span class="o">.</span><span class="n">specifications</span><span class="p">[</span><span class="s1">&#39;Connection&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">rpt</span><span class="p">[</span><span class="s1">&#39;include_results&#39;</span><span class="p">]:</span>
+        <span class="n">conn_data</span> <span class="o">=</span> <span class="n">conn_data</span><span class="p">[</span><span class="n">specs</span><span class="p">]</span>
+        <span class="n">fluid_data</span> <span class="o">=</span> <span class="n">fluid_data</span><span class="p">[</span><span class="n">specs</span><span class="p">]</span>
+    <span class="c1"># it is possible to exclude fluid results</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="n">rpt</span><span class="p">[</span><span class="s1">&#39;Connection&#39;</span><span class="p">][</span><span class="s1">&#39;fluid&#39;</span><span class="p">][</span><span class="s1">&#39;include_results&#39;</span><span class="p">]:</span>
+        <span class="n">fluid_data</span> <span class="o">=</span> <span class="n">fluid_data</span><span class="p">[</span><span class="n">specs</span><span class="p">]</span>
+
+    <span class="n">ref_spec</span> <span class="o">=</span> <span class="n">nw</span><span class="o">.</span><span class="n">specifications</span><span class="p">[</span><span class="s1">&#39;Ref&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span>
+        <span class="n">how</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># get some Connection object for equation generator</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">nw</span><span class="o">.</span><span class="n">get_conn</span><span class="p">(</span><span class="n">specs</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">nw</span><span class="o">.</span><span class="n">get_conn</span><span class="p">(</span><span class="n">ref_spec</span><span class="o">.</span><span class="n">index</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">ref_data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">get_attr</span><span class="p">(</span><span class="n">param</span><span class="p">)</span><span class="o">.</span><span class="n">ref_set</span><span class="p">:</span>
+                <span class="n">ref_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;\_&#39;</span><span class="p">)}</span>
+                <span class="n">ref_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                    <span class="p">{</span><span class="s1">&#39;reference&#39;</span><span class="p">:</span>
+                     <span class="n">c</span><span class="o">.</span><span class="n">get_attr</span><span class="p">(</span><span class="n">param</span><span class="p">)</span><span class="o">.</span><span class="n">ref</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;\_&#39;</span><span class="p">),</span>
+                     <span class="s1">&#39;factor in -&#39;</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">get_attr</span><span class="p">(</span><span class="n">param</span><span class="p">)</span><span class="o">.</span><span class="n">ref</span><span class="o">.</span><span class="n">factor</span><span class="p">,</span>
+                     <span class="s1">&#39;delta in &#39;</span> <span class="o">+</span> <span class="n">hlp</span><span class="o">.</span><span class="n">latex_unit</span><span class="p">(</span>
+                         <span class="n">nw</span><span class="o">.</span><span class="n">get_attr</span><span class="p">(</span><span class="n">param</span> <span class="o">+</span> <span class="s1">&#39;_unit&#39;</span><span class="p">)):</span>
+                     <span class="n">c</span><span class="o">.</span><span class="n">get_attr</span><span class="p">(</span><span class="n">param</span><span class="p">)</span><span class="o">.</span><span class="n">ref</span><span class="o">.</span><span class="n">delta</span><span class="p">})</span>
+
+                <span class="n">ref_data</span><span class="p">[</span><span class="n">param</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="n">ref_dict</span><span class="p">]</span>
+
+    <span class="n">latex</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\section{Connections in &#39;</span> <span class="o">+</span> <span class="n">nw</span><span class="o">.</span><span class="n">mode</span> <span class="o">+</span> <span class="s1">&#39; mode}&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+
+    <span class="c1"># if list is empty, all parameters will be included</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rpt</span><span class="p">[</span><span class="s1">&#39;Connection&#39;</span><span class="p">][</span><span class="s1">&#39;params&#39;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">conn_data</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">rpt</span><span class="p">[</span><span class="s1">&#39;Connection&#39;</span><span class="p">][</span><span class="s1">&#39;params&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">specs</span><span class="p">[</span><span class="n">col</span><span class="p">]):</span>
+                <span class="n">conn_data</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">data_to_df</span><span class="p">(</span><span class="n">conn_data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">eqs</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">specs</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">columns</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="n">document_connection_params</span><span class="p">(</span><span class="n">nw</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">specs</span><span class="p">,</span> <span class="n">eqs</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">rpt</span><span class="p">)</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">data_to_df</span><span class="p">(</span><span class="n">fluid_data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">eqs</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">specs</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">columns</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="n">document_connection_fluids</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">specs</span><span class="p">,</span> <span class="n">eqs</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">rpt</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="nb">property</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">ref_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">data_to_df</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">latex</span> <span class="o">+=</span> <span class="n">document_connection_ref</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="nb">property</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">latex</span></div>
+
+
+<div class="viewcode-block" id="document_connection_params"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.document_models.document_connection_params">[docs]</a><span class="k">def</span> <span class="nf">document_connection_params</span><span class="p">(</span><span class="n">nw</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">specs</span><span class="p">,</span> <span class="n">eqs</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">rpt</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Document parameter specification of connections.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nw : tespy.networks.network.Network</span>
+<span class="sd">        Network object for unit information.</span>
+
+<span class="sd">    df : pandas.core.frame.DataFrame</span>
+<span class="sd">        DataFrame containing the connection parameter data.</span>
+
+<span class="sd">    specs : pandas.core.frame.DataFrame</span>
+<span class="sd">        DataFrame containing information on model input specifications.</span>
+
+<span class="sd">    eqs : list</span>
+<span class="sd">        List of parameters to generate equations for.</span>
+
+<span class="sd">    c : tespy.connections.connection.Connection</span>
+<span class="sd">        Connection object, required for LaTeX equation generation.</span>
+
+<span class="sd">    rpt : dict</span>
+<span class="sd">        Formatting data for the report.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    latex : str</span>
+<span class="sd">        LaTeX code for all connections.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">rpt</span><span class="p">[</span><span class="s1">&#39;include_results&#39;</span><span class="p">]:</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;Connection specifications and results&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;Specified connection parameters&#39;</span>
+    <span class="n">latex</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\subsection{&#39;</span> <span class="o">+</span> <span class="n">label</span> <span class="o">+</span> <span class="s1">&#39;}&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+
+    <span class="n">equations</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">unit</span> <span class="o">=</span> <span class="n">col</span> <span class="o">+</span> <span class="s1">&#39;_unit&#39;</span>
+        <span class="k">if</span> <span class="n">col</span> <span class="o">==</span> <span class="s1">&#39;Td_bp&#39;</span><span class="p">:</span>
+            <span class="n">unit</span> <span class="o">=</span> <span class="s1">&#39;T_unit&#39;</span>
+        <span class="n">col_header</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">col</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;\_&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; in &#39;</span> <span class="o">+</span>
+            <span class="n">hlp</span><span class="o">.</span><span class="n">latex_unit</span><span class="p">(</span><span class="n">nw</span><span class="o">.</span><span class="n">get_attr</span><span class="p">(</span><span class="n">unit</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">eqs</span><span class="p">:</span>
+            <span class="n">col_header</span> <span class="o">+=</span> <span class="p">(</span>
+                <span class="sa">r</span><span class="s1">&#39; (\ref{eq:Connection_&#39;</span> <span class="o">+</span> <span class="n">fpd</span><span class="p">[</span><span class="n">col</span><span class="p">][</span><span class="s1">&#39;text&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;})&#39;</span><span class="p">)</span>
+            <span class="n">equations</span> <span class="o">+=</span> <span class="n">generate_latex_eq</span><span class="p">(</span>
+                <span class="n">c</span><span class="p">,</span> <span class="n">fpd</span><span class="p">[</span><span class="n">col</span><span class="p">][</span><span class="s1">&#39;latex_eq&#39;</span><span class="p">],</span> <span class="n">fpd</span><span class="p">[</span><span class="n">col</span><span class="p">][</span><span class="s1">&#39;text&#39;</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+            <span class="n">fmt</span> <span class="o">=</span> <span class="n">rpt</span><span class="p">[</span><span class="s1">&#39;Connection&#39;</span><span class="p">][</span><span class="n">col</span><span class="p">][</span><span class="s1">&#39;float_fmt&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">specs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="ow">and</span> <span class="n">rpt</span><span class="p">[</span><span class="s1">&#39;include_results&#39;</span><span class="p">]:</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\bftab &#39;</span> <span class="o">+</span> <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">])</span>
+
+        <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="n">col</span><span class="p">:</span> <span class="n">col_header</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">num_col</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+
+    <span class="n">latex</span> <span class="o">+=</span> <span class="n">create_latex_table</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">col_fmt</span><span class="o">=</span><span class="s1">&#39;l&#39;</span> <span class="o">+</span> <span class="n">num_col</span> <span class="o">*</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+    <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\subsection{Equations applied}&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+    <span class="n">latex</span> <span class="o">+=</span> <span class="n">equations</span>
+    <span class="k">return</span> <span class="n">latex</span></div>
+
+
+<div class="viewcode-block" id="document_connection_fluids"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.document_models.document_connection_fluids">[docs]</a><span class="k">def</span> <span class="nf">document_connection_fluids</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">specs</span><span class="p">,</span> <span class="n">eqs</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">rpt</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Document fluid specifications of connections.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df : pandas.core.frame.DataFrame</span>
+<span class="sd">        DataFrame containing the connection fluid data.</span>
+
+<span class="sd">    specs : pandas.core.frame.DataFrame</span>
+<span class="sd">        DataFrame containing information on model input specifications.</span>
+
+<span class="sd">    eqs : list</span>
+<span class="sd">        List of parameters to generate equations for.</span>
+
+<span class="sd">    c : tespy.connections.connection.Connection</span>
+<span class="sd">        Connection object, required for LaTeX equation generation.</span>
+
+<span class="sd">    rpt : dict</span>
+<span class="sd">        Formatting data for the report.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    latex : str</span>
+<span class="sd">        LaTeX code for all connections.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;Specified fluids&#39;</span>
+    <span class="n">latex</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\subsection{&#39;</span> <span class="o">+</span> <span class="n">label</span> <span class="o">+</span> <span class="s1">&#39;}&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+
+    <span class="n">equations</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">fmt</span> <span class="o">=</span> <span class="n">rpt</span><span class="p">[</span><span class="s1">&#39;Connection&#39;</span><span class="p">][</span><span class="s1">&#39;fluid&#39;</span><span class="p">][</span><span class="s1">&#39;float_fmt&#39;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">eqs</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">col</span> <span class="o">==</span> <span class="s1">&#39;balance&#39;</span><span class="p">:</span>
+            <span class="n">eq</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;0=1-\sum x_</span><span class="si">{fl}</span><span class="s1">\;\forall fl\in\text{network fluids}&#39;</span>
+            <span class="n">equations</span> <span class="o">+=</span> <span class="n">generate_latex_eq</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">eq</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">eq</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="sa">r</span><span class="s1">&#39;0 = x_\mathrm{&#39;</span> <span class="o">+</span> <span class="n">col</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;} - x_\mathrm{&#39;</span> <span class="o">+</span>
+                <span class="n">col</span> <span class="o">+</span> <span class="s1">&#39;,spec}&#39;</span><span class="p">)</span>
+            <span class="n">equations</span> <span class="o">+=</span> <span class="n">generate_latex_eq</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">eq</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">specs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="ow">and</span> <span class="n">rpt</span><span class="p">[</span><span class="s1">&#39;include_results&#39;</span><span class="p">]:</span>
+                    <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\bftab &#39;</span> <span class="o">+</span> <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">])</span>
+
+        <span class="n">col_header</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">col</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;\_&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; (&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\ref{eq:Connection_&#39;</span> <span class="o">+</span> <span class="n">col</span> <span class="o">+</span> <span class="s1">&#39;})&#39;</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="n">col</span><span class="p">:</span> <span class="n">col_header</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">num_col</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+
+    <span class="n">latex</span> <span class="o">+=</span> <span class="n">create_latex_table</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">col_fmt</span><span class="o">=</span><span class="s1">&#39;l&#39;</span> <span class="o">+</span> <span class="n">num_col</span> <span class="o">*</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+    <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\subsection{Equations applied}&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+    <span class="n">latex</span> <span class="o">+=</span> <span class="n">equations</span>
+    <span class="k">return</span> <span class="n">latex</span></div>
+
+
+<div class="viewcode-block" id="document_connection_ref"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.document_models.document_connection_ref">[docs]</a><span class="k">def</span> <span class="nf">document_connection_ref</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="nb">property</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Document referenced connection properties</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df : pandas.core.frame.DataFrame</span>
+<span class="sd">        DataFrame containing the referenced connection data.</span>
+
+<span class="sd">    property : str</span>
+<span class="sd">        Short name of specified property (:code:`&#39;m&#39;, &#39;p&#39;, ...`).</span>
+
+<span class="sd">    c : tespy.connections.connection.Connection</span>
+<span class="sd">        Connection object, required for LaTeX equation generation.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    latex : str</span>
+<span class="sd">        LaTeX code for all connections.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">label</span> <span class="o">=</span> <span class="n">fpd</span><span class="p">[</span><span class="nb">property</span><span class="p">][</span><span class="s1">&#39;text&#39;</span><span class="p">]</span>
+    <span class="n">caption</span> <span class="o">=</span> <span class="s1">&#39;Specified reference values for &#39;</span> <span class="o">+</span> <span class="n">label</span>
+    <span class="n">latex</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\subsection{Referenced &#39;</span> <span class="o">+</span> <span class="n">label</span> <span class="o">+</span> <span class="s1">&#39;}&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+    <span class="n">latex</span> <span class="o">+=</span> <span class="n">create_latex_table</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">caption</span><span class="p">,</span> <span class="n">col_fmt</span><span class="o">=</span><span class="s1">&#39;llrr&#39;</span><span class="p">)</span>
+
+    <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\subsection{Equation applied}&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+    <span class="n">eq</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="sa">r</span><span class="s1">&#39;0 = \text</span><span class="si">{value}</span><span class="s1"> - \text</span><span class="si">{value}</span><span class="s1">_\mathrm</span><span class="si">{ref}</span><span class="s1"> &#39;</span>
+        <span class="sa">r</span><span class="s1">&#39;\cdot \mathrm</span><span class="si">{factor}</span><span class="s1"> + \text</span><span class="si">{delta}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">latex</span> <span class="o">+=</span> <span class="n">generate_latex_eq</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">eq</span><span class="p">,</span> <span class="s1">&#39;ref&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+    <span class="k">return</span> <span class="n">latex</span></div>
+
+
+<div class="viewcode-block" id="document_ude"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.document_models.document_ude">[docs]</a><span class="k">def</span> <span class="nf">document_ude</span><span class="p">(</span><span class="n">nw</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Document UserDefinedEquation specifications.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nw : tespy.networks.network.Network</span>
+<span class="sd">        TESPy model.</span>
+
+<span class="sd">    path : str</span>
+<span class="sd">        Folder for the documentation, default :code:`report`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    latex : str</span>
+<span class="sd">        LaTeX code for all UserDefinedEquations.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">nw</span><span class="o">.</span><span class="n">user_defined_eq</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+
+    <span class="n">latex</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="sa">r</span><span class="s1">&#39;\section{User defined equations in &#39;</span> <span class="o">+</span> <span class="n">nw</span><span class="o">.</span><span class="n">mode</span> <span class="o">+</span> <span class="s1">&#39; mode}&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">ude_data</span> <span class="ow">in</span> <span class="n">nw</span><span class="o">.</span><span class="n">user_defined_eq</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+
+        <span class="n">eq_label</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;(\ref{eq:UserDefinedEquation_&#39;</span> <span class="o">+</span> <span class="n">label</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;})&#39;</span><span class="p">)</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;\subsection{Equation for ``&#39;</span> <span class="o">+</span> <span class="n">label</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\&#39;\&#39;</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">eq_label</span> <span class="o">+</span>
+            <span class="sa">r</span><span class="s1">&#39;}&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">latex</span> <span class="o">+=</span> <span class="n">generate_latex_eq</span><span class="p">(</span>
+            <span class="n">ude_data</span><span class="p">,</span> <span class="n">ude_data</span><span class="o">.</span><span class="n">latex</span><span class="p">[</span><span class="s1">&#39;equation&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">))</span>
+        <span class="n">figures</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">ude_data</span><span class="o">.</span><span class="n">latex</span><span class="p">[</span><span class="s1">&#39;lines&#39;</span><span class="p">]:</span>
+            <span class="n">local_path</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s1">&#39;figures/UDE_CharLine_&#39;</span> <span class="o">+</span>
+                <span class="n">ude_data</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.pdf&#39;</span><span class="p">)</span>
+            <span class="n">figname</span> <span class="o">=</span> <span class="n">path</span> <span class="o">+</span> <span class="n">local_path</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;UDE_CharLine_&#39;</span> <span class="o">+</span> <span class="n">ude_data</span><span class="o">.</span><span class="n">label</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">xlabel</span> <span class="o">=</span> <span class="s1">&#39;$X$&#39;</span>
+            <span class="n">ylabel</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;$f\left(X\right)$&#39;</span>
+            <span class="n">line</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">figname</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">xlabel</span><span class="p">,</span> <span class="n">ylabel</span><span class="p">)</span>
+            <span class="n">figures</span> <span class="o">+=</span> <span class="p">[</span><span class="n">create_latex_figure</span><span class="p">(</span>
+                <span class="n">local_path</span><span class="p">,</span> <span class="s1">&#39;CharLine &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; of &#39;</span> <span class="o">+</span> <span class="n">ude_data</span><span class="o">.</span><span class="n">label</span> <span class="o">+</span>
+                <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">eq_label</span><span class="p">,</span> <span class="n">label</span><span class="p">)]</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="nb">map</span> <span class="ow">in</span> <span class="n">ude_data</span><span class="o">.</span><span class="n">latex</span><span class="p">[</span><span class="s1">&#39;maps&#39;</span><span class="p">]:</span>
+            <span class="n">local_path</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s1">&#39;figures/UDE_CharMap_&#39;</span> <span class="o">+</span>
+                <span class="n">ude_data</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.pdf&#39;</span><span class="p">)</span>
+            <span class="n">figname</span> <span class="o">=</span> <span class="n">path</span> <span class="o">+</span> <span class="n">local_path</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;UDE_CharLine_&#39;</span> <span class="o">+</span> <span class="n">ude_data</span><span class="o">.</span><span class="n">label</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">xlabel</span> <span class="o">=</span> <span class="s1">&#39;$Y$&#39;</span>
+            <span class="n">ylabel</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;$f\left(Y,\vec</span><span class="si">{Y}</span><span class="s1">,\vec</span><span class="si">{Z}</span><span class="s1">\right)$&#39;</span>
+            <span class="nb">map</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">figname</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">xlabel</span><span class="p">,</span> <span class="n">ylabel</span><span class="p">)</span>
+            <span class="n">figures</span> <span class="o">+=</span> <span class="p">[</span><span class="n">create_latex_figure</span><span class="p">(</span>
+                <span class="n">local_path</span><span class="p">,</span> <span class="s1">&#39;CharMap &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; of &#39;</span> <span class="o">+</span> <span class="n">ude_data</span><span class="o">.</span><span class="n">label</span> <span class="o">+</span>
+                <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">eq_label</span><span class="p">,</span> <span class="n">label</span><span class="p">)]</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">latex</span> <span class="o">+=</span> <span class="n">place_figures</span><span class="p">(</span><span class="n">figures</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">latex</span></div>
+
+
+<div class="viewcode-block" id="document_components"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.document_models.document_components">[docs]</a><span class="k">def</span> <span class="nf">document_components</span><span class="p">(</span><span class="n">nw</span><span class="p">,</span> <span class="n">rpt</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Document component specifications.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nw : tespy.networks.network.Network</span>
+<span class="sd">        TESPy model.</span>
+
+<span class="sd">    rpt : dict</span>
+<span class="sd">        Formatting data for the report.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    latex : str</span>
+<span class="sd">        LaTeX code for all components.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">latex</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">for</span> <span class="n">cp</span> <span class="ow">in</span> <span class="n">nw</span><span class="o">.</span><span class="n">comps</span><span class="p">[</span><span class="s1">&#39;comp_type&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">():</span>
+
+        <span class="n">component_list</span> <span class="o">=</span> <span class="n">nw</span><span class="o">.</span><span class="n">comps</span><span class="p">[</span><span class="n">nw</span><span class="o">.</span><span class="n">comps</span><span class="p">[</span><span class="s1">&#39;comp_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">cp</span><span class="p">][</span><span class="s1">&#39;object&#39;</span><span class="p">]</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="n">get_component_mandatory_constraints</span><span class="p">(</span>
+            <span class="n">cp</span><span class="p">,</span> <span class="n">component_list</span><span class="p">,</span> <span class="n">rpt</span><span class="p">[</span><span class="s1">&#39;path&#39;</span><span class="p">])</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="n">get_component_specifications</span><span class="p">(</span><span class="n">nw</span><span class="p">,</span> <span class="n">cp</span><span class="p">,</span> <span class="n">rpt</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">latex</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+        <span class="n">latex</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;\section{Components in &#39;</span> <span class="o">+</span> <span class="n">nw</span><span class="o">.</span><span class="n">mode</span> <span class="o">+</span> <span class="s1">&#39; mode}&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">latex</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">latex</span></div>
+
+
+<div class="viewcode-block" id="get_component_mandatory_constraints"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.document_models.get_component_mandatory_constraints">[docs]</a><span class="k">def</span> <span class="nf">get_component_mandatory_constraints</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">component_list</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get latex code for mandatory constraints of component type cp.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    cp : str</span>
+<span class="sd">        Classname of the current class.</span>
+
+<span class="sd">    component_list : pandas.core.frame.DataFrame</span>
+<span class="sd">        DataFrame of the components of Class cp.</span>
+
+<span class="sd">    path : str</span>
+<span class="sd">        Folder for the documentation, default :code:`report`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    latex : str</span>
+<span class="sd">        LaTeX code for mandatory component constraints.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">latex</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+    <span class="n">num_mandatory_eq</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">mandatory_eq</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">figures</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">component_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">constraints</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="s1">&#39;char&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">component</span> <span class="ow">in</span> <span class="n">component_list</span><span class="p">:</span>
+                <span class="n">local_path</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="s1">&#39;figures/&#39;</span> <span class="o">+</span> <span class="n">cp</span> <span class="o">+</span> <span class="s1">&#39;_CharLine_&#39;</span> <span class="o">+</span> <span class="n">label</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span>
+                    <span class="n">component</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.pdf&#39;</span><span class="p">)</span>
+                <span class="n">figname</span> <span class="o">=</span> <span class="n">path</span> <span class="o">+</span> <span class="n">local_path</span>
+                <span class="n">xlabel</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;$X$&#39;</span>
+                <span class="n">ylabel</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;$f\left(X\right)$&#39;</span>
+                <span class="n">component</span><span class="o">.</span><span class="n">get_attr</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;char&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">char_func</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                    <span class="n">figname</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">xlabel</span><span class="p">,</span> <span class="n">ylabel</span><span class="p">)</span>
+                <span class="n">figures</span> <span class="o">+=</span> <span class="p">[</span><span class="n">create_latex_figure</span><span class="p">(</span>
+                    <span class="n">local_path</span><span class="p">,</span>
+                    <span class="s1">&#39;Characteristics of &#39;</span> <span class="o">+</span>
+                    <span class="n">component</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;\_&#39;</span><span class="p">)</span> <span class="o">+</span>
+                    <span class="sa">r</span><span class="s1">&#39; (eq. \ref{eq:&#39;</span> <span class="o">+</span> <span class="n">cp</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">label</span> <span class="o">+</span> <span class="s1">&#39;})&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;CharLine_&#39;</span> <span class="o">+</span> <span class="n">label</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">component</span><span class="o">.</span><span class="n">label</span><span class="p">)]</span>
+        <span class="n">mandatory_eq</span> <span class="o">+=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;latex&#39;</span><span class="p">](</span><span class="n">label</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+        <span class="n">num_mandatory_eq</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="n">num_mandatory_eq</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\subsection{Components of type &#39;</span> <span class="o">+</span> <span class="n">cp</span> <span class="o">+</span> <span class="s1">&#39;}</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\subsubsection{Mandatory constraints}&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="n">mandatory_eq</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="n">place_figures</span><span class="p">(</span><span class="n">figures</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">latex</span></div>
+
+
+<div class="viewcode-block" id="get_component_specifications"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.document_models.get_component_specifications">[docs]</a><span class="k">def</span> <span class="nf">get_component_specifications</span><span class="p">(</span><span class="n">nw</span><span class="p">,</span> <span class="n">cp</span><span class="p">,</span> <span class="n">rpt</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get latex code for component specifications of component type cp.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    cp : str</span>
+<span class="sd">        Classname of the current class.</span>
+
+<span class="sd">    component_list : pandas.core.frame.DataFrame</span>
+<span class="sd">        DataFrame of the components of Class cp.</span>
+
+<span class="sd">    rpt : dict</span>
+<span class="sd">        Formatting data for the report.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    latex : str</span>
+<span class="sd">        LaTeX code for component parameter specification.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">figures</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">col_headers</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">equations</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">nw</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">cp</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">specs</span> <span class="o">=</span> <span class="n">nw</span><span class="o">.</span><span class="n">specifications</span><span class="p">[</span><span class="n">cp</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">rpt</span><span class="p">[</span><span class="s1">&#39;include_results&#39;</span><span class="p">]:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="n">specs</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span> <span class="o">|</span> <span class="n">specs</span><span class="p">[</span><span class="s1">&#39;variables&#39;</span><span class="p">]]</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">rpt</span><span class="p">[</span><span class="n">cp</span><span class="p">][</span><span class="s1">&#39;params&#39;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">rpt</span><span class="p">[</span><span class="n">cp</span><span class="p">][</span><span class="s1">&#39;params&#39;</span><span class="p">]</span>
+                    <span class="ow">and</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">specs</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="n">col</span><span class="p">])</span>
+                    <span class="ow">and</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">specs</span><span class="p">[</span><span class="s1">&#39;variables&#39;</span><span class="p">][</span><span class="n">col</span><span class="p">])):</span>
+                <span class="n">result</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">:</span>
+        <span class="n">fmt</span> <span class="o">=</span> <span class="n">rpt</span><span class="p">[</span><span class="n">cp</span><span class="p">][</span><span class="n">col</span><span class="p">][</span><span class="s1">&#39;float_fmt&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">specs</span><span class="p">[</span><span class="s1">&#39;variables&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]:</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="sa">r</span><span class="s1">&#39;\iftab &#39;</span> <span class="o">+</span> <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]))</span>
+            <span class="k">elif</span> <span class="n">specs</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="ow">and</span> <span class="n">rpt</span><span class="p">[</span><span class="s1">&#39;include_results&#39;</span><span class="p">]:</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="sa">r</span><span class="s1">&#39;\bftab &#39;</span> <span class="o">+</span> <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">])</span>
+
+    <span class="n">group_data</span> <span class="o">=</span> <span class="n">specs</span><span class="p">[</span><span class="s1">&#39;groups&#39;</span><span class="p">][</span><span class="n">specs</span><span class="p">[</span><span class="s1">&#39;groups&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">char_data</span> <span class="o">=</span> <span class="n">specs</span><span class="p">[</span><span class="s1">&#39;chars&#39;</span><span class="p">][</span><span class="n">specs</span><span class="p">[</span><span class="s1">&#39;chars&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">specs</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">specs</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span> <span class="o">|</span> <span class="n">specs</span><span class="p">[</span><span class="s1">&#39;variables&#39;</span><span class="p">],</span>
+         <span class="n">specs</span><span class="p">[</span><span class="s1">&#39;groups&#39;</span><span class="p">],</span> <span class="n">specs</span><span class="p">[</span><span class="s1">&#39;chars&#39;</span><span class="p">]],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">df_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">result</span><span class="p">,</span> <span class="n">group_data</span><span class="p">,</span> <span class="n">char_data</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">char_data</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">char_data</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+            <span class="n">component</span> <span class="o">=</span> <span class="n">nw</span><span class="o">.</span><span class="n">get_comp</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">char_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">component</span><span class="o">.</span><span class="n">get_attr</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+                <span class="n">figures</span> <span class="o">+=</span> <span class="p">[</span><span class="n">get_char_specification</span><span class="p">(</span>
+                    <span class="n">component</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">rpt</span><span class="p">[</span><span class="s1">&#39;path&#39;</span><span class="p">])]</span>
+
+    <span class="n">data_dict_gcp</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">group_elements</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">group_data</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">group_data</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+            <span class="n">component</span> <span class="o">=</span> <span class="n">nw</span><span class="o">.</span><span class="n">get_comp</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">group_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">component</span><span class="o">.</span><span class="n">get_attr</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">elements</span><span class="p">:</span>
+                    <span class="n">element_data</span> <span class="o">=</span> <span class="n">component</span><span class="o">.</span><span class="n">get_attr</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+                    <span class="n">figures</span> <span class="o">+=</span> <span class="p">[</span><span class="n">get_char_specification</span><span class="p">(</span>
+                        <span class="n">component</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">element_data</span><span class="p">,</span> <span class="n">rpt</span><span class="p">[</span><span class="s1">&#39;path&#39;</span><span class="p">],</span>
+                        <span class="n">group</span><span class="o">=</span><span class="n">col</span><span class="p">)]</span>
+
+        <span class="n">elements</span> <span class="o">=</span> <span class="p">[</span><span class="n">el</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">elements</span> <span class="k">if</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">df_data</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+        <span class="n">data_dict_gcp</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_data</span><span class="p">[</span><span class="n">elements</span><span class="p">]</span>
+        <span class="n">group_elements</span> <span class="o">+=</span> <span class="n">data</span><span class="o">.</span><span class="n">elements</span>
+
+    <span class="c1"># remove gouped parameters from main parameter list</span>
+    <span class="n">df_data</span> <span class="o">=</span> <span class="n">df_data</span><span class="p">[</span>
+        <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df_data</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">group_elements</span><span class="p">]]</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_data</span><span class="o">.</span><span class="n">index</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+
+    <span class="c1"># replace column headers</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df_data</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">specs</span><span class="p">[</span><span class="n">col</span><span class="p">])</span> <span class="ow">and</span> <span class="n">col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">group_elements</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">nw</span><span class="o">.</span><span class="n">get_comp</span><span class="p">(</span><span class="n">row</span><span class="p">)</span><span class="o">.</span><span class="n">get_attr</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">latex</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">df_data</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">col_headers</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">col</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;\_&#39;</span><span class="p">)</span> <span class="o">+</span>
+                    <span class="sa">r</span><span class="s1">&#39; (\ref{eq:&#39;</span> <span class="o">+</span> <span class="n">cp</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">col</span> <span class="o">+</span> <span class="s1">&#39;})&#39;</span><span class="p">)</span>
+                <span class="n">equations</span> <span class="o">+=</span> <span class="n">data</span><span class="o">.</span><span class="n">latex</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="o">**</span><span class="n">data</span><span class="o">.</span><span class="n">func_params</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">col_headers</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">col</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;\_&#39;</span><span class="p">)</span>
+
+    <span class="n">df_data</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">df_data</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">col_headers</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">rpt</span><span class="p">[</span><span class="s1">&#39;include_results&#39;</span><span class="p">]:</span>
+        <span class="n">latex</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\subsubsection{Specifications and results}&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">latex</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\subsubsection{Inputs specified}&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+
+    <span class="n">caption</span> <span class="o">=</span> <span class="s1">&#39;Parameters of components of type &#39;</span> <span class="o">+</span> <span class="n">cp</span>
+    <span class="n">num_col</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_data</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+    <span class="n">latex</span> <span class="o">+=</span> <span class="n">create_latex_table</span><span class="p">(</span><span class="n">df_data</span><span class="p">,</span> <span class="n">caption</span><span class="p">,</span> <span class="n">col_fmt</span><span class="o">=</span><span class="s1">&#39;l&#39;</span> <span class="o">+</span> <span class="n">num_col</span> <span class="o">*</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+
+    <span class="c1"># # get parameter groups tables</span>
+    <span class="k">for</span> <span class="n">param</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">data_dict_gcp</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">df_data_gcp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;object&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">df_data_gcp</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df_data_gcp</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="n">col_headers</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">col</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;\_&#39;</span><span class="p">)</span>
+
+            <span class="n">df_data_gcp</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">col_headers</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">caption</span> <span class="o">=</span> <span class="s1">&#39;Parametergroup &#39;</span> <span class="o">+</span> <span class="n">param</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;\_&#39;</span><span class="p">)</span>
+            <span class="n">latex</span> <span class="o">+=</span> <span class="n">create_latex_table</span><span class="p">(</span><span class="n">df_data_gcp</span><span class="p">,</span> <span class="n">caption</span><span class="p">)</span>
+
+    <span class="c1"># write equations and figures of characteristics applied</span>
+    <span class="k">if</span> <span class="n">equations</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\subsubsection{Equations applied}&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="n">equations</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="n">place_figures</span><span class="p">([</span><span class="n">fig</span> <span class="k">for</span> <span class="n">fig</span> <span class="ow">in</span> <span class="n">figures</span> <span class="k">if</span> <span class="n">fig</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">latex</span></div>
+
+
+<div class="viewcode-block" id="document_busses"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.document_models.document_busses">[docs]</a><span class="k">def</span> <span class="nf">document_busses</span><span class="p">(</span><span class="n">nw</span><span class="p">,</span> <span class="n">rpt</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Document bus specifications.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nw : tespy.networks.network.Network</span>
+<span class="sd">        TESPy model.</span>
+
+<span class="sd">    rpt : dict</span>
+<span class="sd">        Formatting data for the report.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    latex : str</span>
+<span class="sd">        LaTeX code for all busses.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">nw</span><span class="o">.</span><span class="n">busses</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">latex</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\section{Busses in &#39;</span> <span class="o">+</span> <span class="n">nw</span><span class="o">.</span><span class="n">mode</span> <span class="o">+</span> <span class="s1">&#39; mode}&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+
+    <span class="n">chars_plotted</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">fmt</span> <span class="o">=</span> <span class="n">rpt</span><span class="p">[</span><span class="s1">&#39;Bus&#39;</span><span class="p">][</span><span class="s1">&#39;float_fmt&#39;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">nw</span><span class="o">.</span><span class="n">busses</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">rpt</span><span class="p">[</span><span class="s1">&#39;include_results&#39;</span><span class="p">]:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">nw</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">label</span><span class="p">][</span>
+                <span class="p">[</span><span class="s1">&#39;component value&#39;</span><span class="p">,</span> <span class="s1">&#39;bus value&#39;</span><span class="p">,</span> <span class="s1">&#39;efficiency&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;total&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;total&#39;</span><span class="p">,</span> <span class="s1">&#39;efficiency&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;total&#39;</span><span class="p">,</span> <span class="s1">&#39;component value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;total&#39;</span><span class="p">,</span> <span class="s1">&#39;component value&#39;</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">P</span><span class="o">.</span><span class="n">is_set</span><span class="p">:</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;total&#39;</span><span class="p">,</span> <span class="s1">&#39;bus value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="sa">r</span><span class="s1">&#39;\bftab&#39;</span> <span class="o">+</span> <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;total&#39;</span><span class="p">,</span> <span class="s1">&#39;bus value&#39;</span><span class="p">]))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;total&#39;</span><span class="p">,</span> <span class="s1">&#39;bus value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;total&#39;</span><span class="p">,</span> <span class="s1">&#39;bus value&#39;</span><span class="p">]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;comp eq&#39;</span><span class="p">,</span> <span class="s1">&#39;bus eq&#39;</span><span class="p">,</span> <span class="s1">&#39;eta ref&#39;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;object&#39;</span><span class="p">)</span>
+
+        <span class="n">figures</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">cp</span> <span class="ow">in</span> <span class="n">b</span><span class="o">.</span><span class="n">comps</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">rpt</span><span class="p">[</span><span class="s1">&#39;include_results&#39;</span><span class="p">]:</span>
+                <span class="c1"># format cols</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">cp</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="s1">&#39;bus value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">cp</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="s1">&#39;bus value&#39;</span><span class="p">]))</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">cp</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="s1">&#39;component value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">cp</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="s1">&#39;component value&#39;</span><span class="p">]))</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">cp</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="s1">&#39;efficiency&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">cp</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="s1">&#39;efficiency&#39;</span><span class="p">]))</span>
+
+            <span class="n">cp_data</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">comps</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">cp</span><span class="p">]</span>
+            <span class="n">char</span> <span class="o">=</span> <span class="n">cp_data</span><span class="p">[</span><span class="s1">&#39;char&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">char</span><span class="o">.</span><span class="n">y</span> <span class="o">==</span> <span class="n">char</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="k">if</span> <span class="n">rpt</span><span class="p">[</span><span class="s1">&#39;include_results&#39;</span><span class="p">]:</span>
+                    <span class="n">eta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">eta</span> <span class="o">=</span> <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">char</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">char</span><span class="p">,</span> <span class="n">cp_data</span><span class="p">[</span><span class="s1">&#39;base&#39;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">chars_plotted</span><span class="p">:</span>
+                    <span class="n">eta</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="sa">r</span><span class="s1">&#39;$f\left(X\right)$ (\ref{fig:&#39;</span> <span class="o">+</span>
+                        <span class="n">chars_plotted</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;label&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;})&#39;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">chars_plotted</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                        <span class="s1">&#39;path&#39;</span><span class="p">:</span>
+                            <span class="s1">&#39;figures/Bus_CharLine_&#39;</span> <span class="o">+</span>
+                            <span class="n">cp</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">nw</span><span class="o">.</span><span class="n">mode</span> <span class="o">+</span> <span class="s1">&#39;.pdf&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;label&#39;</span><span class="p">:</span>
+                            <span class="s1">&#39;Bus_CharLine_&#39;</span> <span class="o">+</span> <span class="n">cp</span><span class="o">.</span><span class="n">label</span> <span class="o">+</span> <span class="n">nw</span><span class="o">.</span><span class="n">mode</span>
+                    <span class="p">}</span>
+                    <span class="n">figname</span> <span class="o">=</span> <span class="n">rpt</span><span class="p">[</span><span class="s1">&#39;path&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">chars_plotted</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;path&#39;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">nw</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;design&#39;</span><span class="p">:</span>
+                        <span class="n">xlabel</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="sa">r</span><span class="s1">&#39;Energy flow ratio $X$ ($X=1$ in design mode)&#39;</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">cp_data</span><span class="p">[</span><span class="s1">&#39;base&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;bus&#39;</span><span class="p">:</span>
+                        <span class="n">xlabel</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="sa">r</span><span class="s1">&#39;Energy flow ratio $X=\frac{\dot</span><span class="si">{E}</span><span class="s1">_&#39;</span>
+                            <span class="sa">r</span><span class="s1">&#39;\mathrm</span><span class="si">{bus}</span><span class="s1">}{\dot</span><span class="si">{E}</span><span class="s1">_\mathrm{bus,design}}$&#39;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">xlabel</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="sa">r</span><span class="s1">&#39;Energy flow ratio $X=\frac{\dot</span><span class="si">{E}</span><span class="s1">_\mathrm{&#39;</span>
+                            <span class="sa">r</span><span class="s1">&#39;comp}}{\dot</span><span class="si">{E}</span><span class="s1">_\mathrm{comp,design}}$&#39;</span><span class="p">)</span>
+                    <span class="n">ylabel</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;Efficiency $\eta$&#39;</span>
+                    <span class="n">char</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">figname</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">xlabel</span><span class="p">,</span> <span class="n">ylabel</span><span class="p">)</span>
+                    <span class="n">figures</span> <span class="o">+=</span> <span class="p">[</span><span class="n">create_latex_figure</span><span class="p">(</span>
+                        <span class="n">chars_plotted</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;path&#39;</span><span class="p">],</span>
+                        <span class="s1">&#39;Bus efficiency characteristic&#39;</span><span class="p">,</span>
+                        <span class="n">chars_plotted</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;label&#39;</span><span class="p">])]</span>
+                    <span class="n">eta</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="sa">r</span><span class="s1">&#39;$f\left(X\right)$ (\ref{fig:&#39;</span> <span class="o">+</span>
+                        <span class="n">chars_plotted</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;label&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;})&#39;</span><span class="p">)</span>
+
+            <span class="n">comp_eq</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">bus_func_doc</span><span class="p">(</span><span class="n">cp_data</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">comp_eq</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">cp</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="s1">&#39;comp eq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">cp</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="s1">&#39;bus eq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">cp</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="s1">&#39;eta ref&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                <span class="k">continue</span>
+
+            <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">cp</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="s1">&#39;comp eq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;$&#39;</span> <span class="o">+</span> <span class="n">comp_eq</span> <span class="o">+</span> <span class="s1">&#39;$&#39;</span>
+
+            <span class="k">if</span> <span class="n">cp_data</span><span class="p">[</span><span class="s1">&#39;base&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;bus&#39;</span><span class="p">:</span>
+                <span class="n">eq</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;$\frac{\dot</span><span class="si">{E}</span><span class="s1">_\mathrm</span><span class="si">{comp}</span><span class="s1">}{\eta}$&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">eq</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;$\dot</span><span class="si">{E}</span><span class="s1">_\mathrm</span><span class="si">{comp}</span><span class="s1"> \cdot \eta$&#39;</span>
+
+            <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">cp</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="s1">&#39;bus eq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">eq</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">cp</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="s1">&#39;eta ref&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">eta</span>
+
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;comp eq&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span><span class="p">()):</span>
+            <span class="k">continue</span>
+
+        <span class="c1"># reorder and rename columns</span>
+        <span class="k">if</span> <span class="n">rpt</span><span class="p">[</span><span class="s1">&#39;include_results&#39;</span><span class="p">]:</span>
+            <span class="n">col_order</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="s1">&#39;comp eq&#39;</span><span class="p">,</span> <span class="s1">&#39;component value&#39;</span><span class="p">,</span> <span class="s1">&#39;bus eq&#39;</span><span class="p">,</span> <span class="s1">&#39;bus value&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;eta ref&#39;</span><span class="p">,</span> <span class="s1">&#39;efficiency&#39;</span><span class="p">]</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col_order</span><span class="p">]</span>
+
+        <span class="n">rename_dict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;component value&#39;</span><span class="p">:</span> <span class="sa">r</span><span class="s1">&#39;$\dot</span><span class="si">{E}</span><span class="s1">_\mathrm{comp,result}$&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;bus value&#39;</span><span class="p">:</span> <span class="sa">r</span><span class="s1">&#39;$\dot</span><span class="si">{E}</span><span class="s1">_\mathrm{bus,result}$&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;efficiency&#39;</span><span class="p">:</span> <span class="sa">r</span><span class="s1">&#39;$\eta_\mathrm</span><span class="si">{result}</span><span class="s1">$&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;comp eq&#39;</span><span class="p">:</span> <span class="sa">r</span><span class="s1">&#39;$\dot</span><span class="si">{E}</span><span class="s1">_\mathrm</span><span class="si">{comp}</span><span class="s1">$&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;bus eq&#39;</span><span class="p">:</span> <span class="sa">r</span><span class="s1">&#39;$\dot</span><span class="si">{E}</span><span class="s1">_\mathrm</span><span class="si">{bus}</span><span class="s1">$&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;eta ref&#39;</span><span class="p">:</span> <span class="sa">r</span><span class="s1">&#39;$\eta$&#39;</span>
+        <span class="p">}</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">rename_dict</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="n">data_to_df</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+
+        <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\subsection{Bus ``&#39;</span> <span class="o">+</span> <span class="n">label</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\&#39;\&#39;</span><span class="s1">}</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+        <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">P</span><span class="o">.</span><span class="n">is_set</span><span class="p">:</span>
+            <span class="n">latex</span> <span class="o">+=</span> <span class="p">(</span>
+                <span class="sa">r</span><span class="s1">&#39;Specified total value of energy flow:&#39;</span>
+                <span class="sa">r</span><span class="s1">&#39; $\dot</span><span class="si">{E}</span><span class="s1">_\mathrm</span><span class="si">{bus}</span><span class="s1"> = \unit[&#39;</span> <span class="o">+</span>
+                <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">P</span><span class="o">.</span><span class="n">val</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;]</span><span class="si">{W}</span><span class="s1">$</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+            <span class="n">eq</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;0=\dot</span><span class="si">{E}</span><span class="s1">_\mathrm</span><span class="si">{bus}</span><span class="s1"> -\sum_i \dot</span><span class="si">{E}</span><span class="s1">_{\mathrm{bus,}i}&#39;</span>
+            <span class="n">latex</span> <span class="o">+=</span> <span class="n">generate_latex_eq</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">eq</span><span class="p">,</span> <span class="s1">&#39;energy_flow_sum&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">latex</span> <span class="o">+=</span> <span class="s1">&#39;This bus is used for postprocessing only.</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+        <span class="n">num_col</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="n">create_latex_table</span><span class="p">(</span>
+            <span class="n">df</span><span class="p">,</span> <span class="s1">&#39;Results overview for bus &#39;</span> <span class="o">+</span> <span class="n">label</span><span class="p">,</span>
+            <span class="n">col_fmt</span><span class="o">=</span><span class="s1">&#39;l&#39;</span> <span class="o">+</span> <span class="n">num_col</span> <span class="o">*</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="n">place_figures</span><span class="p">(</span><span class="n">figures</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">latex</span></div>
+
+
+<div class="viewcode-block" id="data_to_df"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.document_models.data_to_df">[docs]</a><span class="k">def</span> <span class="nf">data_to_df</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create pandas DataFrame from list of dictionaries, remove nan columns.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : list</span>
+<span class="sd">        Rows for the DataFrame.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    df : pandas.core.frame.DataFrame</span>
+<span class="sd">        Polished DataFrame.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;object&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">data</span>
+    <span class="n">to_drop</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">n</span> <span class="o">!=</span> <span class="s1">&#39;label&#39;</span><span class="p">]</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="n">to_drop</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+<div class="viewcode-block" id="create_latex_table"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.document_models.create_latex_table">[docs]</a><span class="k">def</span> <span class="nf">create_latex_table</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">caption</span><span class="p">,</span> <span class="n">col_fmt</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create LaTeX table environment from DataFrame df.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df : pandas.core.frame.DataFrame</span>
+<span class="sd">        DataFrame to export.</span>
+
+<span class="sd">    caption : str</span>
+<span class="sd">        Caption for the table.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    latex : str</span>
+<span class="sd">        LaTeX code for table.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;str&#39;</span><span class="p">)</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;\_&#39;</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;label&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">replace</span><span class="p">({</span><span class="s1">&#39;nan&#39;</span><span class="p">:</span> <span class="s1">&#39;-&#39;</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="c1"># dataframes with bool data only</span>
+        <span class="k">pass</span>
+    <span class="n">longtable</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">60</span><span class="p">:</span>
+        <span class="n">longtable</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">with</span> <span class="n">pd</span><span class="o">.</span><span class="n">option_context</span><span class="p">(</span><span class="s1">&#39;max_colwidth&#39;</span><span class="p">,</span> <span class="mi">2000</span><span class="p">):</span>
+        <span class="n">latex</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">to_latex</span><span class="p">(</span>
+            <span class="n">index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">escape</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">na_rep</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">column_format</span><span class="o">=</span><span class="n">col_fmt</span><span class="p">,</span>
+            <span class="n">longtable</span><span class="o">=</span><span class="n">longtable</span><span class="p">,</span> <span class="n">caption</span><span class="o">=</span><span class="n">caption</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="s1">&#39;H&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">latex</span></div>
+
+
+<div class="viewcode-block" id="create_latex_figure"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.document_models.create_latex_figure">[docs]</a><span class="k">def</span> <span class="nf">create_latex_figure</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">caption</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create LaTeX figure environment.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path : str</span>
+<span class="sd">        Path to the figure.</span>
+
+<span class="sd">    caption : str</span>
+<span class="sd">        Caption of the figure.</span>
+
+<span class="sd">    label : str</span>
+<span class="sd">        LaTeX label for the figure.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    latex : str</span>
+<span class="sd">        LaTeX code for figure.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">latex</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\begin</span><span class="si">{figure}</span><span class="s1">[H]\begin</span><span class="si">{center}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\includegraphics[width=\textwidth]{&#39;</span> <span class="o">+</span> <span class="n">path</span> <span class="o">+</span> <span class="s1">&#39;}&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\caption{&#39;</span> <span class="o">+</span> <span class="n">caption</span> <span class="o">+</span> <span class="s1">&#39;}&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\label{fig:&#39;</span> <span class="o">+</span> <span class="n">label</span> <span class="o">+</span> <span class="s1">&#39;}&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\end</span><span class="si">{center}</span><span class="s1">\end</span><span class="si">{figure}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+    <span class="k">return</span> <span class="n">latex</span></div>
+
+
+<div class="viewcode-block" id="generate_latex_eq"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.document_models.generate_latex_eq">[docs]</a><span class="k">def</span> <span class="nf">generate_latex_eq</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">eqn</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generate LaTeX code for equations.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    obj : object</span>
+<span class="sd">        Object equation is applied for.</span>
+
+<span class="sd">    eqn : str</span>
+<span class="sd">        LaTeX code of the equation core.</span>
+
+<span class="sd">    label : str</span>
+<span class="sd">        LaTeX label for the equation.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    latex : str</span>
+<span class="sd">        LaTeX code for equation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">latex</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="sa">r</span><span class="s1">&#39;\begin</span><span class="si">{equation}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;\label{eq:&#39;</span> <span class="o">+</span>
+        <span class="n">obj</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">label</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;}&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="p">)</span>
+    <span class="n">latex</span> <span class="o">+=</span> <span class="n">eqn</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\end</span><span class="si">{equation}</span><span class="s1">&#39;</span>
+    <span class="k">return</span> <span class="n">latex</span></div>
+
+
+<div class="viewcode-block" id="create_latex_CharLine"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.document_models.create_latex_CharLine">[docs]</a><span class="k">def</span> <span class="nf">create_latex_CharLine</span><span class="p">(</span><span class="n">component</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generate image and create LaTeX code for CharLine documentation.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    component : object</span>
+<span class="sd">        Component or Bus object the characteristics are applied on.</span>
+
+<span class="sd">    param : str</span>
+<span class="sd">        Name of the parameter holding the CharLine information.</span>
+
+<span class="sd">    data : tespy.tools.data_containers.ComponentCharacteristics</span>
+<span class="sd">        DataContainer holding the CharLine information.</span>
+
+<span class="sd">    path : str</span>
+<span class="sd">        Basepath of the report.</span>
+
+<span class="sd">    group : str</span>
+<span class="sd">        Name of the group if the parameter is part of a group, else None.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    latex : str</span>
+<span class="sd">        LaTeX code for figure.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cp</span> <span class="o">=</span> <span class="n">component</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+    <span class="k">if</span> <span class="n">group</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">param</span>
+    <span class="n">local_path</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;figures/&#39;</span> <span class="o">+</span> <span class="n">cp</span> <span class="o">+</span> <span class="s1">&#39;_CharLine_&#39;</span> <span class="o">+</span> <span class="n">param</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span>
+        <span class="n">component</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.pdf&#39;</span><span class="p">)</span>
+    <span class="n">figname</span> <span class="o">=</span> <span class="n">path</span> <span class="o">+</span> <span class="n">local_path</span>
+    <span class="n">xlabel</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="sa">r</span><span class="s1">&#39;$X=&#39;</span> <span class="o">+</span> <span class="n">component</span><span class="o">.</span><span class="n">get_char_expr_doc</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">.</span><span class="n">param</span><span class="p">,</span> <span class="o">**</span><span class="n">data</span><span class="o">.</span><span class="n">char_params</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;$&#39;</span><span class="p">)</span>
+    <span class="n">ylabel</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;$f\left(X\right)$&#39;</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">char_func</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">figname</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">xlabel</span><span class="p">,</span> <span class="n">ylabel</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">create_latex_figure</span><span class="p">(</span>
+        <span class="n">local_path</span><span class="p">,</span>
+        <span class="s1">&#39;Characteristics of &#39;</span> <span class="o">+</span> <span class="n">component</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;\_&#39;</span><span class="p">)</span> <span class="o">+</span>
+        <span class="sa">r</span><span class="s1">&#39; (eq. \ref{eq:&#39;</span> <span class="o">+</span> <span class="n">cp</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">group</span> <span class="o">+</span> <span class="s1">&#39;})&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;CharLine_&#39;</span> <span class="o">+</span> <span class="n">param</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">component</span><span class="o">.</span><span class="n">label</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="create_latex_CharMap"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.document_models.create_latex_CharMap">[docs]</a><span class="k">def</span> <span class="nf">create_latex_CharMap</span><span class="p">(</span><span class="n">component</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generate image and create LaTeX code for CharMap documentation.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    component : object</span>
+<span class="sd">        Component or Bus object the characteristics are applied on.</span>
+
+<span class="sd">    param : str</span>
+<span class="sd">        Name of the parameter holding the CharLine information.</span>
+
+<span class="sd">    data : tespy.tools.data_containers.ComponentCharacteristicMaps</span>
+<span class="sd">        DataContainer holding the CharMap information.</span>
+
+<span class="sd">    path : str</span>
+<span class="sd">        Basepath of the report.</span>
+
+<span class="sd">    group : str</span>
+<span class="sd">        Name of the group if the parameter is part of a group, else None.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    latex : str</span>
+<span class="sd">        LaTeX code for figure.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cp</span> <span class="o">=</span> <span class="n">component</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+    <span class="k">if</span> <span class="n">group</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">param</span>
+    <span class="n">local_path</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;figures/&#39;</span> <span class="o">+</span> <span class="n">cp</span> <span class="o">+</span> <span class="s1">&#39;_CharMap_&#39;</span> <span class="o">+</span> <span class="n">param</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span>
+        <span class="n">component</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.pdf&#39;</span><span class="p">)</span>
+    <span class="n">figname</span> <span class="o">=</span> <span class="n">path</span> <span class="o">+</span> <span class="n">local_path</span>
+    <span class="n">xlabel</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;$Y$&#39;</span><span class="p">)</span>
+    <span class="n">ylabel</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;$f\left(Y,\vec</span><span class="si">{Y}</span><span class="s1">,\vec</span><span class="si">{Z}</span><span class="s1">\right)$&#39;</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">char_func</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">figname</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">xlabel</span><span class="p">,</span> <span class="n">ylabel</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">create_latex_figure</span><span class="p">(</span>
+        <span class="n">local_path</span><span class="p">,</span>
+        <span class="s1">&#39;Characteristics of &#39;</span> <span class="o">+</span> <span class="n">component</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;\_&#39;</span><span class="p">)</span> <span class="o">+</span>
+        <span class="sa">r</span><span class="s1">&#39; (eq. \ref{eq:&#39;</span> <span class="o">+</span> <span class="n">cp</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">group</span> <span class="o">+</span> <span class="s1">&#39;})&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;CharMap_&#39;</span> <span class="o">+</span> <span class="n">param</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">component</span><span class="o">.</span><span class="n">label</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="place_figures"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.document_models.place_figures">[docs]</a><span class="k">def</span> <span class="nf">place_figures</span><span class="p">(</span><span class="n">figures</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generate LaTeX code for figure placement.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    figures : list</span>
+<span class="sd">        List holding LaTeX code of individual figures to be placed in document.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    latex : str</span>
+<span class="sd">        LaTeX code for figure alignment.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">latex</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">num_per_row</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">num_rows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">figures</span><span class="p">)</span> <span class="o">//</span> <span class="n">num_per_row</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_rows</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">figure</span> <span class="ow">in</span> <span class="n">figures</span><span class="p">[</span><span class="n">num_per_row</span> <span class="o">*</span> <span class="n">row</span><span class="p">:</span><span class="n">num_per_row</span> <span class="o">*</span> <span class="p">(</span><span class="n">row</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]:</span>
+            <span class="n">latex</span> <span class="o">+=</span> <span class="p">(</span>
+                <span class="sa">r</span><span class="s1">&#39;\begin</span><span class="si">{minipage}</span><span class="s1">{&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">num_per_row</span><span class="p">)</span> <span class="o">+</span>
+                <span class="sa">r</span><span class="s1">&#39;\textwidth}&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">latex</span> <span class="o">+=</span> <span class="n">figure</span>
+            <span class="n">latex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;\end</span><span class="si">{minipage}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">latex</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="k">return</span> <span class="n">latex</span></div>
+
+
+<div class="viewcode-block" id="get_char_specification"><a class="viewcode-back" href="../../../api/tespy.tools.html#tespy.tools.document_models.get_char_specification">[docs]</a><span class="k">def</span> <span class="nf">get_char_specification</span><span class="p">(</span><span class="n">component</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get CharLine or CharMap plotting latex code.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    component : object</span>
+<span class="sd">        Component or Bus object the characteristics are applied on.</span>
+
+<span class="sd">    param : str</span>
+<span class="sd">        Name of the parameter holding the CharLine information.</span>
+
+<span class="sd">    data : tespy.tools.data_containers.DataContainer</span>
+<span class="sd">        DataContainer holding the CharMap or CharLine information.</span>
+
+<span class="sd">    path : str</span>
+<span class="sd">        Basepath of the report.</span>
+
+<span class="sd">    group : str</span>
+<span class="sd">        Name of the group if the parameter is part of a group, else None.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    latex : str</span>
+<span class="sd">        LaTeX code for characteristic figures.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dc_cc</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">create_latex_CharLine</span><span class="p">(</span><span class="n">component</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dc_cm</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">create_latex_CharMap</span><span class="p">(</span><span class="n">component</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2020, Francesco Witte.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

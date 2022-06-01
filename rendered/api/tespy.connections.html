@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tespy.connections module &mdash; tespy 0.6.0 - Colored Chemicals documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="tespy.data module" href="tespy.data.html" />
+    <link rel="prev" title="tespy.components module" href="tespy.components.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> tespy
+            <img src="../_static/logo_tespy_mid.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.6.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Thermal Engineering Systems in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../first_steps.html">First steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials_examples.html">Examples and Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tespy_modules.html">TESPy modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tespy_analyses.html">Thermodynamic analyses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developing_tespy.html">Developing TESPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zliterature.html">Literature</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="tespy.components.html">tespy.components module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">tespy.connections module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-tespy.connections.bus">tespy.connections.bus module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-tespy.connections.connection">tespy.connections.connection module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tespy.data.html">tespy.data module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tespy.networks.html">tespy.networks module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tespy.tools.html">tespy.tools module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">tespy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../api.html">API Documentation</a> &raquo;</li>
+      <li>tespy.connections module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/tespy.connections.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-tespy.connections">
+<span id="tespy-connections-module"></span><h1>tespy.connections module<a class="headerlink" href="#module-tespy.connections" title="Permalink to this headline">¶</a></h1>
+<section id="module-tespy.connections.bus">
+<span id="tespy-connections-bus-module"></span><h2>tespy.connections.bus module<a class="headerlink" href="#module-tespy.connections.bus" title="Permalink to this headline">¶</a></h2>
+<p>Module of class Bus.</p>
+<p>This file is part of project TESPy (github.com/oemof/tespy). It’s copyrighted
+by the contributors recorded in the version control history of the file,
+available from its original location tespy/connections/bus.py</p>
+<p>SPDX-License-Identifier: MIT</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="tespy.connections.bus.Bus">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tespy.connections.bus.</span></span><span class="sig-name descname"><span class="pre">Bus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/connections/bus.html#Bus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.connections.bus.Bus" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A bus is used to connect different energy flows.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label</strong> (<em>str</em>) – Label for the bus.</p></li>
+<li><p><strong>P</strong> (<em>float</em>) – Total power/heat flow specification for bus, <img class="math" src="../_images/math/c762be76eb1bb39882bc93df0400439cdcfa3475.png" alt="P \text{/W}"/>.</p></li>
+<li><p><strong>printout</strong> (<em>boolean</em>) – Print the results of this bus to prompt with the
+<a class="reference internal" href="tespy.networks.html#tespy.networks.network.Network.print_results" title="tespy.networks.network.Network.print_results"><code class="xref py py-meth docutils literal notranslate"><span class="pre">tespy.networks.network.Network.print_results()</span></code></a> method.
+Standard value is <code class="code docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<p>Busses are used to connect energy flow of different components. They can
+also be used to introduce efficiencies of energy conversion, e.g. in
+motors, generator or boilers. This example takes the combustion engine
+example at
+<a class="reference internal" href="tespy.components.html#tespy.components.combustion.engine.CombustionEngine" title="tespy.components.combustion.engine.CombustionEngine"><code class="xref py py-class docutils literal notranslate"><span class="pre">tespy.components.combustion.engine.CombustionEngine</span></code></a>
+and adds a flue gas cooler and a circulation pump for the cooling water.
+Then busses for heat output, thermal input and electricity output are
+implemented.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="p">(</span><span class="n">Sink</span><span class="p">,</span> <span class="n">Source</span><span class="p">,</span> <span class="n">CombustionEngine</span><span class="p">,</span>
+<span class="gp">... </span><span class="n">HeatExchanger</span><span class="p">,</span> <span class="n">Merge</span><span class="p">,</span> <span class="n">Splitter</span><span class="p">,</span> <span class="n">Pump</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">tespy.connections</span> <span class="kn">import</span> <span class="n">Connection</span><span class="p">,</span> <span class="n">Ref</span><span class="p">,</span> <span class="n">Bus</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">tespy.networks</span> <span class="kn">import</span> <span class="n">Network</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">tespy.tools</span> <span class="kn">import</span> <span class="n">CharLine</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">shutil</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fluid_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Ar&#39;</span><span class="p">,</span> <span class="s1">&#39;N2&#39;</span><span class="p">,</span> <span class="s1">&#39;O2&#39;</span><span class="p">,</span> <span class="s1">&#39;CO2&#39;</span><span class="p">,</span> <span class="s1">&#39;CH4&#39;</span><span class="p">,</span> <span class="s1">&#39;H2O&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nw</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span><span class="n">fluids</span><span class="o">=</span><span class="n">fluid_list</span><span class="p">,</span> <span class="n">p_unit</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="n">T_unit</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">,</span>
+<span class="gp">... </span><span class="n">p_range</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> <span class="n">iterinfo</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">amb</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span><span class="s1">&#39;ambient&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sf</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span><span class="s1">&#39;fuel&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fg</span> <span class="o">=</span> <span class="n">Sink</span><span class="p">(</span><span class="s1">&#39;flue gas outlet&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cw_in</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span><span class="s1">&#39;cooling water inlet&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sp</span> <span class="o">=</span> <span class="n">Splitter</span><span class="p">(</span><span class="s1">&#39;cooling water splitter&#39;</span><span class="p">,</span> <span class="n">num_out</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">me</span> <span class="o">=</span> <span class="n">Merge</span><span class="p">(</span><span class="s1">&#39;cooling water merge&#39;</span><span class="p">,</span> <span class="n">num_in</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cw_out</span> <span class="o">=</span> <span class="n">Sink</span><span class="p">(</span><span class="s1">&#39;cooling water outlet&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fgc</span> <span class="o">=</span> <span class="n">HeatExchanger</span><span class="p">(</span><span class="s1">&#39;flue gas cooler&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pu</span> <span class="o">=</span> <span class="n">Pump</span><span class="p">(</span><span class="s1">&#39;cooling water pump&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">chp</span> <span class="o">=</span> <span class="n">CombustionEngine</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;internal combustion engine&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">amb_comb</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">amb</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">chp</span><span class="p">,</span> <span class="s1">&#39;in3&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sf_comb</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">sf</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">chp</span><span class="p">,</span> <span class="s1">&#39;in4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">comb_fgc</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">chp</span><span class="p">,</span> <span class="s1">&#39;out3&#39;</span><span class="p">,</span> <span class="n">fgc</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fgc_fg</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">fgc</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">fg</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nw</span><span class="o">.</span><span class="n">add_conns</span><span class="p">(</span><span class="n">sf_comb</span><span class="p">,</span> <span class="n">amb_comb</span><span class="p">,</span> <span class="n">comb_fgc</span><span class="p">,</span> <span class="n">fgc_fg</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cw_pu</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">cw_in</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">pu</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pu_sp</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">pu</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">sp</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sp_chp1</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">sp</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">chp</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sp_chp2</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">sp</span><span class="p">,</span> <span class="s1">&#39;out2&#39;</span><span class="p">,</span> <span class="n">chp</span><span class="p">,</span> <span class="s1">&#39;in2&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">chp1_me</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">chp</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">me</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">chp2_me</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">chp</span><span class="p">,</span> <span class="s1">&#39;out2&#39;</span><span class="p">,</span> <span class="n">me</span><span class="p">,</span> <span class="s1">&#39;in2&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">me_fgc</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">me</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">fgc</span><span class="p">,</span> <span class="s1">&#39;in2&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fgc_cw</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">fgc</span><span class="p">,</span> <span class="s1">&#39;out2&#39;</span><span class="p">,</span> <span class="n">cw_out</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nw</span><span class="o">.</span><span class="n">add_conns</span><span class="p">(</span><span class="n">cw_pu</span><span class="p">,</span> <span class="n">pu_sp</span><span class="p">,</span> <span class="n">sp_chp1</span><span class="p">,</span> <span class="n">sp_chp2</span><span class="p">,</span> <span class="n">chp1_me</span><span class="p">,</span> <span class="n">chp2_me</span><span class="p">,</span> <span class="n">me_fgc</span><span class="p">,</span>
+<span class="gp">... </span><span class="n">fgc_cw</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">chp</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">pr1</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span> <span class="n">lamb</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+<span class="gp">... </span><span class="n">design</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;pr1&#39;</span><span class="p">],</span> <span class="n">offdesign</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;zeta1&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fgc</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">pr1</span><span class="o">=</span><span class="mf">0.999</span><span class="p">,</span> <span class="n">pr2</span><span class="o">=</span><span class="mf">0.98</span><span class="p">,</span> <span class="n">design</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;pr1&#39;</span><span class="p">,</span> <span class="s1">&#39;pr2&#39;</span><span class="p">],</span>
+<span class="gp">... </span><span class="n">offdesign</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;zeta1&#39;</span><span class="p">,</span> <span class="s1">&#39;zeta2&#39;</span><span class="p">,</span> <span class="s1">&#39;kA_char&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pu</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">eta_s</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">design</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;eta_s&#39;</span><span class="p">],</span> <span class="n">offdesign</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;eta_s_char&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">amb_comb</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">fluid</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;Ar&#39;</span><span class="p">:</span> <span class="mf">0.0129</span><span class="p">,</span> <span class="s1">&#39;N2&#39;</span><span class="p">:</span> <span class="mf">0.7553</span><span class="p">,</span>
+<span class="gp">... </span><span class="s1">&#39;H2O&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;CH4&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;CO2&#39;</span><span class="p">:</span> <span class="mf">0.0004</span><span class="p">,</span> <span class="s1">&#39;O2&#39;</span><span class="p">:</span> <span class="mf">0.2314</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sf_comb</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">m0</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">fluid</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;CO2&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Ar&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;N2&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<span class="gp">... </span><span class="s1">&#39;O2&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;H2O&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;CH4&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cw_pu</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">fluid</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;CO2&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Ar&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;N2&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<span class="gp">... </span><span class="s1">&#39;O2&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;H2O&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;CH4&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sp_chp2</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">m</span><span class="o">=</span><span class="n">Ref</span><span class="p">(</span><span class="n">sp_chp1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Cooling water mass flow is calculated given the feed water temperature
+(90 °C). The pressure at the cooling water outlet should be identical to
+pressure before pump. The flue gases of the combustion engine leave the
+flue gas cooler at 120 °C.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fgc_cw</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="n">Ref</span><span class="p">(</span><span class="n">cw_pu</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">T</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fgc_fg</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">T</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span> <span class="n">design</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;T&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Now add the busses, pump and combustion engine generator will get a
+characteristic function for conversion efficiency. In case of the
+combustion engine we have to individually choose the bus parameter as there
+are several available (P, TI, Q1, Q2, Q). For heat exchangers or
+turbomachinery the bus parameter is unique. The characteristic function for
+the flue gas cooler is set to -1, as the heat transferred is always
+negative in class heat_exchanger by definition. Instead of specifying the
+combustion engine power output we will define the total electrical power
+output at the bus.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">load</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">eff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.94</span><span class="p">,</span> <span class="mf">0.97</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">])</span> <span class="o">*</span> <span class="mf">0.98</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gen</span> <span class="o">=</span> <span class="n">CharLine</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">load</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">eff</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mot</span> <span class="o">=</span> <span class="n">CharLine</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">load</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">eff</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">power_bus</span> <span class="o">=</span> <span class="n">Bus</span><span class="p">(</span><span class="s1">&#39;total power output&#39;</span><span class="p">,</span> <span class="n">P</span><span class="o">=-</span><span class="mf">10e6</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">heat_bus</span> <span class="o">=</span> <span class="n">Bus</span><span class="p">(</span><span class="s1">&#39;total heat input&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fuel_bus</span> <span class="o">=</span> <span class="n">Bus</span><span class="p">(</span><span class="s1">&#39;thermal input&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You can check, if the bus value is set or not identically to connections.
+Unsetting is possible using <code class="code docutils literal notranslate"><span class="pre">np.nan</span></code> or <code class="code docutils literal notranslate"><span class="pre">None</span></code>. For
+demonstration we will specify a value for the heat bus and unset it again.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">heat_bus</span><span class="o">.</span><span class="n">P</span><span class="o">.</span><span class="n">is_set</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">heat_bus</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">P</span><span class="o">=-</span><span class="mf">1e5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">heat_bus</span><span class="o">.</span><span class="n">P</span><span class="o">.</span><span class="n">is_set</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">heat_bus</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">P</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">heat_bus</span><span class="o">.</span><span class="n">P</span><span class="o">.</span><span class="n">is_set</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">power_bus</span><span class="o">.</span><span class="n">add_comps</span><span class="p">({</span><span class="s1">&#39;comp&#39;</span><span class="p">:</span> <span class="n">chp</span><span class="p">,</span> <span class="s1">&#39;char&#39;</span><span class="p">:</span> <span class="n">gen</span><span class="p">,</span> <span class="s1">&#39;param&#39;</span><span class="p">:</span> <span class="s1">&#39;P&#39;</span><span class="p">},</span>
+<span class="gp">... </span><span class="p">{</span><span class="s1">&#39;comp&#39;</span><span class="p">:</span> <span class="n">pu</span><span class="p">,</span> <span class="s1">&#39;char&#39;</span><span class="p">:</span> <span class="n">mot</span><span class="p">,</span> <span class="s1">&#39;base&#39;</span><span class="p">:</span> <span class="s1">&#39;bus&#39;</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">heat_bus</span><span class="o">.</span><span class="n">add_comps</span><span class="p">({</span><span class="s1">&#39;comp&#39;</span><span class="p">:</span> <span class="n">chp</span><span class="p">,</span> <span class="s1">&#39;param&#39;</span><span class="p">:</span> <span class="s1">&#39;Q&#39;</span><span class="p">,</span> <span class="s1">&#39;char&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">},</span>
+<span class="gp">... </span><span class="p">{</span><span class="s1">&#39;comp&#39;</span><span class="p">:</span> <span class="n">fgc</span><span class="p">,</span> <span class="s1">&#39;char&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fuel_bus</span><span class="o">.</span><span class="n">add_comps</span><span class="p">({</span><span class="s1">&#39;comp&#39;</span><span class="p">:</span> <span class="n">chp</span><span class="p">,</span> <span class="s1">&#39;param&#39;</span><span class="p">:</span> <span class="s1">&#39;TI&#39;</span><span class="p">},</span>
+<span class="gp">... </span><span class="p">{</span><span class="s1">&#39;comp&#39;</span><span class="p">:</span> <span class="n">pu</span><span class="p">,</span> <span class="s1">&#39;char&#39;</span><span class="p">:</span> <span class="n">mot</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nw</span><span class="o">.</span><span class="n">add_busses</span><span class="p">(</span><span class="n">power_bus</span><span class="p">,</span> <span class="n">heat_bus</span><span class="p">,</span> <span class="n">fuel_bus</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;design&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nw</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nw</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;tmp&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The heat bus characteristic for the combustion engine and the flue gas
+cooler have automatically been transformed into an array. The total heat
+output can be seen on both, the heat bus and in the enthalpy rise of the
+cooling water in the combustion engine and the flue gas cooler. Therefore
+these values must be identical.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">heat_bus</span><span class="o">.</span><span class="n">comps</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">fgc</span><span class="p">][</span><span class="s1">&#39;char&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">x</span>
+<span class="go">array([0., 3.])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">heat_bus</span><span class="o">.</span><span class="n">comps</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">fgc</span><span class="p">][</span><span class="s1">&#39;char&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">y</span>
+<span class="go">array([-1., -1.])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">chp</span><span class="o">.</span><span class="n">ti</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="go">25819387.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">chp</span><span class="o">.</span><span class="n">Q1</span><span class="o">.</span><span class="n">val</span> <span class="o">+</span> <span class="n">chp</span><span class="o">.</span><span class="n">Q2</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="go">-8899014.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">fgc_cw</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="p">(</span><span class="n">fgc_cw</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="n">pu_sp</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+<span class="go">12477089.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">heat_bus</span><span class="o">.</span><span class="n">P</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="go">12477089.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">pu</span><span class="o">.</span><span class="n">calc_bus_efficiency</span><span class="p">(</span><span class="n">power_bus</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+<span class="go">0.98</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">power_bus</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">P</span><span class="o">=-</span><span class="mf">7.5e6</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;offdesign&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nw</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span> <span class="n">design_path</span><span class="o">=</span><span class="s1">&#39;tmp&#39;</span><span class="p">,</span> <span class="n">init_path</span><span class="o">=</span><span class="s1">&#39;tmp&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">chp</span><span class="o">.</span><span class="n">ti</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="go">21192700.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">chp</span><span class="o">.</span><span class="n">P</span><span class="o">.</span><span class="n">val</span> <span class="o">/</span> <span class="n">chp</span><span class="o">.</span><span class="n">P</span><span class="o">.</span><span class="n">design</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="go">0.761</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">pu</span><span class="o">.</span><span class="n">calc_bus_efficiency</span><span class="p">(</span><span class="n">power_bus</span><span class="p">),</span> <span class="mi">3</span><span class="p">)</span>
+<span class="go">0.968</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="s1">&#39;./tmp&#39;</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.connections.bus.Bus.add_comps">
+<span class="sig-name descname"><span class="pre">add_comps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/connections/bus.html#Bus.add_comps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.connections.bus.Bus.add_comps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add components to a bus.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>*args</strong> (<em>dict</em>) – Dictionaries containing the component information to be added to
+the bus. The information are described below.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>Required Key</strong></p>
+<ul class="simple">
+<li><p>comp (tespy.components.component.Component): Component you want to
+add to the bus.</p></li>
+</ul>
+<p><strong>Optional Keys</strong></p>
+<ul>
+<li><p>param (str): Bus parameter, optional.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>You do not need to provide a parameter, if the component only has
+one option for the bus (turbomachines, heat exchangers,
+combustion chamber).</p></li>
+<li><p>For instance, you do neet do provide a parameter, if you want to
+add a combustion engine (‘Q’, ‘Q1’, ‘Q2’, ‘TI’, ‘P’, ‘Qloss’).</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>char (float/tespy.components.characteristics.characteristics):
+Characteristic function for this components share to the bus value,
+optional.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>If you do not provide a characteristic line at all, TESPy assumes
+a constant factor of 1.</p></li>
+<li><p>If you provide a numeric value instead of a characteristic line,
+TESPy takes this numeric value as a constant factor.</p></li>
+<li><p>Provide a <a class="reference internal" href="tespy.tools.html#tespy.tools.characteristics.CharLine" title="tespy.tools.characteristics.CharLine"><code class="xref py py-class docutils literal notranslate"><span class="pre">tespy.tools.characteristics.CharLine</span></code></a>, if
+you want the factor to follow a characteristic line.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>P_ref (float): Energy flow specification for reference case,
+<img class="math" src="../_images/math/c762be76eb1bb39882bc93df0400439cdcfa3475.png" alt="P \text{/W}"/>, optional.</p></li>
+<li><p>base (str): Base value for characteristic line and efficiency
+calculation. The base can either be <code class="code docutils literal notranslate"><span class="pre">'component'</span></code> (default) or
+<code class="code docutils literal notranslate"><span class="pre">'bus'</span></code>.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>In case you choose <code class="code docutils literal notranslate"><span class="pre">'component'</span></code>, the characteristic line
+input will follow the value of the component’s bus function and
+the efficiency definition is
+<img class="math" src="../_images/math/1585a4c23afdb323a2d5e2c562b5cfb7b58a8fbc.png" alt="\eta=\frac{P_\mathrm{bus}}{P_\mathrm{component}}"/>.</p></li>
+<li><p>In case you choose <code class="code docutils literal notranslate"><span class="pre">'bus'</span></code>, the characteristic line
+input will follow the bus value of the component and the
+efficiency definition is
+<img class="math" src="../_images/math/50b3b717df9814269a7310269a45ac878240a6ae.png" alt="\eta=\frac{P_\mathrm{component}}{P_\mathrm{bus}}"/>.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.connections.bus.Bus.get_attr">
+<span class="sig-name descname"><span class="pre">get_attr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/connections/bus.html#Bus.get_attr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.connections.bus.Bus.get_attr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the value of a busses attribute.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>key</strong> (<em>str</em>) – The attribute you want to retrieve.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Specified attribute.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>out</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.connections.bus.Bus.set_attr">
+<span class="sig-name descname"><span class="pre">set_attr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/connections/bus.html#Bus.set_attr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.connections.bus.Bus.set_attr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set, reset or unset attributes of a bus object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label</strong> (<em>str</em>) – Label for the bus.</p></li>
+<li><p><strong>P</strong> (<em>float</em>) – Total power/heat flow specification for bus, <img class="math" src="../_images/math/c762be76eb1bb39882bc93df0400439cdcfa3475.png" alt="P \text{/W}"/>.</p></li>
+<li><p><strong>printout</strong> (<em>boolean</em>) – Print the results of this bus to prompt with the
+<a class="reference internal" href="tespy.networks.html#tespy.networks.network.Network.print_results" title="tespy.networks.network.Network.print_results"><code class="xref py py-meth docutils literal notranslate"><span class="pre">tespy.networks.network.Network.print_results()</span></code></a> method.
+Standard value is <code class="code docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Specify <img class="math" src="../_images/math/818acf5c8f9fbc136def732dd2abb0c2e7276e67.png" alt="P=\text{nan}"/>, if you want to unset the value of P.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-tespy.connections.connection">
+<span id="tespy-connections-connection-module"></span><h2>tespy.connections.connection module<a class="headerlink" href="#module-tespy.connections.connection" title="Permalink to this headline">¶</a></h2>
+<p>Module of class Connection and class Ref.</p>
+<p>This file is part of project TESPy (github.com/oemof/tespy). It’s copyrighted
+by the contributors recorded in the version control history of the file,
+available from its original location tespy/connections/connection.py</p>
+<p>SPDX-License-Identifier: MIT</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="tespy.connections.connection.Connection">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tespy.connections.connection.</span></span><span class="sig-name descname"><span class="pre">Connection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comp1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outlet_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comp2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inlet_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/connections/connection.html#Connection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.connections.connection.Connection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class connection is the container for fluid properties between components.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>m</strong> (<em>float</em><em>, </em><a class="reference internal" href="#tespy.connections.connection.Ref" title="tespy.connections.connection.Ref"><em>tespy.connections.connection.Ref</em></a>) – Mass flow specification.</p></li>
+<li><p><strong>m0</strong> (<em>float</em>) – Starting value specification for mass flow.</p></li>
+<li><p><strong>p</strong> (<em>float</em><em>, </em><a class="reference internal" href="#tespy.connections.connection.Ref" title="tespy.connections.connection.Ref"><em>tespy.connections.connection.Ref</em></a>) – Pressure specification.</p></li>
+<li><p><strong>p0</strong> (<em>float</em>) – Starting value specification for pressure.</p></li>
+<li><p><strong>h</strong> (<em>float</em><em>, </em><a class="reference internal" href="#tespy.connections.connection.Ref" title="tespy.connections.connection.Ref"><em>tespy.connections.connection.Ref</em></a>) – Enthalpy specification.</p></li>
+<li><p><strong>h0</strong> (<em>float</em>) – Starting value specification for enthalpy.</p></li>
+<li><p><strong>fluid</strong> (<em>dict</em>) – Fluid compostition specification.</p></li>
+<li><p><strong>fluid0</strong> (<em>dict</em>) – Starting value specification for fluid compostition.</p></li>
+<li><p><strong>fluid_balance</strong> (<em>boolean</em>) – Fluid balance equation specification.</p></li>
+<li><p><strong>x</strong> (<em>float</em>) – Gas phase mass fraction specification.</p></li>
+<li><p><strong>T</strong> (<em>float</em><em>, </em><a class="reference internal" href="#tespy.connections.connection.Ref" title="tespy.connections.connection.Ref"><em>tespy.connections.connection.Ref</em></a>) – Temperature specification.</p></li>
+<li><p><strong>Td_bp</strong> (<em>float</em>) – Temperature difference to boiling point at pressure corresponding
+pressure of this connection in K.</p></li>
+<li><p><strong>v</strong> (<em>float</em>) – Volumetric flow specification.</p></li>
+<li><p><strong>state</strong> (<em>str</em>) – State of the pure fluid on this connection: liquid (‘l’) or gaseous
+(‘g’).</p></li>
+<li><p><strong>design</strong> (<em>list</em>) – List containing design parameters (stated as string).</p></li>
+<li><p><strong>offdesign</strong> (<em>list</em>) – List containing offdesign parameters (stated as string).</p></li>
+<li><p><strong>design_path</strong> (<em>str</em>) – Path to individual design case for this connection.</p></li>
+<li><p><strong>local_offdesign</strong> (<em>boolean</em>) – Treat this connection in offdesign mode in a design calculation.</p></li>
+<li><p><strong>local_design</strong> (<em>boolean</em>) – Treat this connection in design mode in an offdesign calculation.</p></li>
+<li><p><strong>printout</strong> (<em>boolean</em>) – Include this connection in the network’s results printout.</p></li>
+<li><p><strong>label</strong> (<em>str</em>) – Label of the connection. The default value is:
+<code class="code docutils literal notranslate"><span class="pre">'source:source_id_target:target_id'</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>The fluid balance parameter applies a balancing of the fluid vector on
+the specified conntion to 100 %. For example, you have four fluid
+components (a, b, c and d) in your vector, you set two of them
+(a and b) and want the other two (components c and d) to be a result of
+your calculation. If you set this parameter to True, the equation
+(0 = 1 - a - b - c - d) will be applied.</p></li>
+<li><p>The specification of values for design and/or offdesign is used for
+automatic switch from design to offdesign calculation: All parameters
+given in ‘design’, e.g. <code class="code docutils literal notranslate"><span class="pre">design=['T',</span> <span class="pre">'p']</span></code>, are unset in any
+offdesign calculation, parameters given in ‘offdesign’ are set for
+offdesign calculation.</p></li>
+</ul>
+</div>
+<p class="rubric">Example</p>
+<p>This example shows how to create connections and specify parameters. First
+create the required components and connect them in the next step. After
+that, it is possible specify parameters with the <code class="code docutils literal notranslate"><span class="pre">set_attr</span></code> method.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="n">Sink</span><span class="p">,</span> <span class="n">Source</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">tespy.connections</span> <span class="kn">import</span> <span class="n">Connection</span><span class="p">,</span> <span class="n">Ref</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">tespy.tools</span> <span class="kn">import</span> <span class="n">FluidComposition</span> <span class="k">as</span> <span class="n">dc_flu</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">tespy.tools</span> <span class="kn">import</span> <span class="n">FluidProperties</span> <span class="k">as</span> <span class="n">dc_prop</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">so1</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span><span class="s1">&#39;source1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">so2</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span><span class="s1">&#39;source2&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">si1</span> <span class="o">=</span> <span class="n">Sink</span><span class="p">(</span><span class="s1">&#39;sink1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">si2</span> <span class="o">=</span> <span class="n">Sink</span><span class="p">(</span><span class="s1">&#39;sink2&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">so_si1</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">so1</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">si1</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;connection 1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">so_si2</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">so2</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">si2</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">so_si1</span><span class="o">.</span><span class="n">label</span>
+<span class="go">&#39;connection 1&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">so_si2</span><span class="o">.</span><span class="n">label</span>
+<span class="go">&#39;source2:out1_sink2:in1&#39;</span>
+</pre></div>
+</div>
+<p>There are different ways of setting parameters on connections: Specify</p>
+<ul class="simple">
+<li><p>a numeric value  (for attributes mass flow, pressure and enthalpy)</p></li>
+<li><p>a numeric starting value (for attributes mass flow, pressure and
+enthalpy)</p></li>
+<li><p>a dictionary (for attributes fluid and fluid0)</p></li>
+<li><p>a boolean value (for attributes fluid_balance, local_design,
+local_offdesign).</p></li>
+<li><p>a referenced value (mass flow, pressure, temperature, enthalpy).</p></li>
+<li><p>numpy.nan or None (unsetting a value).</p></li>
+<li><p>a string (for attributes design_path and state).</p></li>
+<li><p>a list (for attributes design and offdesign).</p></li>
+</ul>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">so_si1</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">v</span><span class="o">=</span><span class="mf">0.012</span><span class="p">,</span> <span class="n">m0</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">fluid</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;H2O&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;N2&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">so_si2</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">m</span><span class="o">=</span><span class="n">Ref</span><span class="p">(</span><span class="n">so_si1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">),</span> <span class="n">h0</span><span class="o">=</span><span class="mi">700</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+<span class="gp">... </span><span class="n">fluid</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;N2&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span> <span class="n">fluid_balance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span><span class="n">design</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;T&#39;</span><span class="p">],</span> <span class="n">offdesign</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>The set_attr method automatically converts your input in data_container
+information.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">so_si1</span><span class="o">.</span><span class="n">v</span><span class="p">)</span>
+<span class="go">&lt;class &#39;tespy.tools.data_containers.FluidProperties&#39;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">so_si1</span><span class="o">.</span><span class="n">fluid</span><span class="p">)</span>
+<span class="go">&lt;class &#39;tespy.tools.data_containers.FluidComposition&#39;&gt;</span>
+</pre></div>
+</div>
+<p>If you want get a spcific value use the logic: connection.property.*.
+Aditionally, it is possible to use the <code class="code docutils literal notranslate"><span class="pre">get_attr</span></code> method.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">so_si1</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val0</span>
+<span class="go">10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">so_si1</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_set</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">so_si1</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">get_attr</span><span class="p">(</span><span class="s1">&#39;val_set&#39;</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">so_si2</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">ref</span><span class="p">)</span>
+<span class="go">&lt;class &#39;tespy.connections.connection.Ref&#39;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">so_si2</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">get_attr</span><span class="p">(</span><span class="s1">&#39;balance&#39;</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">so_si2</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">ref</span><span class="o">.</span><span class="n">get_attr</span><span class="p">(</span><span class="s1">&#39;delta&#39;</span><span class="p">)</span>
+<span class="go">-5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">so_si2</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">ref_set</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">so_si2</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">ref</span><span class="o">.</span><span class="n">get_attr</span><span class="p">(</span><span class="s1">&#39;obj&#39;</span><span class="p">))</span>
+<span class="go">&lt;class &#39;tespy.connections.connection.Connection&#39;&gt;</span>
+</pre></div>
+</div>
+<p>Unset the specified temperature and specify temperature difference to
+boiling point instead.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">so_si2</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_set</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">so_si2</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">Td_bp</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">so_si2</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_set</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">so_si2</span><span class="o">.</span><span class="n">Td_bp</span><span class="o">.</span><span class="n">val</span>
+<span class="go">5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">so_si2</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">Td_bp</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">so_si2</span><span class="o">.</span><span class="n">Td_bp</span><span class="o">.</span><span class="n">val_set</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+<p>Specify the state keyword: The fluid will be forced to liquid or gaseous
+state in this case.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">so_si2</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s1">&#39;l&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">so_si2</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">is_set</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">so_si2</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">so_si2</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">is_set</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">so_si2</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s1">&#39;g&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">so_si2</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">is_set</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">so_si2</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">so_si2</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">is_set</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.connections.connection.Connection.attr">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">attr</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/connections/connection.html#Connection.attr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.connections.connection.Connection.attr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return available attributes of a connection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>out</strong> – List of available attributes of a connection.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.connections.connection.Connection.get_attr">
+<span class="sig-name descname"><span class="pre">get_attr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/connections/connection.html#Connection.get_attr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.connections.connection.Connection.get_attr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the value of a connection’s attribute.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>key</strong> (<em>str</em>) – The attribute you want to retrieve.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Specified attribute.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>out</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.connections.connection.Connection.get_flow">
+<span class="sig-name descname"><span class="pre">get_flow</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/connections/connection.html#Connection.get_flow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.connections.connection.Connection.get_flow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the SI-values for the network variables.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>out</strong> – List of mass flow and fluid property information.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.connections.connection.Connection.get_physical_exergy">
+<span class="sig-name descname"><span class="pre">get_physical_exergy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/connections/connection.html#Connection.get_physical_exergy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.connections.connection.Connection.get_physical_exergy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the value of a connection’s specific physical exergy.
+Calcute physical exergy of connection</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p0</strong> (<em>float</em>) – Ambient pressure p0 / Pa.</p></li>
+<li><p><strong>T0</strong> (<em>float</em>) – Ambient temperature T0 / K.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<div class="math">
+<p><img src="../_images/math/9d461a24761a9517937c15db1d9ff1704a3ebdab.png" alt="e^\mathrm{PH} = e^\mathrm{T} + e^\mathrm{M}\\
+E^\mathrm{T} = \dot{m} \cdot e^\mathrm{T}\\
+E^\mathrm{M} = \dot{m} \cdot e^\mathrm{M}\\
+E^\mathrm{PH} = \dot{m} \cdot e^\mathrm{PH}"/></p>
+</div></div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.connections.connection.Connection.set_attr">
+<span class="sig-name descname"><span class="pre">set_attr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/connections/connection.html#Connection.set_attr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.connections.connection.Connection.set_attr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set, reset or unset attributes of a connection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>m</strong> (<em>float</em><em>, </em><a class="reference internal" href="#tespy.connections.connection.Ref" title="tespy.connections.connection.Ref"><em>tespy.connections.connection.Ref</em></a>) – Mass flow specification.</p></li>
+<li><p><strong>m0</strong> (<em>float</em>) – Starting value specification for mass flow.</p></li>
+<li><p><strong>p</strong> (<em>float</em><em>, </em><a class="reference internal" href="#tespy.connections.connection.Ref" title="tespy.connections.connection.Ref"><em>tespy.connections.connection.Ref</em></a>) – Pressure specification.</p></li>
+<li><p><strong>p0</strong> (<em>float</em>) – Starting value specification for pressure.</p></li>
+<li><p><strong>h</strong> (<em>float</em><em>, </em><a class="reference internal" href="#tespy.connections.connection.Ref" title="tespy.connections.connection.Ref"><em>tespy.connections.connection.Ref</em></a>) – Enthalpy specification.</p></li>
+<li><p><strong>h0</strong> (<em>float</em>) – Starting value specification for enthalpy.</p></li>
+<li><p><strong>fluid</strong> (<em>dict</em>) – Fluid compostition specification.</p></li>
+<li><p><strong>fluid0</strong> (<em>dict</em>) – Starting value specification for fluid compostition.</p></li>
+<li><p><strong>fluid_balance</strong> (<em>boolean</em>) – Fluid balance equation specification.</p></li>
+<li><p><strong>x</strong> (<em>float</em>) – Gas phase mass fraction specification.</p></li>
+<li><p><strong>T</strong> (<em>float</em><em>, </em><a class="reference internal" href="#tespy.connections.connection.Ref" title="tespy.connections.connection.Ref"><em>tespy.connections.connection.Ref</em></a>) – Temperature specification.</p></li>
+<li><p><strong>Td_bp</strong> (<em>float</em>) – Temperature difference to boiling point at pressure corresponding
+pressure of this connection in K.</p></li>
+<li><p><strong>v</strong> (<em>float</em>) – Volumetric flow specification.</p></li>
+<li><p><strong>state</strong> (<em>str</em>) – State of the pure fluid on this connection: liquid (‘l’) or gaseous
+(‘g’).</p></li>
+<li><p><strong>design</strong> (<em>list</em>) – List containing design parameters (stated as string).</p></li>
+<li><p><strong>offdesign</strong> (<em>list</em>) – List containing offdesign parameters (stated as string).</p></li>
+<li><p><strong>design_path</strong> (<em>str</em>) – Path to individual design case for this connection.</p></li>
+<li><p><strong>local_offdesign</strong> (<em>boolean</em>) – Treat this connection in offdesign mode in a design calculation.</p></li>
+<li><p><strong>local_design</strong> (<em>boolean</em>) – Treat this connection in design mode in an offdesign calculation.</p></li>
+<li><p><strong>printout</strong> (<em>boolean</em>) – Include this connection in the network’s results printout.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>The fluid balance parameter applies a balancing of the fluid vector
+on the specified conntion to 100 %. For example, you have four fluid
+components (a, b, c and d) in your vector, you set two of them
+(a and b) and want the other two (components c and d) to be a result
+of your calculation. If you set this parameter to True, the equation
+(0 = 1 - a - b - c - d) will be applied.</p></li>
+<li><p>The specification of values for design and/or offdesign is used for
+automatic switch from design to offdesign calculation: All parameters
+given in ‘design’, e.g. <code class="code docutils literal notranslate"><span class="pre">design=['T',</span> <span class="pre">'p']</span></code>, are unset in any
+offdesign calculation, parameters given in ‘offdesign’ are set for
+offdesign calculation.</p></li>
+<li><p>The property state is applied on pure fluids only. If you specify the
+desired state of the fluid at a connection the convergence check will
+adjust the enthalpy values of that connection for the first
+iterations in order to meet the state requirement.</p></li>
+</ul>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tespy.connections.connection.Ref">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tespy.connections.connection.</span></span><span class="sig-name descname"><span class="pre">Ref</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/connections/connection.html#Ref"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.connections.connection.Ref" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A bus is used to connect different energy flows.</p>
+<p>For example, reference the mass flow of one connection <img class="math" src="../_images/math/51ac9faa380f2ad5849c324de2e51854a229090b.png" alt="\dot{m}"/> to
+another mass flow <img class="math" src="../_images/math/f09ce78836ada40ad87d29d6000494e7eb8c90ed.png" alt="\dot{m}_{ref}"/>:</p>
+<div class="math">
+<p><img src="../_images/math/02e7484605adc314ff6ea7c08e62e9c9b68e6e7c.png" alt="\dot{m} = \dot{m}_\mathrm{ref} \cdot \mathrm{factor} + \mathrm{delta}"/></p>
+</div><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obj</strong> (<a class="reference internal" href="#tespy.connections.connection.Connection" title="tespy.connections.connection.Connection"><em>tespy.connections.connection.Connection</em></a>) – Connection to be referenced.</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – Factor to multiply specified property with.</p></li>
+<li><p><strong>delta</strong> (<em>float</em>) – Delta to add after multiplication.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.connections.connection.Ref.get_attr">
+<span class="sig-name descname"><span class="pre">get_attr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/connections/connection.html#Ref.get_attr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.connections.connection.Ref.get_attr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the value of a reference attribute.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>key</strong> (<em>str</em>) – The attribute you want to retrieve.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Specified attribute.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>out</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="tespy.components.html" class="btn btn-neutral float-left" title="tespy.components module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tespy.data.html" class="btn btn-neutral float-right" title="tespy.data module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2020, Francesco Witte.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tespy.connections.connection &mdash; tespy 0.6.0 - Colored Chemicals documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> tespy
+            <img src="../../../_static/logo_tespy_mid.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.6.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../introduction.html">Thermal Engineering Systems in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../first_steps.html">First steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials_examples.html">Examples and Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tespy_modules.html">TESPy modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tespy_analyses.html">Thermodynamic analyses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developing_tespy.html">Developing TESPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../zliterature.html">Literature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">tespy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>tespy.connections.connection</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for tespy.connections.connection</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8</span>
+
+<span class="sd">&quot;&quot;&quot;Module of class Connection and class Ref.</span>
+
+
+<span class="sd">This file is part of project TESPy (github.com/oemof/tespy). It&#39;s copyrighted</span>
+<span class="sd">by the contributors recorded in the version control history of the file,</span>
+<span class="sd">available from its original location tespy/connections/connection.py</span>
+
+<span class="sd">SPDX-License-Identifier: MIT</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">tespy.components.component</span> <span class="kn">import</span> <span class="n">Component</span>
+<span class="kn">from</span> <span class="nn">tespy.tools</span> <span class="kn">import</span> <span class="n">fluid_properties</span> <span class="k">as</span> <span class="n">fp</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.data_containers</span> <span class="kn">import</span> <span class="n">DataContainerSimple</span> <span class="k">as</span> <span class="n">dc_simple</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.data_containers</span> <span class="kn">import</span> <span class="n">FluidComposition</span> <span class="k">as</span> <span class="n">dc_flu</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.data_containers</span> <span class="kn">import</span> <span class="n">FluidProperties</span> <span class="k">as</span> <span class="n">dc_prop</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.helpers</span> <span class="kn">import</span> <span class="n">TESPyConnectionError</span>
+
+<span class="c1"># pass the warning messages to the logger</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">captureWarnings</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Connection"><a class="viewcode-back" href="../../../api/tespy.connections.html#tespy.connections.connection.Connection">[docs]</a><span class="k">class</span> <span class="nc">Connection</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class connection is the container for fluid properties between components.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    m : float, tespy.connections.connection.Ref</span>
+<span class="sd">        Mass flow specification.</span>
+
+<span class="sd">    m0 : float</span>
+<span class="sd">        Starting value specification for mass flow.</span>
+
+<span class="sd">    p : float, tespy.connections.connection.Ref</span>
+<span class="sd">        Pressure specification.</span>
+
+<span class="sd">    p0 : float</span>
+<span class="sd">        Starting value specification for pressure.</span>
+
+<span class="sd">    h : float, tespy.connections.connection.Ref</span>
+<span class="sd">        Enthalpy specification.</span>
+
+<span class="sd">    h0 : float</span>
+<span class="sd">        Starting value specification for enthalpy.</span>
+
+<span class="sd">    fluid : dict</span>
+<span class="sd">        Fluid compostition specification.</span>
+
+<span class="sd">    fluid0 : dict</span>
+<span class="sd">        Starting value specification for fluid compostition.</span>
+
+<span class="sd">    fluid_balance : boolean</span>
+<span class="sd">        Fluid balance equation specification.</span>
+
+<span class="sd">    x : float</span>
+<span class="sd">        Gas phase mass fraction specification.</span>
+
+<span class="sd">    T : float, tespy.connections.connection.Ref</span>
+<span class="sd">        Temperature specification.</span>
+
+<span class="sd">    Td_bp : float</span>
+<span class="sd">        Temperature difference to boiling point at pressure corresponding</span>
+<span class="sd">        pressure of this connection in K.</span>
+
+<span class="sd">    v : float</span>
+<span class="sd">        Volumetric flow specification.</span>
+
+<span class="sd">    state : str</span>
+<span class="sd">        State of the pure fluid on this connection: liquid (&#39;l&#39;) or gaseous</span>
+<span class="sd">        (&#39;g&#39;).</span>
+
+<span class="sd">    design : list</span>
+<span class="sd">        List containing design parameters (stated as string).</span>
+
+<span class="sd">    offdesign : list</span>
+<span class="sd">        List containing offdesign parameters (stated as string).</span>
+
+<span class="sd">    design_path : str</span>
+<span class="sd">        Path to individual design case for this connection.</span>
+
+<span class="sd">    local_offdesign : boolean</span>
+<span class="sd">        Treat this connection in offdesign mode in a design calculation.</span>
+
+<span class="sd">    local_design : boolean</span>
+<span class="sd">        Treat this connection in design mode in an offdesign calculation.</span>
+
+<span class="sd">    printout : boolean</span>
+<span class="sd">        Include this connection in the network&#39;s results printout.</span>
+
+<span class="sd">    label : str</span>
+<span class="sd">        Label of the connection. The default value is:</span>
+<span class="sd">        :code:`&#39;source:source_id_target:target_id&#39;`.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    - The fluid balance parameter applies a balancing of the fluid vector on</span>
+<span class="sd">      the specified conntion to 100 %. For example, you have four fluid</span>
+<span class="sd">      components (a, b, c and d) in your vector, you set two of them</span>
+<span class="sd">      (a and b) and want the other two (components c and d) to be a result of</span>
+<span class="sd">      your calculation. If you set this parameter to True, the equation</span>
+<span class="sd">      (0 = 1 - a - b - c - d) will be applied.</span>
+
+<span class="sd">    - The specification of values for design and/or offdesign is used for</span>
+<span class="sd">      automatic switch from design to offdesign calculation: All parameters</span>
+<span class="sd">      given in &#39;design&#39;, e.g. :code:`design=[&#39;T&#39;, &#39;p&#39;]`, are unset in any</span>
+<span class="sd">      offdesign calculation, parameters given in &#39;offdesign&#39; are set for</span>
+<span class="sd">      offdesign calculation.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    This example shows how to create connections and specify parameters. First</span>
+<span class="sd">    create the required components and connect them in the next step. After</span>
+<span class="sd">    that, it is possible specify parameters with the :code:`set_attr` method.</span>
+
+<span class="sd">    &gt;&gt;&gt; from tespy.components import Sink, Source</span>
+<span class="sd">    &gt;&gt;&gt; from tespy.connections import Connection, Ref</span>
+<span class="sd">    &gt;&gt;&gt; from tespy.tools import FluidComposition as dc_flu</span>
+<span class="sd">    &gt;&gt;&gt; from tespy.tools import FluidProperties as dc_prop</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; so1 = Source(&#39;source1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; so2 = Source(&#39;source2&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; si1 = Sink(&#39;sink1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; si2 = Sink(&#39;sink2&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; so_si1 = Connection(so1, &#39;out1&#39;, si1, &#39;in1&#39;, label=&#39;connection 1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; so_si2 = Connection(so2, &#39;out1&#39;, si2, &#39;in1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; so_si1.label</span>
+<span class="sd">    &#39;connection 1&#39;</span>
+<span class="sd">    &gt;&gt;&gt; so_si2.label</span>
+<span class="sd">    &#39;source2:out1_sink2:in1&#39;</span>
+
+<span class="sd">    There are different ways of setting parameters on connections: Specify</span>
+
+<span class="sd">    - a numeric value  (for attributes mass flow, pressure and enthalpy)</span>
+<span class="sd">    - a numeric starting value (for attributes mass flow, pressure and</span>
+<span class="sd">      enthalpy)</span>
+<span class="sd">    - a dictionary (for attributes fluid and fluid0)</span>
+<span class="sd">    - a boolean value (for attributes fluid_balance, local_design,</span>
+<span class="sd">      local_offdesign).</span>
+<span class="sd">    - a referenced value (mass flow, pressure, temperature, enthalpy).</span>
+<span class="sd">    - numpy.nan or None (unsetting a value).</span>
+<span class="sd">    - a string (for attributes design_path and state).</span>
+<span class="sd">    - a list (for attributes design and offdesign).</span>
+
+<span class="sd">    &gt;&gt;&gt; so_si1.set_attr(v=0.012, m0=10, p=5, h=400, fluid={&#39;H2O&#39;: 1, &#39;N2&#39;: 0})</span>
+<span class="sd">    &gt;&gt;&gt; so_si2.set_attr(m=Ref(so_si1, 2, -5), h0=700, T=200,</span>
+<span class="sd">    ... fluid={&#39;N2&#39;: 1}, fluid_balance=True,</span>
+<span class="sd">    ... design=[&#39;T&#39;], offdesign=[&#39;m&#39;, &#39;v&#39;])</span>
+
+<span class="sd">    The set_attr method automatically converts your input in data_container</span>
+<span class="sd">    information.</span>
+
+<span class="sd">    &gt;&gt;&gt; type(so_si1.v)</span>
+<span class="sd">    &lt;class &#39;tespy.tools.data_containers.FluidProperties&#39;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; type(so_si1.fluid)</span>
+<span class="sd">    &lt;class &#39;tespy.tools.data_containers.FluidComposition&#39;&gt;</span>
+
+<span class="sd">    If you want get a spcific value use the logic: connection.property.*.</span>
+<span class="sd">    Aditionally, it is possible to use the :code:`get_attr` method.</span>
+
+<span class="sd">    &gt;&gt;&gt; so_si1.m.val0</span>
+<span class="sd">    10</span>
+<span class="sd">    &gt;&gt;&gt; so_si1.m.val_set</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; so_si1.m.get_attr(&#39;val_set&#39;)</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; type(so_si2.m.ref)</span>
+<span class="sd">    &lt;class &#39;tespy.connections.connection.Ref&#39;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; so_si2.fluid.get_attr(&#39;balance&#39;)</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; so_si2.m.ref.get_attr(&#39;delta&#39;)</span>
+<span class="sd">    -5</span>
+<span class="sd">    &gt;&gt;&gt; so_si2.m.ref_set</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; type(so_si2.m.ref.get_attr(&#39;obj&#39;))</span>
+<span class="sd">    &lt;class &#39;tespy.connections.connection.Connection&#39;&gt;</span>
+
+<span class="sd">    Unset the specified temperature and specify temperature difference to</span>
+<span class="sd">    boiling point instead.</span>
+
+<span class="sd">    &gt;&gt;&gt; so_si2.T.val_set</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; so_si2.set_attr(Td_bp=5, T=np.nan)</span>
+<span class="sd">    &gt;&gt;&gt; so_si2.T.val_set</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; so_si2.Td_bp.val</span>
+<span class="sd">    5</span>
+<span class="sd">    &gt;&gt;&gt; so_si2.set_attr(Td_bp=None)</span>
+<span class="sd">    &gt;&gt;&gt; so_si2.Td_bp.val_set</span>
+<span class="sd">    False</span>
+
+<span class="sd">    Specify the state keyword: The fluid will be forced to liquid or gaseous</span>
+<span class="sd">    state in this case.</span>
+
+<span class="sd">    &gt;&gt;&gt; so_si2.set_attr(state=&#39;l&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; so_si2.state.is_set</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; so_si2.set_attr(state=np.nan)</span>
+<span class="sd">    &gt;&gt;&gt; so_si2.state.is_set</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; so_si2.set_attr(state=&#39;g&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; so_si2.state.is_set</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; so_si2.set_attr(state=None)</span>
+<span class="sd">    &gt;&gt;&gt; so_si2.state.is_set</span>
+<span class="sd">    False</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comp1</span><span class="p">,</span> <span class="n">outlet_id</span><span class="p">,</span> <span class="n">comp2</span><span class="p">,</span> <span class="n">inlet_id</span><span class="p">,</span>
+                 <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="c1"># check input parameters</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">comp1</span><span class="p">,</span> <span class="n">Component</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="nb">isinstance</span><span class="p">(</span><span class="n">comp2</span><span class="p">,</span> <span class="n">Component</span><span class="p">)):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Error creating connection. Check if comp1, comp2 are of &#39;</span>
+                   <span class="s1">&#39;type component.&#39;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">comp1</span> <span class="o">==</span> <span class="n">comp2</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Error creating connection. Cannot connect component &#39;</span> <span class="o">+</span>
+                   <span class="n">comp1</span><span class="o">.</span><span class="n">label</span> <span class="o">+</span> <span class="s1">&#39; to itself.&#39;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">TESPyConnectionError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">outlet_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">comp1</span><span class="o">.</span><span class="n">outlets</span><span class="p">():</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Error creating connection. Specified oulet_id (&#39;</span> <span class="o">+</span>
+                   <span class="n">outlet_id</span> <span class="o">+</span> <span class="s1">&#39;) is not valid for component &#39;</span> <span class="o">+</span>
+                   <span class="n">comp1</span><span class="o">.</span><span class="n">component</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;. Valid ids are: &#39;</span> <span class="o">+</span>
+                   <span class="nb">str</span><span class="p">(</span><span class="n">comp1</span><span class="o">.</span><span class="n">outlets</span><span class="p">())</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">inlet_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">comp2</span><span class="o">.</span><span class="n">inlets</span><span class="p">():</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s1">&#39;Error creating connection. Specified inlet_id (&#39;</span> <span class="o">+</span> <span class="n">inlet_id</span> <span class="o">+</span>
+                <span class="s1">&#39;) is not valid for component &#39;</span> <span class="o">+</span> <span class="n">comp2</span><span class="o">.</span><span class="n">component</span><span class="p">()</span> <span class="o">+</span>
+                <span class="s1">&#39;. Valid ids are: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">comp2</span><span class="o">.</span><span class="n">inlets</span><span class="p">())</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">comp1</span><span class="o">.</span><span class="n">label</span> <span class="o">+</span> <span class="s1">&#39;:&#39;</span> <span class="o">+</span> <span class="n">outlet_id</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span>
+                <span class="n">comp2</span><span class="o">.</span><span class="n">label</span> <span class="o">+</span> <span class="s1">&#39;:&#39;</span> <span class="o">+</span> <span class="n">inlet_id</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">label</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Please provide the label as string.&#39;</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="c1"># set specified values</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="n">comp1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">source_id</span> <span class="o">=</span> <span class="n">outlet_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">comp2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_id</span> <span class="o">=</span> <span class="n">inlet_id</span>
+
+        <span class="c1"># defaults</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">new_design</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">design_path</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">design</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">offdesign</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">local_design</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">local_offdesign</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">printout</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># set default values for kwargs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">variables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attr</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">variables0</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="o">+</span> <span class="s1">&#39;0&#39;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s1">&#39;Created connection &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">label</span> <span class="o">+</span> <span class="s1">&#39; (&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">source_id</span> <span class="o">+</span>
+            <span class="s1">&#39;) -&gt; &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">label</span> <span class="o">+</span> <span class="s1">&#39; (&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_id</span> <span class="o">+</span> <span class="s1">&#39;).&#39;</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Connection.set_attr"><a class="viewcode-back" href="../../../api/tespy.connections.html#tespy.connections.connection.Connection.set_attr">[docs]</a>    <span class="k">def</span> <span class="nf">set_attr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set, reset or unset attributes of a connection.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        m : float, tespy.connections.connection.Ref</span>
+<span class="sd">            Mass flow specification.</span>
+
+<span class="sd">        m0 : float</span>
+<span class="sd">            Starting value specification for mass flow.</span>
+
+<span class="sd">        p : float, tespy.connections.connection.Ref</span>
+<span class="sd">            Pressure specification.</span>
+
+<span class="sd">        p0 : float</span>
+<span class="sd">            Starting value specification for pressure.</span>
+
+<span class="sd">        h : float, tespy.connections.connection.Ref</span>
+<span class="sd">            Enthalpy specification.</span>
+
+<span class="sd">        h0 : float</span>
+<span class="sd">            Starting value specification for enthalpy.</span>
+
+<span class="sd">        fluid : dict</span>
+<span class="sd">            Fluid compostition specification.</span>
+
+<span class="sd">        fluid0 : dict</span>
+<span class="sd">            Starting value specification for fluid compostition.</span>
+
+<span class="sd">        fluid_balance : boolean</span>
+<span class="sd">            Fluid balance equation specification.</span>
+
+<span class="sd">        x : float</span>
+<span class="sd">            Gas phase mass fraction specification.</span>
+
+<span class="sd">        T : float, tespy.connections.connection.Ref</span>
+<span class="sd">            Temperature specification.</span>
+
+<span class="sd">        Td_bp : float</span>
+<span class="sd">            Temperature difference to boiling point at pressure corresponding</span>
+<span class="sd">            pressure of this connection in K.</span>
+
+<span class="sd">        v : float</span>
+<span class="sd">            Volumetric flow specification.</span>
+
+<span class="sd">        state : str</span>
+<span class="sd">            State of the pure fluid on this connection: liquid (&#39;l&#39;) or gaseous</span>
+<span class="sd">            (&#39;g&#39;).</span>
+
+<span class="sd">        design : list</span>
+<span class="sd">            List containing design parameters (stated as string).</span>
+
+<span class="sd">        offdesign : list</span>
+<span class="sd">            List containing offdesign parameters (stated as string).</span>
+
+<span class="sd">        design_path : str</span>
+<span class="sd">            Path to individual design case for this connection.</span>
+
+<span class="sd">        local_offdesign : boolean</span>
+<span class="sd">            Treat this connection in offdesign mode in a design calculation.</span>
+
+<span class="sd">        local_design : boolean</span>
+<span class="sd">            Treat this connection in design mode in an offdesign calculation.</span>
+
+<span class="sd">        printout : boolean</span>
+<span class="sd">            Include this connection in the network&#39;s results printout.</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        - The fluid balance parameter applies a balancing of the fluid vector</span>
+<span class="sd">          on the specified conntion to 100 %. For example, you have four fluid</span>
+<span class="sd">          components (a, b, c and d) in your vector, you set two of them</span>
+<span class="sd">          (a and b) and want the other two (components c and d) to be a result</span>
+<span class="sd">          of your calculation. If you set this parameter to True, the equation</span>
+<span class="sd">          (0 = 1 - a - b - c - d) will be applied.</span>
+<span class="sd">        - The specification of values for design and/or offdesign is used for</span>
+<span class="sd">          automatic switch from design to offdesign calculation: All parameters</span>
+<span class="sd">          given in &#39;design&#39;, e.g. :code:`design=[&#39;T&#39;, &#39;p&#39;]`, are unset in any</span>
+<span class="sd">          offdesign calculation, parameters given in &#39;offdesign&#39; are set for</span>
+<span class="sd">          offdesign calculation.</span>
+<span class="sd">        - The property state is applied on pure fluids only. If you specify the</span>
+<span class="sd">          desired state of the fluid at a connection the convergence check will</span>
+<span class="sd">          adjust the enthalpy values of that connection for the first</span>
+<span class="sd">          iterations in order to meet the state requirement.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># set specified values</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;label&#39;</span><span class="p">:</span>
+                <span class="c1"># bad datatype</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Label can only be specified on instance creation.&#39;</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">TESPyConnectionError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span> <span class="ow">or</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables0</span><span class="p">:</span>
+                <span class="c1"># fluid specification</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="nb">float</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+                    <span class="n">is_numeric</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+                    <span class="n">is_numeric</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">if</span> <span class="s1">&#39;fluid&#39;</span> <span class="ow">in</span> <span class="n">key</span> <span class="ow">and</span> <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;fluid_balance&#39;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+                        <span class="c1"># starting values</span>
+                        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables0</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">val0</span><span class="o">=</span><span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+                        <span class="c1"># specified parameters</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">val</span><span class="o">=</span><span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span>
+                                <span class="n">val_set</span><span class="o">=</span><span class="p">{</span><span class="n">f</span><span class="p">:</span> <span class="kc">True</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()})</span>
+
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># bad datatype</span>
+                        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="s1">&#39;Datatype for fluid vector specification must be &#39;</span>
+                            <span class="s1">&#39;dict.&#39;</span><span class="p">)</span>
+                        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+                <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;state&#39;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;l&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">]:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">val</span><span class="o">=</span><span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">is_set</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">is_set</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">is_numeric</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]):</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">get_attr</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">is_set</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                                <span class="s1">&#39;To unset the state specification either use &#39;</span>
+                                <span class="s1">&#39;np.nan or None.&#39;</span><span class="p">)</span>
+                            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="s1">&#39;Keyword argument &quot;state&quot; must either be &#39;</span>
+                            <span class="s1">&#39;&quot;l&quot; or &quot;g&quot; or be None or np.nan.&#39;</span><span class="p">)</span>
+                        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+                <span class="k">elif</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">get_attr</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">val_set</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">get_attr</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">ref_set</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+                <span class="k">elif</span> <span class="n">is_numeric</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">get_attr</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">val_set</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">get_attr</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">ref_set</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># value specification</span>
+                        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">get_attr</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span>
+                                <span class="n">val_set</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                <span class="n">val</span><span class="o">=</span><span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+                        <span class="c1"># starting value specification</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">get_attr</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span>
+                                <span class="n">val0</span><span class="o">=</span><span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+
+                <span class="c1"># reference object</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">Ref</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="s1">&#39;Td_bp&#39;</span><span class="p">]:</span>
+                        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="s1">&#39;References for volumetric flow, vapor mass &#39;</span>
+                            <span class="s1">&#39;fraction and subcooling/superheating are not &#39;</span>
+                            <span class="s1">&#39;implemented.&#39;</span><span class="p">)</span>
+                        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">get_attr</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">ref</span><span class="o">=</span><span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">get_attr</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">ref_set</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+                <span class="c1"># invalid datatype for keyword</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Bad datatype for keyword argument &#39;</span> <span class="o">+</span> <span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+            <span class="c1"># fluid balance</span>
+            <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;fluid_balance&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">bool</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">get_attr</span><span class="p">(</span><span class="s1">&#39;fluid&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">balance</span><span class="o">=</span><span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="s1">&#39;Datatype for keyword argument fluid_balance must be &#39;</span>
+                        <span class="s1">&#39;boolean.&#39;</span><span class="p">)</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+            <span class="c1"># design/offdesign parameter list</span>
+            <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;design&#39;</span> <span class="ow">or</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;offdesign&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Please provide the &#39;</span> <span class="o">+</span> <span class="n">key</span> <span class="o">+</span> <span class="s1">&#39; parameters as list!&#39;</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="nb">set</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">])</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">key</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]})</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">params</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="s1">&#39;Available parameters for (off-)design specification &#39;</span>
+                        <span class="s1">&#39;are: &#39;</span> <span class="o">+</span> <span class="n">params</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+            <span class="c1"># design path</span>
+            <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;design_path&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">key</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]})</span>
+                <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">design_path</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="s1">&#39;Please provide the design_path parameter as string &#39;</span>
+                        <span class="s1">&#39;or as nan.&#39;</span><span class="p">)</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">new_design</span> <span class="o">=</span> <span class="kc">True</span>
+
+            <span class="c1"># other boolean keywords</span>
+            <span class="k">elif</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;printout&#39;</span><span class="p">,</span> <span class="s1">&#39;local_design&#39;</span><span class="p">,</span> <span class="s1">&#39;local_offdesign&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">bool</span><span class="p">):</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Please provide the &#39;</span> <span class="o">+</span> <span class="n">key</span> <span class="o">+</span> <span class="s1">&#39; as boolean.&#39;</span><span class="p">)</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">key</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]})</span>
+
+            <span class="c1"># invalid keyword</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Connection has no attribute &#39;</span> <span class="o">+</span> <span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Connection.get_attr"><a class="viewcode-back" href="../../../api/tespy.connections.html#tespy.connections.connection.Connection.get_attr">[docs]</a>    <span class="k">def</span> <span class="nf">get_attr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the value of a connection&#39;s attribute.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : str</span>
+<span class="sd">            The attribute you want to retrieve.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        out :</span>
+<span class="sd">            Specified attribute.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Connection has no attribute </span><span class="se">\&quot;</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\&quot;</span><span class="s1">.&#39;</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Connection.attr"><a class="viewcode-back" href="../../../api/tespy.connections.html#tespy.connections.connection.Connection.attr">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">attr</span><span class="p">():</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return available attributes of a connection.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        out : list</span>
+<span class="sd">            List of available attributes of a connection.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;m&#39;</span><span class="p">:</span> <span class="n">dc_prop</span><span class="p">(),</span> <span class="s1">&#39;p&#39;</span><span class="p">:</span> <span class="n">dc_prop</span><span class="p">(),</span> <span class="s1">&#39;h&#39;</span><span class="p">:</span> <span class="n">dc_prop</span><span class="p">(),</span> <span class="s1">&#39;T&#39;</span><span class="p">:</span> <span class="n">dc_prop</span><span class="p">(),</span>
+                <span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">dc_prop</span><span class="p">(),</span> <span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="n">dc_prop</span><span class="p">(),</span> <span class="s1">&#39;vol&#39;</span><span class="p">:</span> <span class="n">dc_prop</span><span class="p">(),</span>
+                <span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="n">dc_prop</span><span class="p">(),</span>
+                <span class="s1">&#39;fluid&#39;</span><span class="p">:</span> <span class="n">dc_flu</span><span class="p">(),</span> <span class="s1">&#39;Td_bp&#39;</span><span class="p">:</span> <span class="n">dc_prop</span><span class="p">(),</span> <span class="s1">&#39;state&#39;</span><span class="p">:</span> <span class="n">dc_simple</span><span class="p">()}</span></div>
+
+<div class="viewcode-block" id="Connection.get_flow"><a class="viewcode-back" href="../../../api/tespy.connections.html#tespy.connections.connection.Connection.get_flow">[docs]</a>    <span class="k">def</span> <span class="nf">get_flow</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the SI-values for the network variables.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        out : list</span>
+<span class="sd">            List of mass flow and fluid property information.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">val_SI</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Connection.get_physical_exergy"><a class="viewcode-back" href="../../../api/tespy.connections.html#tespy.connections.connection.Connection.get_physical_exergy">[docs]</a>    <span class="k">def</span> <span class="nf">get_physical_exergy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p0</span><span class="p">,</span> <span class="n">T0</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the value of a connection&#39;s specific physical exergy.</span>
+<span class="sd">        Calcute physical exergy of connection</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        p0 : float</span>
+<span class="sd">            Ambient pressure p0 / Pa.</span>
+
+<span class="sd">        T0 : float</span>
+<span class="sd">            Ambient temperature T0 / K.</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">            .. math::</span>
+
+<span class="sd">                e^\mathrm{PH} = e^\mathrm{T} + e^\mathrm{M}\\</span>
+<span class="sd">                E^\mathrm{T} = \dot{m} \cdot e^\mathrm{T}\\</span>
+<span class="sd">                E^\mathrm{M} = \dot{m} \cdot e^\mathrm{M}\\</span>
+<span class="sd">                E^\mathrm{PH} = \dot{m} \cdot e^\mathrm{PH}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ex_therm</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ex_mech</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">calc_physical_exergy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p0</span><span class="p">,</span> <span class="n">T0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Ex_therm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ex_therm</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Ex_mech</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ex_mech</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ex_physical</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ex_therm</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">ex_mech</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Ex_physical</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">ex_physical</span></div></div>
+
+
+<div class="viewcode-block" id="Ref"><a class="viewcode-back" href="../../../api/tespy.connections.html#tespy.connections.connection.Ref">[docs]</a><span class="k">class</span> <span class="nc">Ref</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A bus is used to connect different energy flows.</span>
+
+<span class="sd">    For example, reference the mass flow of one connection :math:`\dot{m}` to</span>
+<span class="sd">    another mass flow :math:`\dot{m}_{ref}`:</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \dot{m} = \dot{m}_\mathrm{ref} \cdot \mathrm{factor} + \mathrm{delta}</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    obj : tespy.connections.connection.Connection</span>
+<span class="sd">        Connection to be referenced.</span>
+
+<span class="sd">    factor : float</span>
+<span class="sd">        Factor to multiply specified property with.</span>
+
+<span class="sd">    delta : float</span>
+<span class="sd">        Delta to add after multiplication.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ref_obj</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">delta</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ref_obj</span><span class="p">,</span> <span class="n">Connection</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;First parameter must be object of type connection.&#39;</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">factor</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">factor</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Second parameter must be of type int or float.&#39;</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Thrid parameter must be of type int or float.&#39;</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">obj</span> <span class="o">=</span> <span class="n">ref_obj</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">=</span> <span class="n">factor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delta</span> <span class="o">=</span> <span class="n">delta</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delta_SI</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Created reference object with factor &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">factor</span><span class="p">)</span> <span class="o">+</span>
+               <span class="s1">&#39; and delta &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; referring to connection &#39;</span> <span class="o">+</span>
+               <span class="n">ref_obj</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">label</span> <span class="o">+</span> <span class="s1">&#39; (&#39;</span> <span class="o">+</span> <span class="n">ref_obj</span><span class="o">.</span><span class="n">source_id</span> <span class="o">+</span> <span class="s1">&#39;) -&gt; &#39;</span> <span class="o">+</span>
+               <span class="n">ref_obj</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">label</span> <span class="o">+</span> <span class="s1">&#39; (&#39;</span> <span class="o">+</span> <span class="n">ref_obj</span><span class="o">.</span><span class="n">target_id</span> <span class="o">+</span> <span class="s1">&#39;).&#39;</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Ref.get_attr"><a class="viewcode-back" href="../../../api/tespy.connections.html#tespy.connections.connection.Ref.get_attr">[docs]</a>    <span class="k">def</span> <span class="nf">get_attr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the value of a reference attribute.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : str</span>
+<span class="sd">            The attribute you want to retrieve.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        out :</span>
+<span class="sd">            Specified attribute.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Reference has no attribute </span><span class="se">\&quot;</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\&quot;</span><span class="s1">.&#39;</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2020, Francesco Witte.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

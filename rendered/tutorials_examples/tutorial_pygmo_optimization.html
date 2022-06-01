@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thermal Power Plant Efficiency Optimization &mdash; tespy 0.6.0 - Colored Chemicals documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> tespy
+            <img src="../_static/logo_tespy_mid.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.6.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Thermal Engineering Systems in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../first_steps.html">First steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials_examples.html">Examples and Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tespy_modules.html">TESPy modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tespy_analyses.html">Thermodynamic analyses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developing_tespy.html">Developing TESPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zliterature.html">Literature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">tespy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Thermal Power Plant Efficiency Optimization</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tutorials_examples/tutorial_pygmo_optimization.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="thermal-power-plant-efficiency-optimization">
+<h1>Thermal Power Plant Efficiency Optimization<a class="headerlink" href="#thermal-power-plant-efficiency-optimization" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#task" id="id6">Task</a></p></li>
+<li><p><a class="reference internal" href="#what-is-pygmo" id="id7">What is PyGMO?</a></p></li>
+<li><p><a class="reference internal" href="#creating-your-tespy-model" id="id8">Creating your TESPy-Model</a></p></li>
+<li><p><a class="reference internal" href="#creating-your-pygmo-model" id="id9">Creating your PyGMO-Model</a></p></li>
+<li><p><a class="reference internal" href="#run-pygmo-optimization" id="id10">Run PyGMO-Optimization</a></p></li>
+</ul>
+</div>
+<section id="task">
+<h2><a class="toc-backref" href="#contents">Task</a><a class="headerlink" href="#task" title="Permalink to this headline">¶</a></h2>
+<p>Designing a power plant meets multiple different tasks, such as finding the
+optimal fresh steam temperature and pressure to reduce exhaust steam water
+content, or the optimization of extraction pressures to maximize cycle
+efficiency and many more.</p>
+<p>In case of a rather simple power plant topologies the task of finding optimized
+values for e.g. extraction pressures is still manageable without any
+optimization tool. As the topology becomes more complex and boundary
+conditions come into play the usage of additional tools is recommended. The
+following tutorial is intended to show the usage of PyGMO in combination with
+TESPy to <strong>maximize the cycle efficiency of a power plant with two</strong>
+<strong>extractions.</strong></p>
+<p>The source code can be found at the <a class="reference external" href="https://github.com/oemof/oemof-examples/tree/master/oemof_examples/tespy/efficiency_optimization">tespy_examples repository</a>.</p>
+<figure class="align-center" id="id4">
+<img alt="tutorials_examples/api/_images/power_plant_two_extractions.svg" src="tutorials_examples/api/_images/power_plant_two_extractions.svg" /><figcaption>
+<p><span class="caption-text">Figure: Topology of the power plant.</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="what-is-pygmo">
+<h2><a class="toc-backref" href="#contents">What is PyGMO?</a><a class="headerlink" href="#what-is-pygmo" title="Permalink to this headline">¶</a></h2>
+<p>PyGMO (Python Parallel Global Multiobjective Optimizer, <span id="id1">[<a class="reference internal" href="../zliterature.html#id15" title="Francesco Biscani and Dario Izzo. A parallel global multiobjective framework for optimization: pagmo. Journal of Open Source Software, 5(53):2338, 2020. doi:10.21105/joss.02338.">BI20</a>]</span>) is
+a library that provides a large number of evolutionary optimization algorithms.
+PyGMO can be used to solve constrained, unconstrained, single objective and
+multi objective problems.</p>
+<section id="evolutionary-algorithms">
+<h3>Evolutionary Algorithms<a class="headerlink" href="#evolutionary-algorithms" title="Permalink to this headline">¶</a></h3>
+<p>Evolutionary Algorithms (EA) are optimization algorithms inspired by biological
+evolution. In a given population the algorithm uses the so called fitness
+function to determine the quality of the solutions to each individual (set of
+decision variables) problem. The best possible solution of the population is
+called champion. Via mutation, recombination and selection your population
+evolves to find better solutions.</p>
+<p>EA will never find an exact solution to your problem. They can only give an
+approximation for the real optimum.</p>
+</section>
+<section id="install-pygmo">
+<h3>Install PyGMO<a class="headerlink" href="#install-pygmo" title="Permalink to this headline">¶</a></h3>
+<section id="conda">
+<h4>Conda<a class="headerlink" href="#conda" title="Permalink to this headline">¶</a></h4>
+<p>With the <a class="reference external" href="https://conda.io/en/latest/">conda</a> package manager PyGMO is
+available for Linux, OSX and Windows thanks to the infrastructure of
+<a class="reference external" href="https://conda-forge.org/">conda-forge</a>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install -c conda-forge pygmo
+</pre></div>
+</div>
+</section>
+<section id="pip">
+<h4>pip<a class="headerlink" href="#pip" title="Permalink to this headline">¶</a></h4>
+<p>On Linux you also have the option to use the
+<a class="reference external" href="https://pip.pypa.io/en/stable/">pip</a> package installer:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install pygmo
+</pre></div>
+</div>
+<p>Windows user can perform an installation from source as an alternative to conda.
+For further information on this process we recommend the <a class="reference external" href="https://esa.github.io/pygmo2/install.html#installation-from-source">PyGMO installation</a> accordingly.</p>
+</section>
+</section>
+</section>
+<section id="creating-your-tespy-model">
+<h2><a class="toc-backref" href="#contents">Creating your TESPy-Model</a><a class="headerlink" href="#creating-your-tespy-model" title="Permalink to this headline">¶</a></h2>
+<p>It is necessary to use object oriented programming in PyGMO. Therefore we create
+a class <code class="code docutils literal notranslate"><span class="pre">PowerPlant</span></code> which contains our TESPy-Model and a function to
+return the cycle efficiency.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tespy.networks</span> <span class="kn">import</span> <span class="n">Network</span>
+<span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Turbine</span><span class="p">,</span> <span class="n">Splitter</span><span class="p">,</span> <span class="n">Merge</span><span class="p">,</span> <span class="n">Condenser</span><span class="p">,</span> <span class="n">Pump</span><span class="p">,</span> <span class="n">Sink</span><span class="p">,</span> <span class="n">Source</span><span class="p">,</span>
+    <span class="n">HeatExchangerSimple</span><span class="p">,</span> <span class="n">Desuperheater</span><span class="p">,</span> <span class="n">CycleCloser</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">tespy.connections</span> <span class="kn">import</span> <span class="n">Connection</span><span class="p">,</span> <span class="n">Bus</span>
+<span class="kn">from</span> <span class="nn">tespy.tools</span> <span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<span class="n">logger</span><span class="o">.</span><span class="n">define_logging</span><span class="p">(</span><span class="n">screen_level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">PowerPlant</span><span class="p">():</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nw</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span>
+            <span class="n">fluids</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;BICUBIC::water&#39;</span><span class="p">],</span>
+            <span class="n">p_unit</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="n">T_unit</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="n">h_unit</span><span class="o">=</span><span class="s1">&#39;kJ / kg&#39;</span><span class="p">,</span>
+            <span class="n">iterinfo</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="c1"># components</span>
+        <span class="c1"># main cycle</span>
+        <span class="n">eco</span> <span class="o">=</span> <span class="n">HeatExchangerSimple</span><span class="p">(</span><span class="s1">&#39;economizer&#39;</span><span class="p">)</span>
+        <span class="n">eva</span> <span class="o">=</span> <span class="n">HeatExchangerSimple</span><span class="p">(</span><span class="s1">&#39;evaporator&#39;</span><span class="p">)</span>
+        <span class="n">sup</span> <span class="o">=</span> <span class="n">HeatExchangerSimple</span><span class="p">(</span><span class="s1">&#39;superheater&#39;</span><span class="p">)</span>
+        <span class="n">cc</span> <span class="o">=</span> <span class="n">CycleCloser</span><span class="p">(</span><span class="s1">&#39;cycle closer&#39;</span><span class="p">)</span>
+        <span class="n">hpt</span> <span class="o">=</span> <span class="n">Turbine</span><span class="p">(</span><span class="s1">&#39;high pressure turbine&#39;</span><span class="p">)</span>
+        <span class="n">sp1</span> <span class="o">=</span> <span class="n">Splitter</span><span class="p">(</span><span class="s1">&#39;splitter 1&#39;</span><span class="p">,</span> <span class="n">num_out</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">mpt</span> <span class="o">=</span> <span class="n">Turbine</span><span class="p">(</span><span class="s1">&#39;mid pressure turbine&#39;</span><span class="p">)</span>
+        <span class="n">sp2</span> <span class="o">=</span> <span class="n">Splitter</span><span class="p">(</span><span class="s1">&#39;splitter 2&#39;</span><span class="p">,</span> <span class="n">num_out</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">lpt</span> <span class="o">=</span> <span class="n">Turbine</span><span class="p">(</span><span class="s1">&#39;low pressure turbine&#39;</span><span class="p">)</span>
+        <span class="n">con</span> <span class="o">=</span> <span class="n">Condenser</span><span class="p">(</span><span class="s1">&#39;condenser&#39;</span><span class="p">)</span>
+        <span class="n">pu1</span> <span class="o">=</span> <span class="n">Pump</span><span class="p">(</span><span class="s1">&#39;feed water pump&#39;</span><span class="p">)</span>
+        <span class="n">fwh1</span> <span class="o">=</span> <span class="n">Condenser</span><span class="p">(</span><span class="s1">&#39;feed water preheater 1&#39;</span><span class="p">)</span>
+        <span class="n">fwh2</span> <span class="o">=</span> <span class="n">Condenser</span><span class="p">(</span><span class="s1">&#39;feed water preheater 2&#39;</span><span class="p">)</span>
+        <span class="n">dsh</span> <span class="o">=</span> <span class="n">Desuperheater</span><span class="p">(</span><span class="s1">&#39;desuperheater&#39;</span><span class="p">)</span>
+        <span class="n">me2</span> <span class="o">=</span> <span class="n">Merge</span><span class="p">(</span><span class="s1">&#39;merge2&#39;</span><span class="p">,</span> <span class="n">num_in</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">pu2</span> <span class="o">=</span> <span class="n">Pump</span><span class="p">(</span><span class="s1">&#39;feed water pump 2&#39;</span><span class="p">)</span>
+        <span class="n">pu3</span> <span class="o">=</span> <span class="n">Pump</span><span class="p">(</span><span class="s1">&#39;feed water pump 3&#39;</span><span class="p">)</span>
+        <span class="n">me</span> <span class="o">=</span> <span class="n">Merge</span><span class="p">(</span><span class="s1">&#39;merge&#39;</span><span class="p">,</span> <span class="n">num_in</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="c1"># cooling water</span>
+        <span class="n">cwi</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span><span class="s1">&#39;cooling water source&#39;</span><span class="p">)</span>
+        <span class="n">cwo</span> <span class="o">=</span> <span class="n">Sink</span><span class="p">(</span><span class="s1">&#39;cooling water sink&#39;</span><span class="p">)</span>
+
+        <span class="c1"># connections</span>
+        <span class="c1"># main cycle</span>
+        <span class="n">cc_hpt</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">cc</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">hpt</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;feed steam&#39;</span><span class="p">)</span>
+        <span class="n">hpt_sp1</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">hpt</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">sp1</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;extraction1&#39;</span><span class="p">)</span>
+        <span class="n">sp1_mpt</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">sp1</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">mpt</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="s1">&#39;g&#39;</span><span class="p">)</span>
+        <span class="n">mpt_sp2</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">mpt</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">sp2</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;extraction2&#39;</span><span class="p">)</span>
+        <span class="n">sp2_lpt</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">sp2</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">lpt</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+        <span class="n">lpt_con</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">lpt</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">con</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+        <span class="n">con_pu1</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">con</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">pu1</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+        <span class="n">pu1_fwh1</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">pu1</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">fwh1</span><span class="p">,</span> <span class="s1">&#39;in2&#39;</span><span class="p">)</span>
+        <span class="n">fwh1_me</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">fwh1</span><span class="p">,</span> <span class="s1">&#39;out2&#39;</span><span class="p">,</span> <span class="n">me</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="s1">&#39;l&#39;</span><span class="p">)</span>
+        <span class="n">me_fwh2</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">me</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">fwh2</span><span class="p">,</span> <span class="s1">&#39;in2&#39;</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="s1">&#39;l&#39;</span><span class="p">)</span>
+        <span class="n">fwh2_dsh</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">fwh2</span><span class="p">,</span> <span class="s1">&#39;out2&#39;</span><span class="p">,</span> <span class="n">dsh</span><span class="p">,</span> <span class="s1">&#39;in2&#39;</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="s1">&#39;l&#39;</span><span class="p">)</span>
+        <span class="n">dsh_me2</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">dsh</span><span class="p">,</span> <span class="s1">&#39;out2&#39;</span><span class="p">,</span> <span class="n">me2</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+        <span class="n">me2_eco</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">me2</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">eco</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="s1">&#39;l&#39;</span><span class="p">)</span>
+        <span class="n">eco_eva</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">eco</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">eva</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+        <span class="n">eva_sup</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">eva</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">sup</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+        <span class="n">sup_cc</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">sup</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">cc</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">nw</span><span class="o">.</span><span class="n">add_conns</span><span class="p">(</span><span class="n">cc_hpt</span><span class="p">,</span> <span class="n">hpt_sp1</span><span class="p">,</span> <span class="n">sp1_mpt</span><span class="p">,</span> <span class="n">mpt_sp2</span><span class="p">,</span> <span class="n">sp2_lpt</span><span class="p">,</span>
+                          <span class="n">lpt_con</span><span class="p">,</span> <span class="n">con_pu1</span><span class="p">,</span> <span class="n">pu1_fwh1</span><span class="p">,</span> <span class="n">fwh1_me</span><span class="p">,</span> <span class="n">me_fwh2</span><span class="p">,</span>
+                          <span class="n">fwh2_dsh</span><span class="p">,</span> <span class="n">dsh_me2</span><span class="p">,</span> <span class="n">me2_eco</span><span class="p">,</span> <span class="n">eco_eva</span><span class="p">,</span> <span class="n">eva_sup</span><span class="p">,</span> <span class="n">sup_cc</span><span class="p">)</span>
+
+        <span class="c1"># cooling water</span>
+        <span class="n">cwi_con</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">cwi</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">con</span><span class="p">,</span> <span class="s1">&#39;in2&#39;</span><span class="p">)</span>
+        <span class="n">con_cwo</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">con</span><span class="p">,</span> <span class="s1">&#39;out2&#39;</span><span class="p">,</span> <span class="n">cwo</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">nw</span><span class="o">.</span><span class="n">add_conns</span><span class="p">(</span><span class="n">cwi_con</span><span class="p">,</span> <span class="n">con_cwo</span><span class="p">)</span>
+
+        <span class="c1"># preheating</span>
+        <span class="n">sp1_dsh</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">sp1</span><span class="p">,</span> <span class="s1">&#39;out2&#39;</span><span class="p">,</span> <span class="n">dsh</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+        <span class="n">dsh_fwh2</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">dsh</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">fwh2</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+        <span class="n">fwh2_pu2</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">fwh2</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">pu2</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+        <span class="n">pu2_me2</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">pu2</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">me2</span><span class="p">,</span> <span class="s1">&#39;in2&#39;</span><span class="p">)</span>
+
+        <span class="n">sp2_fwh1</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">sp2</span><span class="p">,</span> <span class="s1">&#39;out2&#39;</span><span class="p">,</span> <span class="n">fwh1</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+        <span class="n">fwh1_pu3</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">fwh1</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">pu3</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+        <span class="n">pu3_me</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">pu3</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">me</span><span class="p">,</span> <span class="s1">&#39;in2&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">nw</span><span class="o">.</span><span class="n">add_conns</span><span class="p">(</span><span class="n">sp1_dsh</span><span class="p">,</span> <span class="n">dsh_fwh2</span><span class="p">,</span> <span class="n">fwh2_pu2</span><span class="p">,</span> <span class="n">pu2_me2</span><span class="p">,</span>
+                          <span class="n">sp2_fwh1</span><span class="p">,</span> <span class="n">fwh1_pu3</span><span class="p">,</span> <span class="n">pu3_me</span><span class="p">)</span>
+
+        <span class="c1"># busses</span>
+        <span class="c1"># power bus</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">power</span> <span class="o">=</span> <span class="n">Bus</span><span class="p">(</span><span class="s1">&#39;power&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">power</span><span class="o">.</span><span class="n">add_comps</span><span class="p">(</span>
+            <span class="p">{</span><span class="s1">&#39;comp&#39;</span><span class="p">:</span> <span class="n">hpt</span><span class="p">,</span> <span class="s1">&#39;char&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;comp&#39;</span><span class="p">:</span> <span class="n">mpt</span><span class="p">,</span> <span class="s1">&#39;char&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">},</span>
+            <span class="p">{</span><span class="s1">&#39;comp&#39;</span><span class="p">:</span> <span class="n">lpt</span><span class="p">,</span> <span class="s1">&#39;char&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;comp&#39;</span><span class="p">:</span> <span class="n">pu1</span><span class="p">,</span> <span class="s1">&#39;char&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">},</span>
+            <span class="p">{</span><span class="s1">&#39;comp&#39;</span><span class="p">:</span> <span class="n">pu2</span><span class="p">,</span> <span class="s1">&#39;char&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;comp&#39;</span><span class="p">:</span> <span class="n">pu3</span><span class="p">,</span> <span class="s1">&#39;char&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">})</span>
+
+        <span class="c1"># heating bus</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">heat</span> <span class="o">=</span> <span class="n">Bus</span><span class="p">(</span><span class="s1">&#39;heat&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">heat</span><span class="o">.</span><span class="n">add_comps</span><span class="p">(</span>
+            <span class="p">{</span><span class="s1">&#39;comp&#39;</span><span class="p">:</span> <span class="n">eco</span><span class="p">,</span> <span class="s1">&#39;char&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;comp&#39;</span><span class="p">:</span> <span class="n">eva</span><span class="p">,</span> <span class="s1">&#39;char&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+            <span class="p">{</span><span class="s1">&#39;comp&#39;</span><span class="p">:</span> <span class="n">sup</span><span class="p">,</span> <span class="s1">&#39;char&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">nw</span><span class="o">.</span><span class="n">add_busses</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">power</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">heat</span><span class="p">)</span>
+
+        <span class="c1"># parametrization</span>
+        <span class="c1"># components</span>
+        <span class="n">hpt</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">eta_s</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
+        <span class="n">mpt</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">eta_s</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
+        <span class="n">lpt</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">eta_s</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
+
+        <span class="n">pu1</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">eta_s</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+        <span class="n">pu2</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">eta_s</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+        <span class="n">pu3</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">eta_s</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+
+        <span class="n">eco</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">pr</span><span class="o">=</span><span class="mf">0.99</span><span class="p">)</span>
+        <span class="n">eva</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">pr</span><span class="o">=</span><span class="mf">0.99</span><span class="p">)</span>
+        <span class="n">sup</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">pr</span><span class="o">=</span><span class="mf">0.99</span><span class="p">)</span>
+
+        <span class="n">con</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">pr1</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">pr2</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span> <span class="n">ttd_u</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+        <span class="n">fwh1</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">pr1</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">pr2</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span> <span class="n">ttd_u</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+        <span class="n">fwh2</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">pr1</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">pr2</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span> <span class="n">ttd_u</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+        <span class="n">dsh</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">pr1</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span> <span class="n">pr2</span><span class="o">=</span><span class="mf">0.99</span><span class="p">)</span>
+
+        <span class="c1"># connections</span>
+        <span class="n">eco_eva</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">eva_sup</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">cc_hpt</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">m</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mi">650</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">fluid</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;water&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+        <span class="n">hpt_sp1</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+        <span class="n">mpt_sp2</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">lpt_con</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+
+        <span class="n">cwi_con</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">T</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">fluid</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;water&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+
+    <span class="k">def</span> <span class="nf">calculate_efficiency</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="c1"># set extraction pressure</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nw</span><span class="o">.</span><span class="n">get_conn</span><span class="p">(</span><span class="s1">&#39;extraction1&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nw</span><span class="o">.</span><span class="n">get_conn</span><span class="p">(</span><span class="s1">&#39;extraction2&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">nw</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="s1">&#39;design&#39;</span><span class="p">)</span>
+
+        <span class="c1"># components are saved in a DataFrame, column &#39;object&#39; holds the</span>
+        <span class="c1"># component instances</span>
+        <span class="k">for</span> <span class="n">cp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nw</span><span class="o">.</span><span class="n">comps</span><span class="p">[</span><span class="s1">&#39;object&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">Condenser</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">Desuperheater</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">cp</span><span class="o">.</span><span class="n">Q</span><span class="o">.</span><span class="n">val</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">Pump</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">cp</span><span class="o">.</span><span class="n">P</span><span class="o">.</span><span class="n">val</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">Turbine</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">cp</span><span class="o">.</span><span class="n">P</span><span class="o">.</span><span class="n">val</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nw</span><span class="o">.</span><span class="n">res</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">1e-3</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">nw</span><span class="o">.</span><span class="n">lin_dep</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nw</span><span class="o">.</span><span class="n">busses</span><span class="p">[</span><span class="s1">&#39;power&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">P</span><span class="o">.</span><span class="n">val</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">nw</span><span class="o">.</span><span class="n">busses</span><span class="p">[</span><span class="s1">&#39;heat&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">P</span><span class="o">.</span><span class="n">val</span>
+</pre></div>
+</div>
+<p>Note, that you have to label all busses and connections you want to access
+later on with PyGMO. In <code class="code docutils literal notranslate"><span class="pre">calculate_efficiency(self,</span> <span class="pre">x)</span></code> the variable
+<code class="code docutils literal notranslate"><span class="pre">x</span></code> is a list containing your decision variables. This function returns
+the cycle efficiency for a specific set of decision variables. The efficiency
+is defined by the ratio of total power transferred (including turbines and
+pumps) to steam generator heat input.</p>
+<p>Additionally, we have to make sure, only the result of physically feasible
+solutions is returned. In case we have infeasible solutions, we can simply
+return <code class="code docutils literal notranslate"><span class="pre">np.nan</span></code>. An infeasible solution is obtained in case the power
+of a turbine is positive, the power of a pump is negative or the heat exchanged
+in any of the preheaters is positive. We also check, if the calculation does
+converge.</p>
+<div class="math">
+<p><img src="../_images/math/d81bd0888587514ef1a18512a05ac230b7ff4cce.png" alt="\eta_\mathrm{th}=\frac{|\sum P|}{\dot{Q}_{sg}}"/></p>
+</div></section>
+<section id="creating-your-pygmo-model">
+<h2><a class="toc-backref" href="#contents">Creating your PyGMO-Model</a><a class="headerlink" href="#creating-your-pygmo-model" title="Permalink to this headline">¶</a></h2>
+<p>The optimization in PyGMO starts by defining the problem. You can set the
+number of objectives your problem has in <code class="code docutils literal notranslate"><span class="pre">get_nobj()</span></code>. The number of
+constraints is set in <code class="code docutils literal notranslate"><span class="pre">get_nec()</span></code> (equality constraints) and
+<code class="code docutils literal notranslate"><span class="pre">get_nic()</span></code> (inequality constraints). In <code class="code docutils literal notranslate"><span class="pre">get_bounds()</span></code> you set the
+bounds of your decision variables. Finally, you define your fitness function
+and constraints in <code class="code docutils literal notranslate"><span class="pre">fitness(self,</span> <span class="pre">x)</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pygmo</span> <span class="k">as</span> <span class="nn">pg</span>
+
+
+<span class="k">class</span> <span class="nc">optimization_problem</span><span class="p">():</span>
+
+    <span class="k">def</span> <span class="nf">fitness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">f1</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">calculate_efficiency</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">ci1</span> <span class="o">=</span> <span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">f1</span><span class="p">,</span> <span class="n">ci1</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">get_nobj</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return number of objectives.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mi">1</span>
+
+    <span class="c1"># equality constraints</span>
+    <span class="k">def</span> <span class="nf">get_nec</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+    <span class="c1"># inequality constraints</span>
+    <span class="k">def</span> <span class="nf">get_nic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="nf">get_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return bounds of decision variables.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">40</span><span class="p">,</span> <span class="mi">40</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>By default PyGMO minimizes the fitness function. Therefore we set the fitness
+function f1 to the reciprocal of the cycle efficiency. We set one inequality
+constraint so that the pressure of the first extraction has to be bigger than
+the second one:</p>
+<div class="math">
+<p><img src="../_images/math/94b28c1371fa1a623f36f7025897ab9ce58e4ea1.png" alt="p_{e,1} &gt; p_{e,2}"/></p>
+</div><p>In PyGMO your inequality constraint has to be in form of &lt;0:</p>
+<div class="math">
+<p><img src="../_images/math/5ceed35508125319aa7105cc7fdc354d16d0f8ef.png" alt="- p_{e,1} + p_{e,2} &lt; 0"/></p>
+</div><p>We expect that the extraction pressure won’t be more than 40 bar and not less
+1 bar. Therefore we set the bounds of our decision variables:</p>
+<div class="math">
+<p><img src="../_images/math/a31e1279da18b9a6163664985122f0b0e5752fc7.png" alt="1 bar &lt; p_{e,1} &lt; 40 bar\\
+1 bar &lt; p_{e,2} &lt; 40 bar"/></p>
+</div></section>
+<section id="run-pygmo-optimization">
+<h2><a class="toc-backref" href="#contents">Run PyGMO-Optimization</a><a class="headerlink" href="#run-pygmo-optimization" title="Permalink to this headline">¶</a></h2>
+<p>The following code shows how to run the PyGMO optimization.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">optimize</span> <span class="o">=</span> <span class="n">optimization_problem</span><span class="p">()</span>
+<span class="n">optimize</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">PowerPlant</span><span class="p">()</span>
+<span class="n">prob</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">problem</span><span class="p">(</span><span class="n">optimize</span><span class="p">)</span>
+<span class="n">num_gen</span> <span class="o">=</span> <span class="mi">15</span>
+
+<span class="n">pop</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">population</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">algo</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">algorithm</span><span class="p">(</span><span class="n">pg</span><span class="o">.</span><span class="n">ihs</span><span class="p">(</span><span class="n">gen</span><span class="o">=</span><span class="n">num_gen</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>With optimize you tell PyGMO which problem you want to optimize. In the class
+<code class="code docutils literal notranslate"><span class="pre">optimization_problem()</span></code> we defined our problem be setting fitness
+function and inequality constraint. With <code class="code docutils literal notranslate"><span class="pre">optimize.model</span></code> we set the
+model we want to optimize. In our case we want to optimize the extraction
+pressures in our instance of class <code class="code docutils literal notranslate"><span class="pre">PowerPlant</span></code>. Finally, our problem is
+set in <code class="code docutils literal notranslate"><span class="pre">prob</span> <span class="pre">=</span> <span class="pre">pg.problem(optimize)</span></code>.</p>
+<p>With <code class="code docutils literal notranslate"><span class="pre">pop</span></code> we define the size of each population for the optimization,
+<code class="code docutils literal notranslate"><span class="pre">algo</span></code> is used to set the algorithm you want to use. A list of available
+algorithms can be found in
+<a class="reference external" href="https://esa.github.io/pygmo2/overview.html#list-of-algorithms">List of algorithms</a>.
+The choice of your algorithm depends on the type of problem. Have you set
+equality or inequality constraints? Do you perform a single- or multi-objective
+optimization?</p>
+<p>We choose a population size of 10 individuals and want to carry out 15
+generations. We can evolve the population generation by generation, e.g. using
+a for loop. At the end, we print out the information of the best individual.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">gen</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_gen</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Evolution: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">gen</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Efficiency: </span><span class="si">{}</span><span class="s1"> %&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="mi">100</span> <span class="o">/</span> <span class="n">pop</span><span class="o">.</span><span class="n">champion_f</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">4</span><span class="p">)))</span>
+    <span class="n">pop</span> <span class="o">=</span> <span class="n">algo</span><span class="o">.</span><span class="n">evolve</span><span class="p">(</span><span class="n">pop</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Efficiency: </span><span class="si">{}</span><span class="s1"> %&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="mi">100</span> <span class="o">/</span> <span class="n">pop</span><span class="o">.</span><span class="n">champion_f</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">4</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Extraction 1: </span><span class="si">{}</span><span class="s1"> bar&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">pop</span><span class="o">.</span><span class="n">champion_x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">4</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Extraction 2: </span><span class="si">{}</span><span class="s1"> bar&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">pop</span><span class="o">.</span><span class="n">champion_x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">4</span><span class="p">)))</span>
+</pre></div>
+</div>
+<p>In our run, we got:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>Efficiency: <span class="m">44</span>.8596 %
+Extraction <span class="m">1</span>: <span class="m">25</span>.8585 bar
+Extraction <span class="m">2</span>: <span class="m">2</span>.6903 bar
+</pre></div>
+</div>
+<figure class="align-center" id="id5">
+<img alt="tutorials_examples/api/_images/scatterplot_efficiency_optimization.svg" src="tutorials_examples/api/_images/scatterplot_efficiency_optimization.svg" /><figcaption>
+<p><span class="caption-text">Figure: Scatter plot for all individuals during the optimization.</span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2020, Francesco Witte.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

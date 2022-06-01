@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Installation and setup &mdash; tespy 0.6.0 - Colored Chemicals documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="First steps" href="first_steps.html" />
+    <link rel="prev" title="Thermal Engineering Systems in Python" href="introduction.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> tespy
+            <img src="_static/logo_tespy_mid.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.6.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Thermal Engineering Systems in Python</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation and setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#linux">Linux</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#installing-python-3">Installing Python 3</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#having-python-3-installed">Having Python 3 installed</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#using-virtualenv-instead-of-system-wide-python">Using virtualenv instead of system wide Python</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#windows">Windows</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">Having Python 3 installed</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#using-anaconda">Using Anaconda</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#mac-osx">Mac OSX</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="first_steps.html">First steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials_examples.html">Examples and Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tespy_modules.html">TESPy modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tespy_analyses.html">Thermodynamic analyses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developing_tespy.html">Developing TESPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="zliterature.html">Literature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">tespy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Installation and setup</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/installation.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="installation-and-setup">
+<span id="installation-and-setup-label"></span><h1>Installation and setup<a class="headerlink" href="#installation-and-setup" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#linux" id="id2">Linux</a></p></li>
+<li><p><a class="reference internal" href="#windows" id="id3">Windows</a></p></li>
+<li><p><a class="reference internal" href="#mac-osx" id="id4">Mac OSX</a></p></li>
+</ul>
+</div>
+<p>Following you find guidelines for the installation process for different
+operation systems.</p>
+<section id="linux">
+<h2><a class="toc-backref" href="#contents">Linux</a><a class="headerlink" href="#linux" title="Permalink to this headline">¶</a></h2>
+<section id="installing-python-3">
+<h3>Installing Python 3<a class="headerlink" href="#installing-python-3" title="Permalink to this headline">¶</a></h3>
+<p>TESPy is a Python package, thus it requires you to have Python 3 installed.
+Most Linux distributions will have Python 3 in their repository. Use the
+specific software management to install it. If you are using Ubuntu/Debian try
+executing the following code in your terminal:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">sudo apt-get install python3</span>
+</pre></div>
+</div>
+<p>You can also download different versions of Python via
+<a class="reference external" href="https://www.python.org/downloads/">https://www.python.org/downloads/</a>.</p>
+</section>
+<section id="having-python-3-installed">
+<h3>Having Python 3 installed<a class="headerlink" href="#having-python-3-installed" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">pip install tespy</span>
+</pre></div>
+</div>
+<p>To use pip you have to install the pypi package. Normally pypi is part of your
+virtual environment.</p>
+</section>
+<section id="using-virtualenv-instead-of-system-wide-python">
+<span id="virtualenv-label"></span><h3>Using virtualenv instead of system wide Python<a class="headerlink" href="#using-virtualenv-instead-of-system-wide-python" title="Permalink to this headline">¶</a></h3>
+<p>Instead of installing TESPy with pip to your system Python, you can instead
+install TESPy to a virtual Python environment.</p>
+<blockquote>
+<div><ol class="arabic">
+<li><p>Install virtualenv using the package management of your Linux distribution,
+pip install or install it from source
+(<a class="reference external" href="https://virtualenv.pypa.io/en/stable/installation.html">see virtualenv documentation</a>)</p></li>
+<li><p>Open terminal to create and activate a virtual environment by typing:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">virtualenv -p /usr/bin/python3 your_env_name</span>
+<span class="go">source your_env_name/bin/activate</span>
+</pre></div>
+</div>
+</li>
+<li><p>In terminal type: <code class="code docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">tespy</span></code></p></li>
+</ol>
+</div></blockquote>
+<p>Warning: If you have an older version of virtualenv you should update pip
+<code class="code docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">--upgrade</span> <span class="pre">pip</span></code>.</p>
+</section>
+</section>
+<section id="windows">
+<span id="tespy-installation-windows-label"></span><h2><a class="toc-backref" href="#contents">Windows</a><a class="headerlink" href="#windows" title="Permalink to this headline">¶</a></h2>
+<section id="id1">
+<h3>Having Python 3 installed<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>If you already have a working Python 3 environment you can install TESPy by
+using pip. We recommend you installing the package in a virtual environment.
+You can use virtualenv (<a class="reference internal" href="#virtualenv-label"><span class="std std-ref">see here for instructions</span></a>)
+or a virtual environment e.g. in <a class="reference internal" href="#anaconda-label"><span class="std std-ref">Anaconda</span></a>.</p>
+<p>TESPy requires the CoolProp python package, which will be installed
+automatically. As it is build from C++, you need to have Microsoft Visual
+Studio C++ Build Tools 14.0 installed. Try installing TESPy with the following
+code in the command window of your python environment:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">pip install tespy</span>
+</pre></div>
+</div>
+<p>If you get an error within the installation of the CoolProp package, install
+the C++ Build Tools first and then restart the installation. Also, if pip is
+not part of your python environment, you have to install the pypi package.</p>
+</section>
+<section id="using-anaconda">
+<span id="anaconda-label"></span><h3>Using Anaconda<a class="headerlink" href="#using-anaconda" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><ol class="arabic">
+<li><p>Download latest <a class="reference external" href="https://www.anaconda.com/products/individual">Anaconda</a>
+for Python 3.x (64 or 32 bit).</p></li>
+<li><p>Install Anaconda</p></li>
+<li><p>Open ‘Anaconda Prompt’ to create and activate a virtual environment by
+typing:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">conda create -n yourenvname python=3.x</span>
+<span class="go">activate yourenvname</span>
+</pre></div>
+</div>
+</li>
+<li><p>In the active Anaconda Prompt type: <code class="code docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">tespy</span></code></p></li>
+<li><p>If the installation of CoolProp fails, make sure, you have
+Microsoft Visual Stuido C++ Build Tools 14.0 installed on your computer.</p></li>
+</ol>
+</div></blockquote>
+</section>
+</section>
+<section id="mac-osx">
+<h2><a class="toc-backref" href="#contents">Mac OSX</a><a class="headerlink" href="#mac-osx" title="Permalink to this headline">¶</a></h2>
+<p>Installation instructions for Mac OSX are not available, yet. If you want to
+share your knowledge on the installation and fill this gap, feel free to
+contact us.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="introduction.html" class="btn btn-neutral float-left" title="Thermal Engineering Systems in Python" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="first_steps.html" class="btn btn-neutral float-right" title="First steps" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2020, Francesco Witte.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

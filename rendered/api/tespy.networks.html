@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tespy.networks module &mdash; tespy 0.6.0 - Colored Chemicals documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="tespy.tools module" href="tespy.tools.html" />
+    <link rel="prev" title="tespy.data module" href="tespy.data.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> tespy
+            <img src="../_static/logo_tespy_mid.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.6.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Thermal Engineering Systems in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../first_steps.html">First steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials_examples.html">Examples and Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tespy_modules.html">TESPy modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tespy_analyses.html">Thermodynamic analyses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developing_tespy.html">Developing TESPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zliterature.html">Literature</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="tespy.components.html">tespy.components module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tespy.connections.html">tespy.connections module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tespy.data.html">tespy.data module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">tespy.networks module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-tespy.networks.network">tespy.networks.network module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-tespy.networks.network_reader">tespy.networks.network_reader module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tespy.tools.html">tespy.tools module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">tespy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../api.html">API Documentation</a> &raquo;</li>
+      <li>tespy.networks module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/tespy.networks.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-tespy.networks">
+<span id="tespy-networks-module"></span><h1>tespy.networks module<a class="headerlink" href="#module-tespy.networks" title="Permalink to this headline">¶</a></h1>
+<section id="module-tespy.networks.network">
+<span id="tespy-networks-network-module"></span><h2>tespy.networks.network module<a class="headerlink" href="#module-tespy.networks.network" title="Permalink to this headline">¶</a></h2>
+<p>Module for tespy network class.</p>
+<p>The network is the container for every TESPy simulation. The network class
+automatically creates the system of equations describing topology and
+parametrization of a specific model and solves it.</p>
+<p>This file is part of project TESPy (github.com/oemof/tespy). It’s copyrighted
+by the contributors recorded in the version control history of the file,
+available from its original location tespy/networks/networks.py</p>
+<p>SPDX-License-Identifier: MIT</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="tespy.networks.network.Network">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tespy.networks.network.</span></span><span class="sig-name descname"><span class="pre">Network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fluids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">memorise_fluid_properties</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class component is the base class of all TESPy components.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fluids</strong> (<em>list</em>) – A list of all fluids within the network container.</p></li>
+<li><p><strong>memorise_fluid_properties</strong> (<em>boolean</em>) – Activate or deactivate fluid property value memorization. Default
+state is activated (<code class="code docutils literal notranslate"><span class="pre">True</span></code>).</p></li>
+<li><p><strong>h_range</strong> (<em>list</em>) – List with minimum and maximum values for enthalpy value range.</p></li>
+<li><p><strong>h_unit</strong> (<em>str</em>) – Specify the unit for enthalpy: ‘J / kg’, ‘kJ / kg’, ‘MJ / kg’.</p></li>
+<li><p><strong>iterinfo</strong> (<em>boolean</em>) – Print convergence progress to console.</p></li>
+<li><p><strong>m_range</strong> (<em>list</em>) – List with minimum and maximum values for mass flow value range.</p></li>
+<li><p><strong>m_unit</strong> (<em>str</em>) – Specify the unit for mass flow: ‘kg / s’, ‘t / h’.</p></li>
+<li><p><strong>p_range</strong> (<em>list</em>) – List with minimum and maximum values for pressure value range.</p></li>
+<li><p><strong>p_unit</strong> (<em>str</em>) – Specify the unit for pressure: ‘Pa’, ‘psi’, ‘bar’, ‘MPa’.</p></li>
+<li><p><strong>s_unit</strong> (<em>str</em>) – Specify the unit for specific entropy: ‘J / kgK’, ‘kJ / kgK’,
+‘MJ / kgK’.</p></li>
+<li><p><strong>T_unit</strong> (<em>str</em>) – Specify the unit for temperature: ‘K’, ‘C’, ‘F’, ‘R’.</p></li>
+<li><p><strong>v_unit</strong> (<em>str</em>) – Specify the unit for volumetric flow: ‘m3 / s’, ‘m3 / h’, ‘l / s’,
+‘l / h’.</p></li>
+<li><p><strong>vol_unit</strong> (<em>str</em>) – Specify the unit for specific volume: ‘m3 / kg’, ‘l / kg’.</p></li>
+<li><p><strong>x_unit</strong> (<em>str</em>) – Specify the unit for steam mass fraction: ‘-’, ‘%’.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Unit specification is optional: If not specified the SI unit (first
+element in above lists) will be applied!</p>
+<p>Range specification is optional, too. The value range is used to stabilize
+the newton algorithm. For more information see the “getting started”
+section in the online-documentation.</p>
+</div>
+<p class="rubric">Example</p>
+<p>Basic example for a setting up a tespy.networks.network.Network object. Specifying
+the fluids is mandatory! Unit systems, fluid property range and iterinfo
+are optional.</p>
+<p>Standard value for iterinfo is <code class="code docutils literal notranslate"><span class="pre">True</span></code>. This will print out
+convergence progress to the console. You can stop the printouts by setting
+this property to <code class="code docutils literal notranslate"><span class="pre">False</span></code>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">tespy.networks</span> <span class="kn">import</span> <span class="n">Network</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fluid_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;water&#39;</span><span class="p">,</span> <span class="s1">&#39;air&#39;</span><span class="p">,</span> <span class="s1">&#39;R134a&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mynetwork</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span><span class="n">fluids</span><span class="o">=</span><span class="n">fluid_list</span><span class="p">,</span> <span class="n">p_unit</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="n">T_unit</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mynetwork</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">p_range</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">mynetwork</span><span class="p">)</span>
+<span class="go">&lt;class &#39;tespy.networks.network.Network&#39;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mynetwork</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">iterinfo</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mynetwork</span><span class="o">.</span><span class="n">iterinfo</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mynetwork</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">iterinfo</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mynetwork</span><span class="o">.</span><span class="n">iterinfo</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>A simple network consisting of a source, a pipe and a sink. This example
+shows how the printout parameter can be used. We specify
+<code class="code docutils literal notranslate"><span class="pre">printout=False</span></code> for both connections, the pipe as well as the heat
+bus. Therefore the <code class="code docutils literal notranslate"><span class="pre">.print_results()</span></code> method should not print any
+results.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">tespy.networks</span> <span class="kn">import</span> <span class="n">Network</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="n">Source</span><span class="p">,</span> <span class="n">Sink</span><span class="p">,</span> <span class="n">Pipe</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">tespy.connections</span> <span class="kn">import</span> <span class="n">Connection</span><span class="p">,</span> <span class="n">Bus</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nw</span> <span class="o">=</span> <span class="n">Network</span><span class="p">([</span><span class="s1">&#39;CH4&#39;</span><span class="p">],</span> <span class="n">T_unit</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="n">p_unit</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="n">v_unit</span><span class="o">=</span><span class="s1">&#39;m3 / s&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">so</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span><span class="s1">&#39;source&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">si</span> <span class="o">=</span> <span class="n">Sink</span><span class="p">(</span><span class="s1">&#39;sink&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">Pipe</span><span class="p">(</span><span class="s1">&#39;pipe&#39;</span><span class="p">,</span> <span class="n">Q</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">pr</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="n">printout</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">si</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nw</span><span class="o">.</span><span class="n">add_conns</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">fluid</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;CH4&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span> <span class="n">T</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">printout</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">printout</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Bus</span><span class="p">(</span><span class="s1">&#39;heat bus&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">add_comps</span><span class="p">({</span><span class="s1">&#39;comp&#39;</span><span class="p">:</span> <span class="n">p</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nw</span><span class="o">.</span><span class="n">add_busses</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">printout</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nw</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">iterinfo</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nw</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="s1">&#39;design&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nw</span><span class="o">.</span><span class="n">print_results</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.add_busses">
+<span class="sig-name descname"><span class="pre">add_busses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.add_busses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.add_busses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add one or more busses to the network.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>b</strong> (<a class="reference internal" href="tespy.connections.html#tespy.connections.bus.Bus" title="tespy.connections.bus.Bus"><em>tespy.connections.bus.Bus</em></a>) – The bus to be added to the network, bus objects bi
+<code class="code docutils literal notranslate"><span class="pre">add_busses(b1,</span> <span class="pre">b2,</span> <span class="pre">b3,</span> <span class="pre">...)</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.add_conns">
+<span class="sig-name descname"><span class="pre">add_conns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.add_conns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.add_conns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add one or more connections to the network.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>c</strong> (<a class="reference internal" href="tespy.connections.html#tespy.connections.connection.Connection" title="tespy.connections.connection.Connection"><em>tespy.connections.connection.Connection</em></a>) – The connection to be added to the network, connections objects ci
+<code class="code docutils literal notranslate"><span class="pre">add_conns(c1,</span> <span class="pre">c2,</span> <span class="pre">c3,</span> <span class="pre">...)</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.add_subsys">
+<span class="sig-name descname"><span class="pre">add_subsys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.add_subsys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.add_subsys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add one or more subsystems to the network.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>c</strong> (<a class="reference internal" href="tespy.components.html#tespy.components.subsystem.Subsystem" title="tespy.components.subsystem.Subsystem"><em>tespy.components.subsystem.Subsystem</em></a>) – The subsystem to be added to the network, subsystem objects si
+<code class="code docutils literal notranslate"><span class="pre">network.add_subsys(s1,</span> <span class="pre">s2,</span> <span class="pre">s3,</span> <span class="pre">...)</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.add_ude">
+<span class="sig-name descname"><span class="pre">add_ude</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.add_ude"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.add_ude" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a user defined function to the network.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>c</strong> (<a class="reference internal" href="tespy.tools.html#tespy.tools.helpers.UserDefinedEquation" title="tespy.tools.helpers.UserDefinedEquation"><em>tespy.tools.helpers.UserDefinedEquation</em></a>) – The objects to be added to the network, UserDefinedEquation objects
+ci <code class="code docutils literal notranslate"><span class="pre">del_conns(c1,</span> <span class="pre">c2,</span> <span class="pre">c3,</span> <span class="pre">...)</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.check_busses">
+<span class="sig-name descname"><span class="pre">check_busses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.check_busses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.check_busses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checksthe busses to be added for type, duplicates and identical labels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>b</strong> (<a class="reference internal" href="tespy.connections.html#tespy.connections.bus.Bus" title="tespy.connections.bus.Bus"><em>tespy.connections.bus.Bus</em></a>) – The bus to be checked.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.check_conns">
+<span class="sig-name descname"><span class="pre">check_conns</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.check_conns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.check_conns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check connections for multiple usage of inlets or outlets.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.check_network">
+<span class="sig-name descname"><span class="pre">check_network</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.check_network"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.check_network" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if components are connected properly within the network.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.del_busses">
+<span class="sig-name descname"><span class="pre">del_busses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.del_busses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.del_busses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove one or more busses from the network.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>b</strong> (<a class="reference internal" href="tespy.connections.html#tespy.connections.bus.Bus" title="tespy.connections.bus.Bus"><em>tespy.connections.bus.Bus</em></a>) – The bus to be removed from the network, bus objects bi
+<code class="code docutils literal notranslate"><span class="pre">add_busses(b1,</span> <span class="pre">b2,</span> <span class="pre">b3,</span> <span class="pre">...)</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.del_conns">
+<span class="sig-name descname"><span class="pre">del_conns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.del_conns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.del_conns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove one or more connections from the network.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>c</strong> (<a class="reference internal" href="tespy.connections.html#tespy.connections.connection.Connection" title="tespy.connections.connection.Connection"><em>tespy.connections.connection.Connection</em></a>) – The connection to be removed from the network, connections objects
+ci <code class="code docutils literal notranslate"><span class="pre">del_conns(c1,</span> <span class="pre">c2,</span> <span class="pre">c3,</span> <span class="pre">...)</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.del_ude">
+<span class="sig-name descname"><span class="pre">del_ude</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.del_ude"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.del_ude" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove a user defined function from the network.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>c</strong> (<a class="reference internal" href="tespy.tools.html#tespy.tools.helpers.UserDefinedEquation" title="tespy.tools.helpers.UserDefinedEquation"><em>tespy.tools.helpers.UserDefinedEquation</em></a>) – The objects to be added deleted from the network,
+UserDefinedEquation objects ci <code class="code docutils literal notranslate"><span class="pre">del_conns(c1,</span> <span class="pre">c2,</span> <span class="pre">c3,</span> <span class="pre">...)</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.get_attr">
+<span class="sig-name descname"><span class="pre">get_attr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.get_attr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.get_attr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the value of a network attribute.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>key</strong> (<em>str</em>) – The attribute you want to retrieve.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Specified attribute.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>out</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.get_bus_data">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_bus_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.get_bus_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.get_bus_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return bus information of a component.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.get_busses">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_busses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.get_busses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.get_busses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the list of busses a component is integrated in.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.get_class_base">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_class_base</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.get_class_base"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.get_class_base" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the class name.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.get_comp">
+<span class="sig-name descname"><span class="pre">get_comp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.get_comp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.get_comp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get Component via label.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>label</strong> (<em>str</em>) – Label of the Component object.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>c</strong> – Component object with specified label, None if no Component of
+the network has this label.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="tespy.components.html#tespy.components.component.Component" title="tespy.components.component.Component">tespy.components.component.Component</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.get_conn">
+<span class="sig-name descname"><span class="pre">get_conn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.get_conn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.get_conn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get Connection via label.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>label</strong> (<em>str</em>) – Label of the Connection object.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>c</strong> – Connection object with specified label, None if no Connection of
+the network has this label.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="tespy.connections.html#tespy.connections.connection.Connection" title="tespy.connections.connection.Connection">tespy.connections.connection.Connection</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.get_id">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.get_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.get_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the id of the python object.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.get_props">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_props</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.get_props"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.get_props" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return properties.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.init_comp_design_params">
+<span class="sig-name descname"><span class="pre">init_comp_design_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">component</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.init_comp_design_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.init_comp_design_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write design point information to components.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>component</strong> (<a class="reference internal" href="tespy.components.html#tespy.components.component.Component" title="tespy.components.component.Component"><em>tespy.components.component.Component</em></a>) – Write design point information to this component.</p></li>
+<li><p><strong>data</strong> (<em>pandas.core.series.Series</em><em>, </em><em>pandas.core.frame.DataFrame</em>) – Design point information.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.init_components">
+<span class="sig-name descname"><span class="pre">init_components</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comps</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.init_components"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.init_components" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set up a dataframe for the network’s components.</p>
+<p>Additionally, check, if all components have unique labels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>comps</strong> (<em>pandas.core.frame.DataFrame</em>) – DataFrame containing all components of the network gathered from
+the network’s connection information.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The dataframe for the components is derived from the network’s
+connections. Thus it does not hold any additional information, the
+dataframe is used to simplify the code, only.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.init_conn_design_params">
+<span class="sig-name descname"><span class="pre">init_conn_design_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.init_conn_design_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.init_conn_design_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write design point information to connections.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>c</strong> (<a class="reference internal" href="tespy.connections.html#tespy.connections.connection.Connection" title="tespy.connections.connection.Connection"><em>tespy.connections.connection.Connection</em></a>) – Write design point information to this connection.</p></li>
+<li><p><strong>df</strong> (<em>pandas.core.frame.DataFrame</em>) – Dataframe containing design point information.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.init_count_connections_parameters">
+<span class="sig-name descname"><span class="pre">init_count_connections_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.init_count_connections_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.init_count_connections_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Count the number of parameters set on a connection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>c</strong> (<a class="reference internal" href="tespy.connections.html#tespy.connections.connection.Connection" title="tespy.connections.connection.Connection"><em>tespy.connections.connection.Connection</em></a>) – Connection count parameters of.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.init_design">
+<span class="sig-name descname"><span class="pre">init_design</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.init_design"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.init_design" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialise a design calculation.</p>
+<p>Offdesign parameters are unset, design parameters are set. If
+<code class="code docutils literal notranslate"><span class="pre">local_offdesign</span></code> is <code class="code docutils literal notranslate"><span class="pre">True</span></code> for connections or components,
+the design point information are read from the .csv-files in the
+respective <code class="code docutils literal notranslate"><span class="pre">design_path</span></code>. In this case, the design values are
+unset, the offdesign values set.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.init_fluids">
+<span class="sig-name descname"><span class="pre">init_fluids</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.init_fluids"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.init_fluids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialise the fluid vector on every connection of the network.</p>
+<ul class="simple">
+<li><p>Create fluid vector for every component as dict,
+index: nw.fluids,
+values: 0 if not set by user.</p></li>
+<li><p>Create fluid_set vector with same logic,
+index: nw.fluids,
+values: False if not set by user.</p></li>
+<li><p>If there are any combustion chambers in the network, calculate fluid
+vector starting from there.</p></li>
+<li><p>Propagate fluid vector in direction of sources and targets.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.init_offdesign">
+<span class="sig-name descname"><span class="pre">init_offdesign</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.init_offdesign"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.init_offdesign" title="Permalink to this definition">¶</a></dt>
+<dd><p>Switch components and connections from design to offdesign mode.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>components</strong></p>
+<p>All parameters stated in the component’s attribute <code class="code docutils literal notranslate"><span class="pre">cp.design</span></code>
+will be unset and all parameters stated in the component’s attribute
+<code class="code docutils literal notranslate"><span class="pre">cp.offdesign</span></code> will be set instead.</p>
+<p>Additionally, all component parameters specified as variables are
+unset and the values from design point are set.</p>
+<p><strong>connections</strong></p>
+<p>All parameters given in the connection’s attribute <code class="code docutils literal notranslate"><span class="pre">c.design</span></code>
+will be unset and all parameters stated in the connections’s attribute
+<code class="code docutils literal notranslate"><span class="pre">cp.offdesign</span></code> will be set instead. This does also affect
+referenced values!</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.init_offdesign_params">
+<span class="sig-name descname"><span class="pre">init_offdesign_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.init_offdesign_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.init_offdesign_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read design point information from specified <code class="code docutils literal notranslate"><span class="pre">design_path</span></code>.</p>
+<p>If a <code class="code docutils literal notranslate"><span class="pre">design_path</span></code> has been specified individually for components
+or connections, the data will be read from the specified individual
+path instead.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The methods
+<a class="reference internal" href="#tespy.networks.network.Network.init_comp_design_params" title="tespy.networks.network.Network.init_comp_design_params"><code class="xref py py-meth docutils literal notranslate"><span class="pre">tespy.networks.network.Network.init_comp_design_params()</span></code></a>
+(components) and the
+<a class="reference internal" href="#tespy.networks.network.Network.init_conn_design_params" title="tespy.networks.network.Network.init_conn_design_params"><code class="xref py py-meth docutils literal notranslate"><span class="pre">tespy.networks.network.Network.init_conn_design_params()</span></code></a>
+(connections) handle the parameter specification.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.init_precalc_properties">
+<span class="sig-name descname"><span class="pre">init_precalc_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.init_precalc_properties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.init_precalc_properties" title="Permalink to this definition">¶</a></dt>
+<dd><p>Precalculate enthalpy values for connections.</p>
+<p>Precalculation is performed only if temperature, vapor mass fraction,
+temperature difference to boiling point or phase is specified.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>c</strong> (<a class="reference internal" href="tespy.connections.html#tespy.connections.connection.Connection" title="tespy.connections.connection.Connection"><em>tespy.connections.connection.Connection</em></a>) – Connection to precalculate values for.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.init_properties">
+<span class="sig-name descname"><span class="pre">init_properties</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.init_properties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.init_properties" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialise the fluid properties on every connection of the network.</p>
+<ul class="simple">
+<li><p>Set generic starting values for mass flow, enthalpy and pressure if
+not user specified, read from <code class="code docutils literal notranslate"><span class="pre">ìnit_path</span></code> or available from
+previous calculation.</p></li>
+<li><p>For generic starting values precalculate enthalpy value at points of
+given temperature, vapor mass fraction, temperature difference to
+boiling point or fluid state.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.init_read_connections">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">init_read_connections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.init_read_connections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.init_read_connections" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read connection information from base_path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>base_path</strong> (<em>str</em>) – Path to network information.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.init_set_properties">
+<span class="sig-name descname"><span class="pre">init_set_properties</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.init_set_properties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.init_set_properties" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specification of SI values for user set values.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.init_val0">
+<span class="sig-name descname"><span class="pre">init_val0</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.init_val0"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.init_val0" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set starting values for fluid properties.</p>
+<p>The component classes provide generic starting values for their inlets
+and outlets.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>c</strong> (<a class="reference internal" href="tespy.connections.html#tespy.connections.connection.Connection" title="tespy.connections.connection.Connection"><em>tespy.connections.connection.Connection</em></a>) – Connection to initialise.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.initialise">
+<span class="sig-name descname"><span class="pre">initialise</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.initialise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.initialise" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initilialise the network depending on calclation mode.</p>
+<p>Design</p>
+<ul class="simple">
+<li><p>Generic fluid composition and fluid property initialisation.</p></li>
+<li><p>Starting values from initialisation path if provided.</p></li>
+</ul>
+<p>Offdesign</p>
+<ul class="simple">
+<li><p>Check offdesign path specification.</p></li>
+<li><p>Set component and connection design point properties.</p></li>
+<li><p>Switch from design/offdesign parameter specification.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.matrix_inversion">
+<span class="sig-name descname"><span class="pre">matrix_inversion</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.matrix_inversion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.matrix_inversion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Invert matrix of derivatives and caluclate increment.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.postprocessing">
+<span class="sig-name descname"><span class="pre">postprocessing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.postprocessing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.postprocessing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate connection, bus and component parameters.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.print_components">
+<span class="sig-name descname"><span class="pre">print_components</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.print_components"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.print_components" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the print values for the component data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>c</strong> (<em>pandas.core.series.Series</em>) – Series containing the component data.</p></li>
+<li><p><strong>param</strong> (<em>str</em>) – Component parameter to print.</p></li>
+<li><p><strong>colored</strong> (<em>booloean</em>) – Color the printout.</p></li>
+<li><p><strong>coloring</strong> (<em>dict</em>) – Coloring information for colored printout.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>value</strong> – String representation of the value to print.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.print_iterinfo_body">
+<span class="sig-name descname"><span class="pre">print_iterinfo_body</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.print_iterinfo_body"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.print_iterinfo_body" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print convergence progress.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.print_iterinfo_head">
+<span class="sig-name descname"><span class="pre">print_iterinfo_head</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.print_iterinfo_head"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.print_iterinfo_head" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print head of convergence progress.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.print_iterinfo_tail">
+<span class="sig-name descname"><span class="pre">print_iterinfo_tail</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.print_iterinfo_tail"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.print_iterinfo_tail" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print tail of convergence progress.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.print_results">
+<span class="sig-name descname"><span class="pre">print_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">colored</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.print_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.print_results" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print the calculations results to prompt.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.process_busses">
+<span class="sig-name descname"><span class="pre">process_busses</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.process_busses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.process_busses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process the bus results.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.process_components">
+<span class="sig-name descname"><span class="pre">process_components</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.process_components"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.process_components" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process the component results.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.process_connections">
+<span class="sig-name descname"><span class="pre">process_connections</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.process_connections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.process_connections" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process the Connection results.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.property_range_message">
+<span class="sig-name descname"><span class="pre">property_range_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.property_range_message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.property_range_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return debugging message for fluid property range adjustments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>c</strong> (<a class="reference internal" href="tespy.connections.html#tespy.connections.connection.Connection" title="tespy.connections.connection.Connection"><em>tespy.connections.connection.Connection</em></a>) – Connection to check fluid properties.</p></li>
+<li><p><strong>prop</strong> (<em>str</em>) – Fluid property.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>msg</strong> – Debugging message.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the results to results files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>str</em>) – Path for the results.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Results will be saved to path. The results contain:</p>
+<ul class="simple">
+<li><p>network.json (network information)</p></li>
+<li><p>connections.csv (connection information)</p></li>
+<li><p>folder components containing .csv files for busses and
+characteristics as well as .csv files for all types of components
+within your network.</p></li>
+</ul>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.save_busses">
+<span class="sig-name descname"><span class="pre">save_busses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fn</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.save_busses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.save_busses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the bus properties.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>fn</strong> (<em>str</em>) – Path/filename for the file.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.save_characteristics">
+<span class="sig-name descname"><span class="pre">save_characteristics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.save_characteristics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.save_characteristics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the characteristics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>fn</strong> (<em>str</em>) – Path/filename for the file.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.save_components">
+<span class="sig-name descname"><span class="pre">save_components</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.save_components"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.save_components" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the component properties.</p>
+<ul>
+<li><p>Uses components labels as row identifier.</p></li>
+<li><p>Writes:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>component’s incomming and outgoing connections (object id) and</p></li>
+<li><p>component’s parametrisation.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>path</strong> (<em>str</em>) – Path/filename for the file.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.save_connections">
+<span class="sig-name descname"><span class="pre">save_connections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fn</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.save_connections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.save_connections" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the connection properties.</p>
+<ul>
+<li><p>Uses connections object id as row identifier and saves</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>connections source and target as well as</p></li>
+<li><p>properties with references and</p></li>
+<li><p>fluid vector (including user specification if structure is True).</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Connections source and target are identified by its labels.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>fn</strong> (<em>str</em>) – Path/filename for the file.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.save_network">
+<span class="sig-name descname"><span class="pre">save_network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fn</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.save_network"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.save_network" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save basic network configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>fn</strong> (<em>str</em>) – Path/filename for the network configuration file.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.set_attr">
+<span class="sig-name descname"><span class="pre">set_attr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.set_attr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.set_attr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set, resets or unsets attributes of a network.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>h_range</strong> (<em>list</em>) – List with minimum and maximum values for enthalpy value range.</p></li>
+<li><p><strong>h_unit</strong> (<em>str</em>) – Specify the unit for enthalpy: ‘J / kg’, ‘kJ / kg’, ‘MJ / kg’.</p></li>
+<li><p><strong>iterinfo</strong> (<em>boolean</em>) – Print convergence progress to console.</p></li>
+<li><p><strong>m_range</strong> (<em>list</em>) – List with minimum and maximum values for mass flow value range.</p></li>
+<li><p><strong>m_unit</strong> (<em>str</em>) – Specify the unit for mass flow: ‘kg / s’, ‘t / h’.</p></li>
+<li><p><strong>p_range</strong> (<em>list</em>) – List with minimum and maximum values for pressure value range.</p></li>
+<li><p><strong>p_unit</strong> (<em>str</em>) – Specify the unit for pressure: ‘Pa’, ‘psi’, ‘bar’, ‘MPa’.</p></li>
+<li><p><strong>s_unit</strong> (<em>str</em>) – Specify the unit for specific entropy: ‘J / kgK’, ‘kJ / kgK’,
+‘MJ / kgK’.</p></li>
+<li><p><strong>T_unit</strong> (<em>str</em>) – Specify the unit for temperature: ‘K’, ‘C’, ‘F’, ‘R’.</p></li>
+<li><p><strong>v_unit</strong> (<em>str</em>) – Specify the unit for volumetric flow: ‘m3 / s’, ‘m3 / h’, ‘l / s’,
+‘l / h’.</p></li>
+<li><p><strong>vol_unit</strong> (<em>str</em>) – Specify the unit for specific volume: ‘m3 / kg’, ‘l / kg’.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.set_defaults">
+<span class="sig-name descname"><span class="pre">set_defaults</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.set_defaults"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.set_defaults" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set default network properties.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.set_fluid_back_ends">
+<span class="sig-name descname"><span class="pre">set_fluid_back_ends</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">memorise_fluid_properties</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.set_fluid_back_ends"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.set_fluid_back_ends" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the fluid back ends.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.solve">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">design_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_previous</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cuda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">always_all_equations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.solve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.solve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Solve the network.</p>
+<ul class="simple">
+<li><p>Check network consistency.</p></li>
+<li><p>Initialise calculation and preprocessing.</p></li>
+<li><p>Perform actual calculation.</p></li>
+<li><p>Postprocessing.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mode</strong> (<em>str</em>) – Choose from ‘design’ and ‘offdesign’.</p></li>
+<li><p><strong>init_path</strong> (<em>str</em>) – Path to the folder, where your network was saved to, e.g.
+saving to <code class="code docutils literal notranslate"><span class="pre">nw.save('myplant/tests')</span></code> would require loading
+from <code class="code docutils literal notranslate"><span class="pre">init_path='myplant/tests'</span></code>.</p></li>
+<li><p><strong>design_path</strong> (<em>str</em>) – Path to the folder, where your network’s design case was saved to,
+e.g. saving to <code class="code docutils literal notranslate"><span class="pre">nw.save('myplant/tests')</span></code> would require
+loading from <code class="code docutils literal notranslate"><span class="pre">design_path='myplant/tests'</span></code>.</p></li>
+<li><p><strong>max_iter</strong> (<em>int</em>) – Maximum number of iterations before calculation stops, default: 50.</p></li>
+<li><p><strong>min_iter</strong> (<em>int</em>) – Minimum number of iterations before calculation stops, default: 4.</p></li>
+<li><p><strong>init_only</strong> (<em>boolean</em>) – Perform initialisation only, default: <code class="code docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>init_previous</strong> (<em>boolean</em>) – Initialise the calculation with values from the previous
+calculation, default: <code class="code docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>use_cuda</strong> (<em>boolean</em>) – Use cuda instead of numpy for matrix inversion, default:
+<code class="code docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>always_all_equations</strong> (<em>boolean</em>) – Calculate all equations in every iteration. Disabling this flag,
+will increase calculation speed, especially for mixtures, default:
+<code class="code docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For more information on the solution process have a look at the online
+documentation at tespy.readthedocs.io in the section “TESPy modules”.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.solve_busses">
+<span class="sig-name descname"><span class="pre">solve_busses</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.solve_busses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.solve_busses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the equations and the partial derivatives for the busses.</p>
+<ul class="simple">
+<li><p>Iterate through busses in network to get residuals and derivatives.</p></li>
+<li><p>Place residual values in residual value vector of the network.</p></li>
+<li><p>Place partial derivatives in jacobian matrix of the network.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.solve_check_props">
+<span class="sig-name descname"><span class="pre">solve_check_props</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.solve_check_props"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.solve_check_props" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check for invalid fluid property values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>c</strong> (<a class="reference internal" href="tespy.connections.html#tespy.connections.connection.Connection" title="tespy.connections.connection.Connection"><em>tespy.connections.connection.Connection</em></a>) – Connection to check fluid properties.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.solve_check_temperature">
+<span class="sig-name descname"><span class="pre">solve_check_temperature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.solve_check_temperature"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.solve_check_temperature" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if temperature is within user specified limits.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>c</strong> (<a class="reference internal" href="tespy.connections.html#tespy.connections.connection.Connection" title="tespy.connections.connection.Connection"><em>tespy.connections.connection.Connection</em></a>) – Connection to check fluid properties.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.solve_components">
+<span class="sig-name descname"><span class="pre">solve_components</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.solve_components"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.solve_components" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the residual and derivatives of component equations.</p>
+<ul class="simple">
+<li><p>Iterate through components in network to get residuals and
+derivatives.</p></li>
+<li><p>Place residual values in residual value vector of the network.</p></li>
+<li><p>Place partial derivatives in jacobian matrix of the network.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.solve_connections">
+<span class="sig-name descname"><span class="pre">solve_connections</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.solve_connections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.solve_connections" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the residual and derivatives of connection equations.</p>
+<ul class="simple">
+<li><p>Iterate through connections in network to get residuals and
+derivatives.</p></li>
+<li><p>Place residual values in residual value vector of the network.</p></li>
+<li><p>Place partial derivatives in jacobian matrix of the network.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>Equations</strong></p>
+<p><strong>mass flow, pressure and enthalpy</strong></p>
+<div class="math">
+<p><img src="../_images/math/8409328688bb9a007e16bc69f5554827e798cb82.png" alt="val = 0"/></p>
+</div><p><strong>temperatures</strong></p>
+<div class="math">
+<p><img src="../_images/math/d29689abf02963e88781e88118e7cec926fd36eb.png" alt="val = T_{j} - T \left( p_{j}, h_{j}, fluid_{j} \right)"/></p>
+</div><p><strong>volumetric flow</strong></p>
+<div class="math">
+<p><img src="../_images/math/62c0ac179c6919c885408e6c9b82da9fefa7a7e3.png" alt="val = \dot{V}_{j} - v \left( p_{j}, h_{j} \right) \cdot \dot{m}_j"/></p>
+</div><p><strong>superheating or subcooling</strong> <em>Works with pure fluids only!</em></p>
+<div class="math">
+<p><img src="../_images/math/245fd2cd2990898717acb43fe017484df0f11a84.png" alt="val = T_{j} - td_{bp} - T_{bp}\left( p_{j}, fluid_{j} \right)
+
+\text{td: temperature difference, bp: boiling point}"/></p>
+</div><p><strong>vapour mass fraction</strong> <em>Works with pure fluids only!</em></p>
+<div class="math">
+<p><img src="../_images/math/ee0983c9ccd364886f3bcb45409a46bb1319fde6.png" alt="val = h_{j} - h \left( p_{j}, x_{j}, fluid_{j} \right)"/></p>
+</div><p><strong>Referenced values</strong></p>
+<p><strong>mass flow, pressure and enthalpy</strong></p>
+<div class="math">
+<p><img src="../_images/math/18b8157d900df1f525c772a39cb282cf85837c03.png" alt="val = x_{j} - x_{j,ref} \cdot a + b"/></p>
+</div><p><strong>temperatures</strong></p>
+<div class="math">
+<p><img src="../_images/math/65ff772a4901e356fee333394242c2394f729773.png" alt="val = T \left( p_{j}, h_{j}, fluid_{j} \right) -
+T \left( p_{j}, h_{j}, fluid_{j} \right) \cdot a + b"/></p>
+</div><p><strong>Derivatives</strong></p>
+<p><strong>mass flow, pressure and enthalpy</strong></p>
+<div class="math">
+<p><img src="../_images/math/49f8537d4012c7c284453d6647244a650bb2616f.png" alt="J\left(\frac{\partial f_{i}}{\partial m_{j}}\right) = 1\\
+\text{for equation i, connection j}\\
+\text{pressure and enthalpy analogously}"/></p>
+</div><p><strong>temperatures</strong></p>
+<div class="math">
+<p><img src="../_images/math/82b7a0ef4b1f65d4d1f7488ac32a757e9e62a889.png" alt="J\left(\frac{\partial f_{i}}{\partial p_{j}}\right) =
+-\frac{\partial T_{j}}{\partial p_{j}}\\
+J\left(\frac{\partial f_{i}}{\partial h_{j}}\right) =
+-\frac{\partial T_{j}}{\partial h_{j}}\\
+J\left(\frac{\partial f_{i}}{\partial fluid_{j,k}}\right) =
+- \frac{\partial T_{j}}{\partial fluid_{j,k}}
+
+\forall k \in \text{fluid components}\\
+\text{for equation i, connection j}"/></p>
+</div><p><strong>volumetric flow</strong></p>
+<div class="math">
+<p><img src="../_images/math/18d7f61f8df319a7e6d100fbf02c3d86f03321e3.png" alt="J\left(\frac{\partial f_{i}}{\partial m_{j}}\right) =
+-v \left( p_{j}, h_{j} \right)\\
+J\left(\frac{\partial f_{i}}{\partial p_{j}}\right) =
+-\frac{\partial v_{j}}{\partial p_{j}} \cdot \dot{m}_j\\
+J\left(\frac{\partial f_{i}}{\partial h_{j}}\right) =
+-\frac{\partial v_{j}}{\partial h_{j}} \cdot \dot{m}_j\\
+
+\forall k \in \text{fluid components}\\
+\text{for equation i, connection j}"/></p>
+</div><p><strong>superheating or subcooling</strong> <em>Works with pure fluids only!</em></p>
+<div class="math">
+<p><img src="../_images/math/b27c6836d392eb4db8e5b14c52a9c97a123aa763.png" alt="J\left(\frac{\partial f_{i}}{\partial p_{j}}\right) =
+\frac{\partial T \left( p_{j}, h_{j}, fluid_{j} \right)}
+{\partial p_{j}} -
+\frac{\partial T_{bp} \left( p_{j}, fluid_{j} \right)}
+{\partial p_{j}} \\
+J\left(\frac{\partial f_{i}}{\partial h_{j}}\right) =
+\frac{\partial T \left( p_{j}, h_{j}, fluid_{j} \right)}
+{\partial h_{j}}\\
+
+\text{for equation i, connection j}\\
+\text{td: temperature difference, bp: boiling point}"/></p>
+</div><p><strong>vapour mass fraction</strong> <em>Works with pure fluids only!</em></p>
+<div class="math">
+<p><img src="../_images/math/682f6160fcad8f0bfdf1cd1fc08e2474de606668.png" alt="J\left(\frac{\partial f_{i}}{\partial p_{j}}\right) =
+-\frac{\partial h \left( p_{j}, x_{j}, fluid_{j} \right)}
+{\partial p_{j}}\\
+J\left(\frac{\partial f_{i}}{\partial h_{j}}\right) = 1\\
+\text{for equation i, connection j, x: vapour mass fraction}"/></p>
+</div><p><strong>Referenced values</strong></p>
+<p><strong>mass flow, pressure and enthalpy</strong></p>
+<div class="math">
+<p><img src="../_images/math/a74ce6f215c52d2446a12c9e6ab657e467d1b0fd.png" alt="J\left(\frac{\partial f_{i}}{\partial m_{j}}\right) = 1\\
+J\left(\frac{\partial f_{i}}{\partial m_{j,ref}}\right) = - a\\
+\text{for equation i, connection j}\\
+\text{pressure and enthalpy analogously}"/></p>
+</div><p><strong>temperatures</strong></p>
+<div class="math">
+<p><img src="../_images/math/144d456d68cdf10e35410d65d781f56c80ecb78c.png" alt="J\left(\frac{\partial f_{i}}{\partial p_{j}}\right) =
+\frac{dT_{j}}{dp_{j}}\\
+J\left(\frac{\partial f_{i}}{\partial h_{j}}\right) =
+\frac{dT_{j}}{dh_{j}}\\
+J\left(\frac{\partial f_{i}}{\partial fluid_{j,k}}\right) =
+\frac{dT_{j}}{dfluid_{j,k}}
+\; , \forall k \in \text{fluid components}\\
+J\left(\frac{\partial f_{i}}{\partial p_{j,ref}}\right) =
+\frac{dT_{j,ref}}{dp_{j,ref}} \cdot a \\
+J\left(\frac{\partial f_{i}}{\partial h_{j,ref}}\right) =
+\frac{dT_{j,ref}}{dh_{j,ref}} \cdot a \\
+J\left(\frac{\partial f_{i}}{\partial fluid_{j,k,ref}}\right) =
+\frac{dT_{j}}{dfluid_{j,k,ref}} \cdot a
+\; , \forall k \in \text{fluid components}\\
+\text{for equation i, connection j}"/></p>
+</div></div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.solve_control">
+<span class="sig-name descname"><span class="pre">solve_control</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.solve_control"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.solve_control" title="Permalink to this definition">¶</a></dt>
+<dd><p>Control iteration step of the newton algorithm.</p>
+<ul class="simple">
+<li><p>Calculate the residual value for each equation</p></li>
+<li><p>Calculate the jacobian matrix</p></li>
+<li><p>Calculate new values for variables</p></li>
+<li><p>Restrict fluid properties to value ranges</p></li>
+<li><p>Check component parameters for consistency</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.solve_determination">
+<span class="sig-name descname"><span class="pre">solve_determination</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.solve_determination"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.solve_determination" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check, if the number of supplied parameters is sufficient.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.solve_loop">
+<span class="sig-name descname"><span class="pre">solve_loop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.solve_loop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.solve_loop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loop of the newton algorithm.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tespy.networks.network.Network.solve_user_defined_eq">
+<span class="sig-name descname"><span class="pre">solve_user_defined_eq</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network.html#Network.solve_user_defined_eq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network.Network.solve_user_defined_eq" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the residual and jacobian of user defined equations.</p>
+<ul class="simple">
+<li><p>Iterate through user defined functions and calculate residual value
+and corresponding jacobian.</p></li>
+<li><p>Place residual values in residual value vector of the network.</p></li>
+<li><p>Place partial derivatives regarding connection parameters in jacobian
+matrix of the network.</p></li>
+</ul>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-tespy.networks.network_reader">
+<span id="tespy-networks-network-reader-module"></span><h2>tespy.networks.network_reader module<a class="headerlink" href="#module-tespy.networks.network_reader" title="Permalink to this headline">¶</a></h2>
+<p>Module for loading a tespy network from saved state.</p>
+<p>Use the method <a class="reference internal" href="#tespy.networks.network_reader.load_network" title="tespy.networks.network_reader.load_network"><code class="xref py py-func docutils literal notranslate"><span class="pre">tespy.networks.network_reader.load_network()</span></code></a> for importing
+a network from a saved state.</p>
+<p>This file is part of project TESPy (github.com/oemof/tespy). It’s copyrighted
+by the contributors recorded in the version control history of the file,
+available from its original location tespy/networks/network_reader.py</p>
+<p>SPDX-License-Identifier: MIT</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="tespy.networks.network_reader.busses_add_comps">
+<span class="sig-prename descclassname"><span class="pre">tespy.networks.network_reader.</span></span><span class="sig-name descname"><span class="pre">busses_add_comps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network_reader.html#busses_add_comps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network_reader.busses_add_comps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add components to busses according to data from .csv file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>c</strong> (<em>pandas.core.series.Series</em>) – Component information from .csv-file.</p></li>
+<li><p><strong>args</strong><strong>[</strong><strong>0</strong><strong>]</strong> (<em>pandas.core.frame.DataFrame</em>) – DataFrame containing all created busses.</p></li>
+<li><p><strong>args</strong><strong>[</strong><strong>1</strong><strong>]</strong> (<em>pandas.core.frame.DataFrame</em>) – DataFrame containing all created characteristic lines.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tespy.networks.network_reader.conns_set_ref">
+<span class="sig-prename descclassname"><span class="pre">tespy.networks.network_reader.</span></span><span class="sig-name descname"><span class="pre">conns_set_ref</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network_reader.html#conns_set_ref"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network_reader.conns_set_ref" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set references on connections as specified in connection data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>c</strong> (<em>pandas.core.series.Series</em>) – Connection information from .csv-file.</p></li>
+<li><p><strong>args</strong><strong>[</strong><strong>0</strong><strong>]</strong> (<em>pandas.core.frame.DataFrame</em>) – DataFrame containing all created connections.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>instance</strong> – TESPy reference object.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tespy.connections.ref</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tespy.networks.network_reader.construct_busses">
+<span class="sig-prename descclassname"><span class="pre">tespy.networks.network_reader.</span></span><span class="sig-name descname"><span class="pre">construct_busses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network_reader.html#construct_busses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network_reader.construct_busses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create busses of the network.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>c</strong> (<em>pandas.core.series.Series</em>) – Bus information from .csv-file.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>b</strong> – TESPy bus object.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="tespy.connections.html#tespy.connections.bus.Bus" title="tespy.connections.bus.Bus">tespy.connections.bus.Bus</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tespy.networks.network_reader.construct_components">
+<span class="sig-prename descclassname"><span class="pre">tespy.networks.network_reader.</span></span><span class="sig-name descname"><span class="pre">construct_components</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network_reader.html#construct_components"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network_reader.construct_components" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create TESPy component from class name and set parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>c</strong> (<em>pandas.core.series.Series</em>) – Component information from .csv-file.</p></li>
+<li><p><strong>args</strong><strong>[</strong><strong>0</strong><strong>]</strong> (<em>pandas.core.frame.DataFrame</em>) – DataFrame containing the data of characteristic lines.</p></li>
+<li><p><strong>args</strong><strong>[</strong><strong>1</strong><strong>]</strong> (<em>pandas.core.frame.DataFrame</em>) – DataFrame containing the data of characteristic maps.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>instance</strong> – TESPy component object.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="tespy.components.html#tespy.components.component.Component" title="tespy.components.component.Component">tespy.components.component.Component</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tespy.networks.network_reader.construct_connections">
+<span class="sig-prename descclassname"><span class="pre">tespy.networks.network_reader.</span></span><span class="sig-name descname"><span class="pre">construct_connections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network_reader.html#construct_connections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network_reader.construct_connections" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create TESPy connection from data in the .csv-file and its parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>c</strong> (<em>pandas.core.series.Series</em>) – Connection information from .csv-file.</p></li>
+<li><p><strong>args</strong><strong>[</strong><strong>0</strong><strong>]</strong> (<em>pandas.core.frame.DataFrame</em>) – DataFrame containing all created components.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>conn</strong> – TESPy connection object.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="tespy.connections.html#tespy.connections.connection.Connection" title="tespy.connections.connection.Connection">tespy.connections.connection.Connection</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tespy.networks.network_reader.construct_network">
+<span class="sig-prename descclassname"><span class="pre">tespy.networks.network_reader.</span></span><span class="sig-name descname"><span class="pre">construct_network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network_reader.html#construct_network"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network_reader.construct_network" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create TESPy network from the data provided in the netw.csv-file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>path</strong> (<em>str</em>) – Base-path to stored network data.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>nw</strong> – TESPy network object.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#tespy.networks.network.Network" title="tespy.networks.network.Network">tespy.networks.network.Network</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tespy.networks.network_reader.load_network">
+<span class="sig-prename descclassname"><span class="pre">tespy.networks.network_reader.</span></span><span class="sig-name descname"><span class="pre">load_network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tespy/networks/network_reader.html#load_network"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tespy.networks.network_reader.load_network" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a network from a base path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>path</strong> (<em>str</em>) – The path to the network data.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>nw</strong> – TESPy networks object.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#tespy.networks.network.Network" title="tespy.networks.network.Network">tespy.networks.network.Network</a></p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you save the network structure of an existing TESPy network, it will be
+saved to the path you specified. The structure of the saved data in that
+path is the structure you need to provide in the path for loading the
+network.</p>
+<p>The structure of the path must be as follows:</p>
+<ul>
+<li><p>Folder: path (e.g. ‘mynetwork’)</p></li>
+<li><p>Subfolder: components (‘mynetwork/components’) containing</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>bus.csv*</p></li>
+<li><p>char.csv*</p></li>
+<li><p>char_map.csv*</p></li>
+<li><p>component_class_name.csv (e.g. heat_exchanger.csv)</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>connections.csv</p></li>
+<li><p>network.json</p></li>
+</ul>
+<p>The imported network has the following additional features:</p>
+<ul class="simple">
+<li><p>Connections are accessible by label, e.g.
+<code class="code docutils literal notranslate"><span class="pre">myimportednetwork.get_conn('myconnection')</span></code>. The default label
+logic is <code class="code docutils literal notranslate"><span class="pre">source:source_id_target:target_id</span></code>, where the source
+means the label of the component the connection originates from and
+target means the label of the component, the connections targets on.</p></li>
+<li><p>Components are accessible by label as well, e.g. for a component
+‘heat exchanger’ <code class="code docutils literal notranslate"><span class="pre">myimportednetwork.get_comp('heat</span> <span class="pre">exchanger')</span></code>.</p></li>
+<li><p>Busses are stored in a dict like structure, therefore accessible like
+follows, e.g. a bus labeld ‘power input’
+<code class="code docutils literal notranslate"><span class="pre">myimportednetwork.busses['power</span> <span class="pre">input']</span></code>.</p></li>
+</ul>
+</div>
+<p class="rubric">Example</p>
+<p>Create a network and export it. This is followed by loading the network
+with the network_reader module. All network information stored will be
+passed to a new network object. Components, connections and busses will
+be accessible by label. The following example setup is simple gas turbine
+setup with compressor, combustion chamber and turbine. The fuel is fed
+from a pipeline and throttled to the required pressure while keeping the
+temperature at a constant value.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="p">(</span><span class="n">Sink</span><span class="p">,</span> <span class="n">Source</span><span class="p">,</span> <span class="n">CombustionChamber</span><span class="p">,</span>
+<span class="gp">... </span><span class="n">Compressor</span><span class="p">,</span> <span class="n">Turbine</span><span class="p">,</span> <span class="n">HeatExchangerSimple</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">tespy.connections</span> <span class="kn">import</span> <span class="n">Connection</span><span class="p">,</span> <span class="n">Ref</span><span class="p">,</span> <span class="n">Bus</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">tespy.networks</span> <span class="kn">import</span> <span class="n">load_network</span><span class="p">,</span> <span class="n">Network</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">shutil</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fluid_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;CH4&#39;</span><span class="p">,</span> <span class="s1">&#39;O2&#39;</span><span class="p">,</span> <span class="s1">&#39;N2&#39;</span><span class="p">,</span> <span class="s1">&#39;CO2&#39;</span><span class="p">,</span> <span class="s1">&#39;H2O&#39;</span><span class="p">,</span> <span class="s1">&#39;Ar&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nw</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span><span class="n">fluids</span><span class="o">=</span><span class="n">fluid_list</span><span class="p">,</span> <span class="n">p_unit</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="n">T_unit</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">,</span>
+<span class="gp">... </span><span class="n">h_unit</span><span class="o">=</span><span class="s1">&#39;kJ / kg&#39;</span><span class="p">,</span> <span class="n">iterinfo</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">air</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span><span class="s1">&#39;air&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span><span class="s1">&#39;fuel&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Compressor</span><span class="p">(</span><span class="s1">&#39;compressor&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">comb</span> <span class="o">=</span> <span class="n">CombustionChamber</span><span class="p">(</span><span class="s1">&#39;combustion&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">Turbine</span><span class="p">(</span><span class="s1">&#39;turbine&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">HeatExchangerSimple</span><span class="p">(</span><span class="s1">&#39;fuel preheater&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">si</span> <span class="o">=</span> <span class="n">Sink</span><span class="p">(</span><span class="s1">&#39;sink&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">inc</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">air</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;ambient air&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cc</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">comb</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fp</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pc</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">comb</span><span class="p">,</span> <span class="s1">&#39;in2&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ct</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">comb</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">outg</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">si</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nw</span><span class="o">.</span><span class="n">add_conns</span><span class="p">(</span><span class="n">inc</span><span class="p">,</span> <span class="n">cc</span><span class="p">,</span> <span class="n">fp</span><span class="p">,</span> <span class="n">pc</span><span class="p">,</span> <span class="n">ct</span><span class="p">,</span> <span class="n">outg</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Specify component and connection properties. The intlet pressure at the
+compressor and the outlet pressure after the turbine are identical. For the
+compressor, the pressure ratio and isentropic efficiency are design
+parameters. A compressor map (efficiency vs. mass flow and pressure rise
+vs. mass flow) is selected for the compressor. Fuel is Methane.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">pr</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">eta_s</span><span class="o">=</span><span class="mf">0.88</span><span class="p">,</span> <span class="n">design</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;eta_s&#39;</span><span class="p">,</span> <span class="s1">&#39;pr&#39;</span><span class="p">],</span>
+<span class="gp">... </span><span class="n">offdesign</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;char_map_eta_s&#39;</span><span class="p">,</span> <span class="s1">&#39;char_map_pr&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">eta_s</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">design</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;eta_s&#39;</span><span class="p">],</span>
+<span class="gp">... </span><span class="n">offdesign</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;eta_s_char&#39;</span><span class="p">,</span> <span class="s1">&#39;cone&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">inc</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">fluid</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;N2&#39;</span><span class="p">:</span> <span class="mf">0.7556</span><span class="p">,</span> <span class="s1">&#39;O2&#39;</span><span class="p">:</span> <span class="mf">0.2315</span><span class="p">,</span> <span class="s1">&#39;Ar&#39;</span><span class="p">:</span> <span class="mf">0.0129</span><span class="p">,</span> <span class="s1">&#39;CH4&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<span class="gp">... </span><span class="s1">&#39;H2O&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span> <span class="n">fluid_balance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fp</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">fluid</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;N2&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;O2&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Ar&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;CH4&#39;</span><span class="p">:</span> <span class="mf">0.96</span><span class="p">,</span> <span class="s1">&#39;H2O&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<span class="gp">... </span><span class="s1">&#39;CO2&#39;</span><span class="p">:</span> <span class="mf">0.04</span><span class="p">},</span> <span class="n">T</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">40</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pc</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">T</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ct</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">T</span><span class="o">=</span><span class="mi">1100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">outg</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="n">Ref</span><span class="p">(</span><span class="n">inc</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">power</span> <span class="o">=</span> <span class="n">Bus</span><span class="p">(</span><span class="s1">&#39;total power output&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">power</span><span class="o">.</span><span class="n">add_comps</span><span class="p">({</span><span class="s1">&#39;comp&#39;</span><span class="p">:</span> <span class="n">c</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;comp&#39;</span><span class="p">:</span> <span class="n">t</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nw</span><span class="o">.</span><span class="n">add_busses</span><span class="p">(</span><span class="n">power</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For a stable start, we specify the fresh air mass flow.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">inc</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">m</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nw</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="s1">&#39;design&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The total power output is set to 1 MW, electrical or mechanical
+efficiencies are not considered in this example. The documentation
+example in class <a class="reference internal" href="tespy.connections.html#tespy.connections.bus.Bus" title="tespy.connections.bus.Bus"><code class="xref py py-class docutils literal notranslate"><span class="pre">tespy.connections.bus.Bus</span></code></a> provides more
+information on efficiencies of generators, for instance.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">inc</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">m</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">power</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">P</span><span class="o">=-</span><span class="mf">1e6</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nw</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="s1">&#39;design&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nw</span><span class="o">.</span><span class="n">lin_dep</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nw</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;exported_nwk&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mass_flow</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">nw</span><span class="o">.</span><span class="n">get_conn</span><span class="p">(</span><span class="s1">&#39;ambient air&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">igva</span><span class="o">=</span><span class="s1">&#39;var&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nw</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="s1">&#39;offdesign&#39;</span><span class="p">,</span> <span class="n">design_path</span><span class="o">=</span><span class="s1">&#39;exported_nwk&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">eta_s</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="go">0.9</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">power</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">P</span><span class="o">=-</span><span class="mf">0.75e6</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nw</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="s1">&#39;offdesign&#39;</span><span class="p">,</span> <span class="n">design_path</span><span class="o">=</span><span class="s1">&#39;exported_nwk&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nw</span><span class="o">.</span><span class="n">lin_dep</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">eta_s_t</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">eta_s</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">igva</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">igva</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">eta_s_t</span>
+<span class="go">0.898</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">igva</span>
+<span class="go">20.138</span>
+</pre></div>
+</div>
+<p>The designed network is exported to the path ‘exported_nwk’. Now import the
+network and recalculate. Check if the results match with the previous
+calculation in design and offdesign case.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">imported_nwk</span> <span class="o">=</span> <span class="n">load_network</span><span class="p">(</span><span class="s1">&#39;exported_nwk&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">imported_nwk</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">iterinfo</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">imported_nwk</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="s1">&#39;design&#39;</span><span class="p">,</span> <span class="n">init_path</span><span class="o">=</span><span class="s1">&#39;exported_nwk&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">imported_nwk</span><span class="o">.</span><span class="n">lin_dep</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">imported_nwk</span><span class="o">.</span><span class="n">get_conn</span><span class="p">(</span><span class="s1">&#39;ambient air&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="n">mass_flow</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">imported_nwk</span><span class="o">.</span><span class="n">get_comp</span><span class="p">(</span><span class="s1">&#39;turbine&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">eta_s</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="go">0.9</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">imported_nwk</span><span class="o">.</span><span class="n">get_comp</span><span class="p">(</span><span class="s1">&#39;compressor&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">igva</span><span class="o">=</span><span class="s1">&#39;var&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">imported_nwk</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="s1">&#39;offdesign&#39;</span><span class="p">,</span> <span class="n">design_path</span><span class="o">=</span><span class="s1">&#39;exported_nwk&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">imported_nwk</span><span class="o">.</span><span class="n">get_comp</span><span class="p">(</span><span class="s1">&#39;turbine&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">eta_s</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="go">0.9</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">imported_nwk</span><span class="o">.</span><span class="n">busses</span><span class="p">[</span><span class="s1">&#39;total power output&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">P</span><span class="o">=-</span><span class="mf">0.75e6</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">imported_nwk</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="s1">&#39;offdesign&#39;</span><span class="p">,</span> <span class="n">design_path</span><span class="o">=</span><span class="s1">&#39;exported_nwk&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">imported_nwk</span><span class="o">.</span><span class="n">get_comp</span><span class="p">(</span><span class="s1">&#39;turbine&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">eta_s</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="o">==</span> <span class="n">eta_s_t</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">imported_nwk</span><span class="o">.</span><span class="n">get_comp</span><span class="p">(</span><span class="s1">&#39;compressor&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">igva</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="o">==</span> <span class="n">igva</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="s1">&#39;./exported_nwk&#39;</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="tespy.data.html" class="btn btn-neutral float-left" title="tespy.data module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tespy.tools.html" class="btn btn-neutral float-right" title="tespy.tools module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2020, Francesco Witte.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

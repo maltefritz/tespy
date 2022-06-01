@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tespy.components.heat_exchangers.base &mdash; tespy 0.6.0 - Colored Chemicals documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../../index.html" class="icon icon-home"> tespy
+            <img src="../../../../_static/logo_tespy_mid.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.6.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../introduction.html">Thermal Engineering Systems in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installation and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../first_steps.html">First steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials_examples.html">Examples and Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tespy_modules.html">TESPy modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tespy_analyses.html">Thermodynamic analyses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../developing_tespy.html">Developing TESPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../zliterature.html">Literature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">tespy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+      <li>tespy.components.heat_exchangers.base</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for tespy.components.heat_exchangers.base</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8</span>
+
+<span class="sd">&quot;&quot;&quot;Module of class HeatExchanger.</span>
+
+
+<span class="sd">This file is part of project TESPy (github.com/oemof/tespy). It&#39;s copyrighted</span>
+<span class="sd">by the contributors recorded in the version control history of the file,</span>
+<span class="sd">available from its original location</span>
+<span class="sd">tespy/components/heat_exchangers/base.py</span>
+
+<span class="sd">SPDX-License-Identifier: MIT</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">tespy.components.component</span> <span class="kn">import</span> <span class="n">Component</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.data_containers</span> <span class="kn">import</span> <span class="n">ComponentCharacteristics</span> <span class="k">as</span> <span class="n">dc_cc</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.data_containers</span> <span class="kn">import</span> <span class="n">ComponentProperties</span> <span class="k">as</span> <span class="n">dc_cp</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.data_containers</span> <span class="kn">import</span> <span class="n">GroupedComponentCharacteristics</span> <span class="k">as</span> <span class="n">dc_gcc</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.document_models</span> <span class="kn">import</span> <span class="n">generate_latex_eq</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.fluid_properties</span> <span class="kn">import</span> <span class="n">T_mix_ph</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.fluid_properties</span> <span class="kn">import</span> <span class="n">h_mix_pT</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.fluid_properties</span> <span class="kn">import</span> <span class="n">s_mix_ph</span>
+
+
+<div class="viewcode-block" id="HeatExchanger"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.base.HeatExchanger">[docs]</a><span class="k">class</span> <span class="nc">HeatExchanger</span><span class="p">(</span><span class="n">Component</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for counter current heat exchanger.</span>
+
+<span class="sd">    The component HeatExchanger is the parent class for the components:</span>
+
+<span class="sd">    - :py:class:`tespy.components.heat_exchangers.condenser.Condenser`</span>
+<span class="sd">    - :py:class:`tespy.components.heat_exchangers.desuperheater.Desuperheater`</span>
+
+<span class="sd">    **Mandatory Equations**</span>
+
+<span class="sd">    - :py:meth:`tespy.components.component.Component.fluid_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.component.Component.mass_flow_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.heat_exchangers.base.HeatExchanger.energy_balance_func`</span>
+
+<span class="sd">    **Optional Equations**</span>
+
+<span class="sd">    - :py:meth:`tespy.components.heat_exchangers.base.HeatExchanger.energy_balance_hot_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.heat_exchangers.base.HeatExchanger.kA_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.heat_exchangers.base.HeatExchanger.kA_char_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.heat_exchangers.base.HeatExchanger.ttd_u_func`</span>
+<span class="sd">    - :py:meth:`tespy.components.heat_exchangers.base.HeatExchanger.ttd_l_func`</span>
+<span class="sd">    - hot side :py:meth:`tespy.components.component.Component.pr_func`</span>
+<span class="sd">    - cold side :py:meth:`tespy.components.component.Component.pr_func`</span>
+<span class="sd">    - hot side :py:meth:`tespy.components.component.Component.zeta_func`</span>
+<span class="sd">    - cold side :py:meth:`tespy.components.component.Component.zeta_func`</span>
+
+<span class="sd">    Inlets/Outlets</span>
+
+<span class="sd">    - in1, in2 (index 1: hot side, index 2: cold side)</span>
+<span class="sd">    - out1, out2 (index 1: hot side, index 2: cold side)</span>
+
+<span class="sd">    Image</span>
+
+<span class="sd">    .. image:: _images/HeatExchanger.svg</span>
+<span class="sd">       :alt: alternative text</span>
+<span class="sd">       :align: center</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    label : str</span>
+<span class="sd">        The label of the component.</span>
+
+<span class="sd">    design : list</span>
+<span class="sd">        List containing design parameters (stated as String).</span>
+
+<span class="sd">    offdesign : list</span>
+<span class="sd">        List containing offdesign parameters (stated as String).</span>
+
+<span class="sd">    design_path : str</span>
+<span class="sd">        Path to the components design case.</span>
+
+<span class="sd">    local_offdesign : boolean</span>
+<span class="sd">        Treat this component in offdesign mode in a design calculation.</span>
+
+<span class="sd">    local_design : boolean</span>
+<span class="sd">        Treat this component in design mode in an offdesign calculation.</span>
+
+<span class="sd">    char_warnings : boolean</span>
+<span class="sd">        Ignore warnings on default characteristics usage for this component.</span>
+
+<span class="sd">    printout : boolean</span>
+<span class="sd">        Include this component in the network&#39;s results printout.</span>
+
+<span class="sd">    Q : float, dict</span>
+<span class="sd">        Heat transfer, :math:`Q/\text{W}`.</span>
+
+<span class="sd">    pr1 : float, dict, :code:`&quot;var&quot;`</span>
+<span class="sd">        Outlet to inlet pressure ratio at hot side, :math:`pr/1`.</span>
+
+<span class="sd">    pr2 : float, dict, :code:`&quot;var&quot;`</span>
+<span class="sd">        Outlet to inlet pressure ratio at cold side, :math:`pr/1`.</span>
+
+<span class="sd">    zeta1 : float, dict, :code:`&quot;var&quot;`</span>
+<span class="sd">        Geometry independent friction coefficient at hot side,</span>
+<span class="sd">        :math:`\frac{\zeta}{D^4}/\frac{1}{\text{m}^4}`.</span>
+
+<span class="sd">    zeta2 : float, dict, :code:`&quot;var&quot;`</span>
+<span class="sd">        Geometry independent friction coefficient at cold side,</span>
+<span class="sd">        :math:`\frac{\zeta}{D^4}/\frac{1}{\text{m}^4}`.</span>
+
+<span class="sd">    ttd_l : float, dict</span>
+<span class="sd">        Lower terminal temperature difference :math:`ttd_\mathrm{l}/\text{K}`.</span>
+
+<span class="sd">    ttd_u : float, dict</span>
+<span class="sd">        Upper terminal temperature difference :math:`ttd_\mathrm{u}/\text{K}`.</span>
+
+<span class="sd">    kA : float, dict</span>
+<span class="sd">        Area independent heat transfer coefficient,</span>
+<span class="sd">        :math:`kA/\frac{\text{W}}{\text{K}}`.</span>
+
+<span class="sd">    kA_char : dict</span>
+<span class="sd">        Area independent heat transfer coefficient characteristic.</span>
+
+<span class="sd">    kA_char1 : tespy.tools.characteristics.CharLine, dict</span>
+<span class="sd">        Characteristic line for hot side heat transfer coefficient.</span>
+
+<span class="sd">    kA_char2 : tespy.tools.characteristics.CharLine, dict</span>
+<span class="sd">        Characteristic line for cold side heat transfer coefficient.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    The HeatExchanger and subclasses (</span>
+<span class="sd">    :py:class:`tespy.components.heat_exchangers.condenser.Condenser`,</span>
+<span class="sd">    :py:class:`tespy.components.heat_exchangers.desuperheater.Desuperheater`)</span>
+<span class="sd">    are countercurrent heat exchangers. Equations (:code:`kA`, :code:`ttd_u`,</span>
+<span class="sd">    :code:`ttd_l`) do not work for directcurrent and crosscurrent or</span>
+<span class="sd">    combinations of different types.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    A water cooling is installed to transfer heat from hot exhaust air. The</span>
+<span class="sd">    heat exchanger is designed for a terminal temperature difference of 5 K.</span>
+<span class="sd">    From this, it is possible to calculate the heat transfer coefficient and</span>
+<span class="sd">    predict water and air outlet temperature in offdesign operation.</span>
+
+<span class="sd">    &gt;&gt;&gt; from tespy.components import Sink, Source, HeatExchanger</span>
+<span class="sd">    &gt;&gt;&gt; from tespy.connections import Connection</span>
+<span class="sd">    &gt;&gt;&gt; from tespy.networks import Network</span>
+<span class="sd">    &gt;&gt;&gt; from tespy.tools import document_model</span>
+<span class="sd">    &gt;&gt;&gt; import shutil</span>
+<span class="sd">    &gt;&gt;&gt; nw = Network(fluids=[&#39;water&#39;, &#39;air&#39;], T_unit=&#39;C&#39;, p_unit=&#39;bar&#39;,</span>
+<span class="sd">    ... h_unit=&#39;kJ / kg&#39;, iterinfo=False)</span>
+<span class="sd">    &gt;&gt;&gt; exhaust_hot = Source(&#39;Exhaust air outlet&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; exhaust_cold = Sink(&#39;Exhaust air inlet&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; cw_cold = Source(&#39;cooling water inlet&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; cw_hot = Sink(&#39;cooling water outlet&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; he = HeatExchanger(&#39;waste heat exchanger&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; he.component()</span>
+<span class="sd">    &#39;heat exchanger&#39;</span>
+<span class="sd">    &gt;&gt;&gt; ex_he = Connection(exhaust_hot, &#39;out1&#39;, he, &#39;in1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; he_ex = Connection(he, &#39;out1&#39;, exhaust_cold, &#39;in1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; cw_he = Connection(cw_cold, &#39;out1&#39;, he, &#39;in2&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; he_cw = Connection(he, &#39;out2&#39;, cw_hot, &#39;in1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; nw.add_conns(ex_he, he_ex, cw_he, he_cw)</span>
+
+<span class="sd">    The volumetric flow of the air is at 100 l/s. After designing the component</span>
+<span class="sd">    it is possible to predict the temperature at different flow rates or</span>
+<span class="sd">    different inlet temperatures of the exhaust air.</span>
+
+<span class="sd">    &gt;&gt;&gt; he.set_attr(pr1=0.98, pr2=0.98, ttd_u=5,</span>
+<span class="sd">    ... design=[&#39;pr1&#39;, &#39;pr2&#39;, &#39;ttd_u&#39;], offdesign=[&#39;zeta1&#39;, &#39;zeta2&#39;, &#39;kA_char&#39;])</span>
+<span class="sd">    &gt;&gt;&gt; cw_he.set_attr(fluid={&#39;air&#39;: 0, &#39;water&#39;: 1}, T=10, p=3,</span>
+<span class="sd">    ... offdesign=[&#39;m&#39;])</span>
+<span class="sd">    &gt;&gt;&gt; ex_he.set_attr(fluid={&#39;air&#39;: 1, &#39;water&#39;: 0}, v=0.1, T=35)</span>
+<span class="sd">    &gt;&gt;&gt; he_ex.set_attr(T=17.5, p=1, design=[&#39;T&#39;])</span>
+<span class="sd">    &gt;&gt;&gt; nw.solve(&#39;design&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; nw.save(&#39;tmp&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; round(ex_he.T.val - he_cw.T.val, 0)</span>
+<span class="sd">    5.0</span>
+<span class="sd">    &gt;&gt;&gt; ex_he.set_attr(v=0.075)</span>
+<span class="sd">    &gt;&gt;&gt; nw.solve(&#39;offdesign&#39;, design_path=&#39;tmp&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; round(he_cw.T.val, 1)</span>
+<span class="sd">    27.5</span>
+<span class="sd">    &gt;&gt;&gt; round(he_ex.T.val, 1)</span>
+<span class="sd">    14.4</span>
+<span class="sd">    &gt;&gt;&gt; ex_he.set_attr(v=0.1, T=40)</span>
+<span class="sd">    &gt;&gt;&gt; nw.solve(&#39;offdesign&#39;, design_path=&#39;tmp&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; document_model(nw)</span>
+<span class="sd">    &gt;&gt;&gt; round(he_cw.T.val, 1)</span>
+<span class="sd">    33.9</span>
+<span class="sd">    &gt;&gt;&gt; round(he_ex.T.val, 1)</span>
+<span class="sd">    18.8</span>
+<span class="sd">    &gt;&gt;&gt; shutil.rmtree(&#39;./tmp&#39;, ignore_errors=True)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="HeatExchanger.component"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.base.HeatExchanger.component">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">component</span><span class="p">():</span>
+        <span class="k">return</span> <span class="s1">&#39;heat exchanger&#39;</span></div>
+
+<div class="viewcode-block" id="HeatExchanger.get_variables"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.base.HeatExchanger.get_variables">[docs]</a>    <span class="k">def</span> <span class="nf">get_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;Q&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(</span>
+                <span class="n">max_val</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">energy_balance_hot_func</span><span class="p">,</span> <span class="n">num_eq</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">deriv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">energy_balance_hot_deriv</span><span class="p">,</span>
+                <span class="n">latex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">energy_balance_hot_func_doc</span><span class="p">),</span>
+            <span class="s1">&#39;kA&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(</span>
+                <span class="n">min_val</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_eq</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kA_func</span><span class="p">,</span> <span class="n">latex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kA_func_doc</span><span class="p">,</span>
+                <span class="n">deriv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kA_deriv</span><span class="p">),</span>
+            <span class="s1">&#39;td_log&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(</span><span class="n">min_val</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">is_result</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="s1">&#39;ttd_u&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(</span>
+                <span class="n">min_val</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_eq</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ttd_u_func</span><span class="p">,</span>
+                <span class="n">deriv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ttd_u_deriv</span><span class="p">,</span> <span class="n">latex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ttd_u_func_doc</span><span class="p">),</span>
+            <span class="s1">&#39;ttd_l&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(</span>
+                <span class="n">min_val</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_eq</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ttd_l_func</span><span class="p">,</span>
+                <span class="n">deriv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ttd_l_deriv</span><span class="p">,</span> <span class="n">latex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ttd_l_func_doc</span><span class="p">),</span>
+            <span class="s1">&#39;pr1&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(</span>
+                <span class="n">min_val</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">max_val</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_eq</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">deriv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pr_deriv</span><span class="p">,</span>
+                <span class="n">latex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pr_func_doc</span><span class="p">,</span>
+                <span class="n">func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pr_func</span><span class="p">,</span> <span class="n">func_params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;pr&#39;</span><span class="p">:</span> <span class="s1">&#39;pr1&#39;</span><span class="p">}),</span>
+            <span class="s1">&#39;pr2&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(</span>
+                <span class="n">min_val</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">max_val</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_eq</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">latex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pr_func_doc</span><span class="p">,</span>
+                <span class="n">deriv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pr_deriv</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pr_func</span><span class="p">,</span>
+                <span class="n">func_params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;pr&#39;</span><span class="p">:</span> <span class="s1">&#39;pr2&#39;</span><span class="p">,</span> <span class="s1">&#39;inconn&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;outconn&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span>
+            <span class="s1">&#39;zeta1&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(</span>
+                <span class="n">min_val</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_val</span><span class="o">=</span><span class="mf">1e15</span><span class="p">,</span> <span class="n">num_eq</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">latex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">zeta_func_doc</span><span class="p">,</span>
+                <span class="n">deriv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">zeta_deriv</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">zeta_func</span><span class="p">,</span>
+                <span class="n">func_params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;zeta&#39;</span><span class="p">:</span> <span class="s1">&#39;zeta1&#39;</span><span class="p">}),</span>
+            <span class="s1">&#39;zeta2&#39;</span><span class="p">:</span> <span class="n">dc_cp</span><span class="p">(</span>
+                <span class="n">min_val</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_val</span><span class="o">=</span><span class="mf">1e15</span><span class="p">,</span> <span class="n">num_eq</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">latex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">zeta_func_doc</span><span class="p">,</span>
+                <span class="n">deriv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">zeta_deriv</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">zeta_func</span><span class="p">,</span>
+                <span class="n">func_params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;zeta&#39;</span><span class="p">:</span> <span class="s1">&#39;zeta2&#39;</span><span class="p">,</span> <span class="s1">&#39;inconn&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;outconn&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span>
+            <span class="s1">&#39;kA_char&#39;</span><span class="p">:</span> <span class="n">dc_gcc</span><span class="p">(</span>
+                <span class="n">elements</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;kA_char1&#39;</span><span class="p">,</span> <span class="s1">&#39;kA_char2&#39;</span><span class="p">],</span>
+                <span class="n">num_eq</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">latex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kA_char_func_doc</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kA_char_func</span><span class="p">,</span>
+                <span class="n">deriv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kA_char_deriv</span><span class="p">),</span>
+            <span class="s1">&#39;kA_char1&#39;</span><span class="p">:</span> <span class="n">dc_cc</span><span class="p">(</span><span class="n">param</span><span class="o">=</span><span class="s1">&#39;m&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;kA_char2&#39;</span><span class="p">:</span> <span class="n">dc_cc</span><span class="p">(</span>
+                <span class="n">param</span><span class="o">=</span><span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="n">char_params</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;rel&#39;</span><span class="p">,</span> <span class="s1">&#39;inconn&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;outconn&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+        <span class="p">}</span></div>
+
+<div class="viewcode-block" id="HeatExchanger.get_mandatory_constraints"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.base.HeatExchanger.get_mandatory_constraints">[docs]</a>    <span class="k">def</span> <span class="nf">get_mandatory_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;mass_flow_constraints&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;func&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass_flow_func</span><span class="p">,</span> <span class="s1">&#39;deriv&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass_flow_deriv</span><span class="p">,</span>
+                <span class="s1">&#39;constant_deriv&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;latex&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass_flow_func_doc</span><span class="p">,</span>
+                <span class="s1">&#39;num_eq&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+            <span class="s1">&#39;fluid_constraints&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;func&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">fluid_func</span><span class="p">,</span> <span class="s1">&#39;deriv&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">fluid_deriv</span><span class="p">,</span>
+                <span class="s1">&#39;constant_deriv&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;latex&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">fluid_func_doc</span><span class="p">,</span>
+                <span class="s1">&#39;num_eq&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_nw_fluids</span> <span class="o">*</span> <span class="mi">2</span><span class="p">},</span>
+            <span class="s1">&#39;energy_balance_constraints&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;func&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_balance_func</span><span class="p">,</span>
+                <span class="s1">&#39;deriv&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_balance_deriv</span><span class="p">,</span>
+                <span class="s1">&#39;constant_deriv&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;latex&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_balance_func_doc</span><span class="p">,</span>
+                <span class="s1">&#39;num_eq&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+        <span class="p">}</span></div>
+
+<div class="viewcode-block" id="HeatExchanger.inlets"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.base.HeatExchanger.inlets">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">inlets</span><span class="p">():</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;in1&#39;</span><span class="p">,</span> <span class="s1">&#39;in2&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="HeatExchanger.outlets"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.base.HeatExchanger.outlets">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">outlets</span><span class="p">():</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="s1">&#39;out2&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="HeatExchanger.energy_balance_func"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.base.HeatExchanger.energy_balance_func">[docs]</a>    <span class="k">def</span> <span class="nf">energy_balance_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Equation for heat exchanger energy balance.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        residual : float</span>
+<span class="sd">            Residual value of equation.</span>
+
+<span class="sd">            .. math::</span>
+
+<span class="sd">                0 = \dot{m}_{in,1} \cdot \left(h_{out,1} - h_{in,1} \right) +</span>
+<span class="sd">                \dot{m}_{in,2} \cdot \left(h_{out,2} - h_{in,2} \right)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span> <span class="o">+</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="HeatExchanger.energy_balance_func_doc"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.base.HeatExchanger.energy_balance_func_doc">[docs]</a>    <span class="k">def</span> <span class="nf">energy_balance_func_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Equation for heat exchanger energy balance.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        label : str</span>
+<span class="sd">            Label for equation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        latex : str</span>
+<span class="sd">            LaTeX code of equations applied.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">latex</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;0 = \dot</span><span class="si">{m}</span><span class="s1">_\mathrm{in,1} \cdot \left(h_\mathrm{out,1} -&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39; h_\mathrm{in,1} \right) +\dot</span><span class="si">{m}</span><span class="s1">_\mathrm{in,2} \cdot &#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\left(h_\mathrm{out,2} - h_\mathrm{in,2} \right)&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">generate_latex_eq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latex</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HeatExchanger.energy_balance_deriv"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.base.HeatExchanger.energy_balance_deriv">[docs]</a>    <span class="k">def</span> <span class="nf">energy_balance_deriv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">increment_filter</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Partial derivatives of energy balance function.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        increment_filter : ndarray</span>
+<span class="sd">            Matrix for filtering non-changing variables.</span>
+
+<span class="sd">        k : int</span>
+<span class="sd">            Position of derivatives in Jacobian matrix (k-th equation).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span></div>
+
+<div class="viewcode-block" id="HeatExchanger.energy_balance_hot_func"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.base.HeatExchanger.energy_balance_hot_func">[docs]</a>    <span class="k">def</span> <span class="nf">energy_balance_hot_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Equation for hot side heat exchanger energy balance.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        residual : float</span>
+<span class="sd">            Residual value of equation.</span>
+
+<span class="sd">            .. math::</span>
+
+<span class="sd">                0 =\dot{m}_{in,1} \cdot \left(h_{out,1}-h_{in,1}\right)-\dot{Q}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="o">.</span><span class="n">val</span></div>
+
+<div class="viewcode-block" id="HeatExchanger.energy_balance_hot_func_doc"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.base.HeatExchanger.energy_balance_hot_func_doc">[docs]</a>    <span class="k">def</span> <span class="nf">energy_balance_hot_func_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Equation for hot side heat exchanger energy balance.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        label : str</span>
+<span class="sd">            Label for equation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        latex : str</span>
+<span class="sd">            LaTeX code of equations applied.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">latex</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;0 =\dot</span><span class="si">{m}</span><span class="s1">_{in,1} \cdot \left(h_{out,1}-&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;h_{in,1}\right)-\dot</span><span class="si">{Q}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">generate_latex_eq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latex</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HeatExchanger.energy_balance_hot_deriv"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.base.HeatExchanger.energy_balance_hot_deriv">[docs]</a>    <span class="k">def</span> <span class="nf">energy_balance_hot_deriv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">increment_filter</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Partial derivatives for hot side heat exchanger energy balance.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        increment_filter : ndarray</span>
+<span class="sd">            Matrix for filtering non-changing variables.</span>
+
+<span class="sd">        k : int</span>
+<span class="sd">            Position of derivatives in Jacobian matrix (k-th equation).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span></div>
+
+<div class="viewcode-block" id="HeatExchanger.kA_func"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.base.HeatExchanger.kA_func">[docs]</a>    <span class="k">def</span> <span class="nf">kA_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate heat transfer from heat transfer coefficient.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        residual : float</span>
+<span class="sd">            Residual value of equation.</span>
+
+<span class="sd">            .. math::</span>
+
+<span class="sd">                0 = \dot{m}_{in,1} \cdot \left( h_{out,1} - h_{in,1}\right) +</span>
+<span class="sd">                kA \cdot \frac{T_{out,1} -</span>
+<span class="sd">                T_{in,2} - T_{in,1} + T_{out,2}}</span>
+<span class="sd">                {\ln{\frac{T_{out,1} - T_{in,2}}{T_{in,1} - T_{out,2}}}}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">i1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">i2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">o1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">o2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># temperature value manipulation for convergence stability</span>
+        <span class="n">T_i1</span> <span class="o">=</span> <span class="n">T_mix_ph</span><span class="p">(</span><span class="n">i1</span><span class="o">.</span><span class="n">get_flow</span><span class="p">(),</span> <span class="n">T0</span><span class="o">=</span><span class="n">i1</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span>
+        <span class="n">T_i2</span> <span class="o">=</span> <span class="n">T_mix_ph</span><span class="p">(</span><span class="n">i2</span><span class="o">.</span><span class="n">get_flow</span><span class="p">(),</span> <span class="n">T0</span><span class="o">=</span><span class="n">i2</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span>
+        <span class="n">T_o1</span> <span class="o">=</span> <span class="n">T_mix_ph</span><span class="p">(</span><span class="n">o1</span><span class="o">.</span><span class="n">get_flow</span><span class="p">(),</span> <span class="n">T0</span><span class="o">=</span><span class="n">o1</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span>
+        <span class="n">T_o2</span> <span class="o">=</span> <span class="n">T_mix_ph</span><span class="p">(</span><span class="n">o2</span><span class="o">.</span><span class="n">get_flow</span><span class="p">(),</span> <span class="n">T0</span><span class="o">=</span><span class="n">o2</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">T_i1</span> <span class="o">&lt;=</span> <span class="n">T_o2</span><span class="p">:</span>
+            <span class="n">T_i1</span> <span class="o">=</span> <span class="n">T_o2</span> <span class="o">+</span> <span class="mf">0.01</span>
+        <span class="k">if</span> <span class="n">T_i1</span> <span class="o">&lt;=</span> <span class="n">T_o2</span><span class="p">:</span>
+            <span class="n">T_o2</span> <span class="o">=</span> <span class="n">T_i1</span> <span class="o">-</span> <span class="mf">0.01</span>
+        <span class="k">if</span> <span class="n">T_i1</span> <span class="o">&lt;=</span> <span class="n">T_o2</span><span class="p">:</span>
+            <span class="n">T_o1</span> <span class="o">=</span> <span class="n">T_i2</span> <span class="o">+</span> <span class="mf">0.02</span>
+        <span class="k">if</span> <span class="n">T_o1</span> <span class="o">&lt;=</span> <span class="n">T_i2</span><span class="p">:</span>
+            <span class="n">T_i2</span> <span class="o">=</span> <span class="n">T_o1</span> <span class="o">-</span> <span class="mf">0.02</span>
+
+        <span class="n">td_log</span> <span class="o">=</span> <span class="p">((</span><span class="n">T_o1</span> <span class="o">-</span> <span class="n">T_i2</span> <span class="o">-</span> <span class="n">T_i1</span> <span class="o">+</span> <span class="n">T_o2</span><span class="p">)</span> <span class="o">/</span>
+                  <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">((</span><span class="n">T_o1</span> <span class="o">-</span> <span class="n">T_i2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">T_i1</span> <span class="o">-</span> <span class="n">T_o2</span><span class="p">)))</span>
+
+        <span class="k">return</span> <span class="n">i1</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="p">(</span>
+            <span class="n">o1</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="n">i1</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">kA</span><span class="o">.</span><span class="n">val</span> <span class="o">*</span> <span class="n">td_log</span></div>
+
+<div class="viewcode-block" id="HeatExchanger.kA_func_doc"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.base.HeatExchanger.kA_func_doc">[docs]</a>    <span class="k">def</span> <span class="nf">kA_func_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate heat transfer from heat transfer coefficient.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        label : str</span>
+<span class="sd">            Label for equation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        latex : str</span>
+<span class="sd">            LaTeX code of equations applied.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">latex</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;0 = \dot</span><span class="si">{m}</span><span class="s1">_\mathrm{in,1} \cdot \left( h_\mathrm{out,1} - &#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;h_\mathrm{in,1}\right)+ kA \cdot \frac{T_\mathrm{out,1} - &#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;T_\mathrm{in,2} - T_\mathrm{in,1} + T_\mathrm{out,2}}&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;{\ln{\frac{T_\mathrm{out,1} - T_\mathrm{in,2}}&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;{T_\mathrm{in,1} - T_\mathrm{out,2}}}}&#39;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">generate_latex_eq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latex</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HeatExchanger.kA_deriv"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.base.HeatExchanger.kA_deriv">[docs]</a>    <span class="k">def</span> <span class="nf">kA_deriv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">increment_filter</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Partial derivatives of heat transfer coefficient function.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        increment_filter : ndarray</span>
+<span class="sd">            Matrix for filtering non-changing variables.</span>
+
+<span class="sd">        k : int</span>
+<span class="sd">            Position of derivatives in Jacobian matrix (k-th equation).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kA_func</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">increment_filter</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">increment_filter</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">2</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HeatExchanger.kA_char_func"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.base.HeatExchanger.kA_char_func">[docs]</a>    <span class="k">def</span> <span class="nf">kA_char_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate heat transfer from heat transfer coefficient characteristic.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        residual : float</span>
+<span class="sd">            Residual value of equation.</span>
+
+<span class="sd">            .. math::</span>
+
+<span class="sd">                0 = \dot{m}_{in,1} \cdot \left( h_{out,1} - h_{in,1}\right) +</span>
+<span class="sd">                kA_{design} \cdot f_{kA} \cdot \frac{T_{out,1} -</span>
+<span class="sd">                T_{in,2} - T_{in,1} + T_{out,2}}</span>
+<span class="sd">                {\ln{\frac{T_{out,1} - T_{in,2}}{T_{in,1} - T_{out,2}}}}</span>
+
+<span class="sd">                f_{kA} = \frac{2}{\frac{1}{f_1\left( expr_1\right)} +</span>
+<span class="sd">                \frac{1}{f_2\left( expr_2\right)}}</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        For standard functions f\ :subscript:`1` \ and f\ :subscript:`2` \ see</span>
+<span class="sd">        module :py:mod:`tespy.data`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">p1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kA_char1</span><span class="o">.</span><span class="n">param</span>
+        <span class="n">p2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kA_char2</span><span class="o">.</span><span class="n">param</span>
+        <span class="n">f1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_char_expr</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">kA_char1</span><span class="o">.</span><span class="n">char_params</span><span class="p">)</span>
+        <span class="n">f2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_char_expr</span><span class="p">(</span><span class="n">p2</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">kA_char2</span><span class="o">.</span><span class="n">char_params</span><span class="p">)</span>
+
+        <span class="n">i1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">i2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">o1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">o2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># temperature value manipulation for convergence stability</span>
+        <span class="n">T_i1</span> <span class="o">=</span> <span class="n">T_mix_ph</span><span class="p">(</span><span class="n">i1</span><span class="o">.</span><span class="n">get_flow</span><span class="p">(),</span> <span class="n">T0</span><span class="o">=</span><span class="n">i1</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span>
+        <span class="n">T_i2</span> <span class="o">=</span> <span class="n">T_mix_ph</span><span class="p">(</span><span class="n">i2</span><span class="o">.</span><span class="n">get_flow</span><span class="p">(),</span> <span class="n">T0</span><span class="o">=</span><span class="n">i2</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span>
+        <span class="n">T_o1</span> <span class="o">=</span> <span class="n">T_mix_ph</span><span class="p">(</span><span class="n">o1</span><span class="o">.</span><span class="n">get_flow</span><span class="p">(),</span> <span class="n">T0</span><span class="o">=</span><span class="n">o1</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span>
+        <span class="n">T_o2</span> <span class="o">=</span> <span class="n">T_mix_ph</span><span class="p">(</span><span class="n">o2</span><span class="o">.</span><span class="n">get_flow</span><span class="p">(),</span> <span class="n">T0</span><span class="o">=</span><span class="n">o2</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">T_i1</span> <span class="o">&lt;=</span> <span class="n">T_o2</span><span class="p">:</span>
+            <span class="n">T_i1</span> <span class="o">=</span> <span class="n">T_o2</span> <span class="o">+</span> <span class="mf">0.01</span>
+        <span class="k">if</span> <span class="n">T_i1</span> <span class="o">&lt;=</span> <span class="n">T_o2</span><span class="p">:</span>
+            <span class="n">T_o2</span> <span class="o">=</span> <span class="n">T_i1</span> <span class="o">-</span> <span class="mf">0.01</span>
+        <span class="k">if</span> <span class="n">T_i1</span> <span class="o">&lt;=</span> <span class="n">T_o2</span><span class="p">:</span>
+            <span class="n">T_o1</span> <span class="o">=</span> <span class="n">T_i2</span> <span class="o">+</span> <span class="mf">0.02</span>
+        <span class="k">if</span> <span class="n">T_o1</span> <span class="o">&lt;=</span> <span class="n">T_i2</span><span class="p">:</span>
+            <span class="n">T_i2</span> <span class="o">=</span> <span class="n">T_o1</span> <span class="o">-</span> <span class="mf">0.02</span>
+
+        <span class="n">td_log</span> <span class="o">=</span> <span class="p">((</span><span class="n">T_o1</span> <span class="o">-</span> <span class="n">T_i2</span> <span class="o">-</span> <span class="n">T_i1</span> <span class="o">+</span> <span class="n">T_o2</span><span class="p">)</span> <span class="o">/</span>
+                  <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">((</span><span class="n">T_o1</span> <span class="o">-</span> <span class="n">T_i2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">T_i1</span> <span class="o">-</span> <span class="n">T_o2</span><span class="p">)))</span>
+
+        <span class="n">fkA1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kA_char1</span><span class="o">.</span><span class="n">char_func</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">f1</span><span class="p">)</span>
+        <span class="n">fkA2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kA_char2</span><span class="o">.</span><span class="n">char_func</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">f2</span><span class="p">)</span>
+        <span class="n">fkA</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">fkA1</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">fkA2</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">i1</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="p">(</span><span class="n">o1</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="n">i1</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span> <span class="o">+</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">kA</span><span class="o">.</span><span class="n">design</span> <span class="o">*</span> <span class="n">fkA</span> <span class="o">*</span> <span class="n">td_log</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HeatExchanger.kA_char_func_doc"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.base.HeatExchanger.kA_char_func_doc">[docs]</a>    <span class="k">def</span> <span class="nf">kA_char_func_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate heat transfer from heat transfer coefficient characteristic.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        label : str</span>
+<span class="sd">            Label for equation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        latex : str</span>
+<span class="sd">            LaTeX code of equations applied.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">latex</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;\begin</span><span class="si">{split}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;0 = &amp; \dot</span><span class="si">{m}</span><span class="s1">_\mathrm{in,1} \cdot \left( h_\mathrm{out,1} - &#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;h_\mathrm{in,1}\right)</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;&amp;+kA_\mathrm</span><span class="si">{design}</span><span class="s1"> \cdot &#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;f_\mathrm</span><span class="si">{kA}</span><span class="s1"> \cdot \frac{T_\mathrm{out,1} - T_\mathrm{in,2}&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39; - T_\mathrm{in,1} + T_\mathrm{out,2}}{\ln{&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\frac{T_\mathrm{out,1} - T_\mathrm{in,2}}{T_\mathrm{in,1} -&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39; T_\mathrm{out,2}}}}</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;f_\mathrm</span><span class="si">{kA}</span><span class="s1">=&amp;\frac</span><span class="si">{2}</span><span class="s1">{\frac</span><span class="si">{1}</span><span class="s1">{f\left(X_1\right)}+&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\frac</span><span class="si">{1}</span><span class="s1">{f\left(X_2\right)}}</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\end</span><span class="si">{split}</span><span class="s1">&#39;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">generate_latex_eq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latex</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HeatExchanger.kA_char_deriv"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.base.HeatExchanger.kA_char_deriv">[docs]</a>    <span class="k">def</span> <span class="nf">kA_char_deriv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">increment_filter</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Partial derivatives of heat transfer coefficient characteristic.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        increment_filter : ndarray</span>
+<span class="sd">            Matrix for filtering non-changing variables.</span>
+
+<span class="sd">        k : int</span>
+<span class="sd">            Position of derivatives in Jacobian matrix (k-th equation).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kA_char_func</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">increment_filter</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">increment_filter</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">increment_filter</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">increment_filter</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">2</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HeatExchanger.ttd_u_func"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.base.HeatExchanger.ttd_u_func">[docs]</a>    <span class="k">def</span> <span class="nf">ttd_u_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Equation for upper terminal temperature difference.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        residual : float</span>
+<span class="sd">            Residual value of equation.</span>
+
+<span class="sd">            .. math::</span>
+
+<span class="sd">                0 = ttd_{u} - T_{in,1} + T_{out,2}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">T_i1</span> <span class="o">=</span> <span class="n">T_mix_ph</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_flow</span><span class="p">(),</span> <span class="n">T0</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span>
+        <span class="n">T_o2</span> <span class="o">=</span> <span class="n">T_mix_ph</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_flow</span><span class="p">(),</span> <span class="n">T0</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ttd_u</span><span class="o">.</span><span class="n">val</span> <span class="o">-</span> <span class="n">T_i1</span> <span class="o">+</span> <span class="n">T_o2</span></div>
+
+<div class="viewcode-block" id="HeatExchanger.ttd_u_func_doc"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.base.HeatExchanger.ttd_u_func_doc">[docs]</a>    <span class="k">def</span> <span class="nf">ttd_u_func_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Equation for upper terminal temperature difference.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        label : str</span>
+<span class="sd">            Label for equation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        latex : str</span>
+<span class="sd">            LaTeX code of equations applied.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">latex</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;0 = ttd_\mathrm</span><span class="si">{u}</span><span class="s1"> - T_\mathrm{in,1} + T_\mathrm{out,2}&#39;</span>
+        <span class="k">return</span> <span class="n">generate_latex_eq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latex</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HeatExchanger.ttd_u_deriv"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.base.HeatExchanger.ttd_u_deriv">[docs]</a>    <span class="k">def</span> <span class="nf">ttd_u_deriv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">increment_filter</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate partial derivates of upper terminal temperature function.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        increment_filter : ndarray</span>
+<span class="sd">            Matrix for filtering non-changing variables.</span>
+
+<span class="sd">        k : int</span>
+<span class="sd">            Position of derivatives in Jacobian matrix (k-th equation).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ttd_u_func</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">increment_filter</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">increment_filter</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">2</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HeatExchanger.ttd_l_func"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.base.HeatExchanger.ttd_l_func">[docs]</a>    <span class="k">def</span> <span class="nf">ttd_l_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Equation for upper terminal temperature difference.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        residual : float</span>
+<span class="sd">            Residual value of equation.</span>
+
+<span class="sd">            .. math::</span>
+
+<span class="sd">                0 = ttd_{l} - T_{out,1} + T_{in,2}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">T_i2</span> <span class="o">=</span> <span class="n">T_mix_ph</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_flow</span><span class="p">(),</span> <span class="n">T0</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span>
+        <span class="n">T_o1</span> <span class="o">=</span> <span class="n">T_mix_ph</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_flow</span><span class="p">(),</span> <span class="n">T0</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ttd_l</span><span class="o">.</span><span class="n">val</span> <span class="o">-</span> <span class="n">T_o1</span> <span class="o">+</span> <span class="n">T_i2</span></div>
+
+<div class="viewcode-block" id="HeatExchanger.ttd_l_func_doc"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.base.HeatExchanger.ttd_l_func_doc">[docs]</a>    <span class="k">def</span> <span class="nf">ttd_l_func_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Equation for upper terminal temperature difference.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        label : str</span>
+<span class="sd">            Label for equation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        latex : str</span>
+<span class="sd">            LaTeX code of equations applied.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">latex</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;0 = ttd_\mathrm</span><span class="si">{l}</span><span class="s1"> - T_\mathrm{out,1} + T_\mathrm{in,2}&#39;</span>
+        <span class="k">return</span> <span class="n">generate_latex_eq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latex</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HeatExchanger.ttd_l_deriv"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.base.HeatExchanger.ttd_l_deriv">[docs]</a>    <span class="k">def</span> <span class="nf">ttd_l_deriv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">increment_filter</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate partial derivates of upper terminal temperature function.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        increment_filter : ndarray</span>
+<span class="sd">            Matrix for filtering non-changing variables.</span>
+
+<span class="sd">        k : int</span>
+<span class="sd">            Position of derivatives in Jacobian matrix (k-th equation).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ttd_l_func</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">increment_filter</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">increment_filter</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">2</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">jacobian</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HeatExchanger.bus_func"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.base.HeatExchanger.bus_func">[docs]</a>    <span class="k">def</span> <span class="nf">bus_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bus</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the value of the bus function.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        bus : tespy.connections.bus.Bus</span>
+<span class="sd">            TESPy bus object.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        val : float</span>
+<span class="sd">            Value of energy transfer :math:`\dot{E}`. This value is passed to</span>
+<span class="sd">            :py:meth:`tespy.components.component.Component.calc_bus_value`</span>
+<span class="sd">            for value manipulation according to the specified characteristic</span>
+<span class="sd">            line of the bus.</span>
+
+<span class="sd">            .. math::</span>
+
+<span class="sd">                \dot{E} = \dot{m}_{in,1} \cdot \left(</span>
+<span class="sd">                h_{out,1} - h_{in,1} \right)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HeatExchanger.bus_func_doc"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.base.HeatExchanger.bus_func_doc">[docs]</a>    <span class="k">def</span> <span class="nf">bus_func_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bus</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return LaTeX string of the bus function.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        bus : tespy.connections.bus.Bus</span>
+<span class="sd">            TESPy bus object.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        latex : str</span>
+<span class="sd">            LaTeX string of bus function.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;\dot</span><span class="si">{m}</span><span class="s1">_\mathrm{in,1} \cdot \left(h_\mathrm{out,1} - &#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;h_\mathrm{in,1} \right)&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HeatExchanger.bus_deriv"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.base.HeatExchanger.bus_deriv">[docs]</a>    <span class="k">def</span> <span class="nf">bus_deriv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bus</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate partial derivatives of the bus function.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        bus : tespy.connections.bus.Bus</span>
+<span class="sd">            TESPy bus object.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        deriv : ndarray</span>
+<span class="sd">            Matrix of partial derivatives.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">deriv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_nw_vars</span><span class="p">))</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_bus_value</span>
+        <span class="n">deriv</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">bus</span><span class="o">=</span><span class="n">bus</span><span class="p">)</span>
+        <span class="n">deriv</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">bus</span><span class="o">=</span><span class="n">bus</span><span class="p">)</span>
+        <span class="n">deriv</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_deriv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">bus</span><span class="o">=</span><span class="n">bus</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">deriv</span></div>
+
+<div class="viewcode-block" id="HeatExchanger.initialise_source"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.base.HeatExchanger.initialise_source">[docs]</a>    <span class="k">def</span> <span class="nf">initialise_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a starting value for pressure and enthalpy at outlet.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        c : tespy.connections.connection.Connection</span>
+<span class="sd">            Connection to perform initialisation on.</span>
+
+<span class="sd">        key : str</span>
+<span class="sd">            Fluid property to retrieve.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        val : float</span>
+<span class="sd">            Starting value for pressure/enthalpy in SI units.</span>
+
+<span class="sd">            .. math::</span>
+
+<span class="sd">                val = \begin{cases}</span>
+<span class="sd">                4 \cdot 10^5 &amp; \text{key = &#39;p&#39;}\\</span>
+<span class="sd">                h\left(p, 200 \text{K} \right) &amp; \text{key = &#39;h&#39; at outlet 1}\\</span>
+<span class="sd">                h\left(p, 250 \text{K} \right) &amp; \text{key = &#39;h&#39; at outlet 2}</span>
+<span class="sd">                \end{cases}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;p&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">50e5</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;h&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">source_id</span> <span class="o">==</span> <span class="s1">&#39;out1&#39;</span><span class="p">:</span>
+                <span class="n">T</span> <span class="o">=</span> <span class="mi">200</span> <span class="o">+</span> <span class="mf">273.15</span>
+                <span class="k">return</span> <span class="n">h_mix_pT</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">get_flow</span><span class="p">(),</span> <span class="n">T</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">T</span> <span class="o">=</span> <span class="mi">250</span> <span class="o">+</span> <span class="mf">273.15</span>
+                <span class="k">return</span> <span class="n">h_mix_pT</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">get_flow</span><span class="p">(),</span> <span class="n">T</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HeatExchanger.initialise_target"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.base.HeatExchanger.initialise_target">[docs]</a>    <span class="k">def</span> <span class="nf">initialise_target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a starting value for pressure and enthalpy at inlet.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        c : tespy.connections.connection.Connection</span>
+<span class="sd">            Connection to perform initialisation on.</span>
+
+<span class="sd">        key : str</span>
+<span class="sd">            Fluid property to retrieve.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        val : float</span>
+<span class="sd">            Starting value for pressure/enthalpy in SI units.</span>
+
+<span class="sd">            .. math::</span>
+
+<span class="sd">                val = \begin{cases}</span>
+<span class="sd">                4 \cdot 10^5 &amp; \text{key = &#39;p&#39;}\\</span>
+<span class="sd">                h\left(p, 300 \text{K} \right) &amp; \text{key = &#39;h&#39; at inlet 1}\\</span>
+<span class="sd">                h\left(p, 220 \text{K} \right) &amp; \text{key = &#39;h&#39; at outlet 2}</span>
+<span class="sd">                \end{cases}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;p&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">50e5</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;h&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">target_id</span> <span class="o">==</span> <span class="s1">&#39;in1&#39;</span><span class="p">:</span>
+                <span class="n">T</span> <span class="o">=</span> <span class="mi">300</span> <span class="o">+</span> <span class="mf">273.15</span>
+                <span class="k">return</span> <span class="n">h_mix_pT</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">get_flow</span><span class="p">(),</span> <span class="n">T</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">T</span> <span class="o">=</span> <span class="mi">220</span> <span class="o">+</span> <span class="mf">273.15</span>
+                <span class="k">return</span> <span class="n">h_mix_pT</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">get_flow</span><span class="p">(),</span> <span class="n">T</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HeatExchanger.calc_parameters"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.base.HeatExchanger.calc_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">calc_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Postprocessing parameter calculation.&quot;&quot;&quot;</span>
+        <span class="c1"># component parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ttd_u</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ttd_l</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span>
+
+        <span class="c1"># pr and zeta</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_attr</span><span class="p">(</span><span class="s1">&#39;pr&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_attr</span><span class="p">(</span><span class="s1">&#39;zeta&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="p">(</span>
+                    <span class="mi">4</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span>
+                    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">vol</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">vol</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span>
+                <span class="p">))</span>
+
+        <span class="c1"># kA and logarithmic temperature difference</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ttd_u</span><span class="o">.</span><span class="n">val</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">ttd_l</span><span class="o">.</span><span class="n">val</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">td_log</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">kA</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">td_log</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">ttd_l</span><span class="o">.</span><span class="n">val</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">ttd_u</span><span class="o">.</span><span class="n">val</span><span class="p">)</span> <span class="o">/</span>
+                               <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ttd_l</span><span class="o">.</span><span class="n">val</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">ttd_u</span><span class="o">.</span><span class="n">val</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">kA</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="o">.</span><span class="n">val</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">td_log</span><span class="o">.</span><span class="n">val</span></div>
+
+<div class="viewcode-block" id="HeatExchanger.entropy_balance"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.base.HeatExchanger.entropy_balance">[docs]</a>    <span class="k">def</span> <span class="nf">entropy_balance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate entropy balance of a heat exchanger.</span>
+
+<span class="sd">        The allocation of the entropy streams due to heat exchanged and due to</span>
+<span class="sd">        irreversibility is performed by solving for T on both sides of the heat</span>
+<span class="sd">        exchanger:</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            h_\mathrm{out} - h_\mathrm{in} = \int_\mathrm{in}^\mathrm{out} v</span>
+<span class="sd">            \cdot dp - \int_\mathrm{in}^\mathrm{out} T \cdot ds</span>
+
+<span class="sd">        As solving :math:`\int_\mathrm{in}^\mathrm{out} v \cdot dp` for non</span>
+<span class="sd">        isobaric processes would require perfect process knowledge (the path)</span>
+<span class="sd">        on how specific volume and pressure change throught the component, the</span>
+<span class="sd">        heat transfer is splitted into three separate virtual processes for</span>
+<span class="sd">        both sides:</span>
+
+<span class="sd">        - in-&gt;in*: decrease pressure to</span>
+<span class="sd">          :math:`p_\mathrm{in*}=p_\mathrm{in}\cdot\sqrt{\frac{p_\mathrm{out}}{p_\mathrm{in}}}`</span>
+<span class="sd">          without changing enthalpy.</span>
+<span class="sd">        - in*-&gt;out* transfer heat without changing pressure.</span>
+<span class="sd">          :math:`h_\mathrm{out*}-h_\mathrm{in*}=h_\mathrm{out}-h_\mathrm{in}`</span>
+<span class="sd">        - out*-&gt;out decrease pressure to outlet pressure :math:`p_\mathrm{out}`</span>
+<span class="sd">          without changing enthalpy.</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        The entropy balance makes the follwing parameter available:</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            \text{S\_Q1}=\dot{m} \cdot \left(s_\mathrm{out*,1}-s_\mathrm{in*,1}</span>
+<span class="sd">            \right)\\</span>
+<span class="sd">            \text{S\_Q2}=\dot{m} \cdot \left(s_\mathrm{out*,2}-s_\mathrm{in*,2}</span>
+<span class="sd">            \right)\\</span>
+<span class="sd">            \text{S\_Qirr}=\text{S\_Q2} - \text{S\_Q1}\\</span>
+<span class="sd">            \text{S\_irr1}=\dot{m} \cdot \left(s_\mathrm{out,1}-s_\mathrm{in,1}</span>
+<span class="sd">            \right) - \text{S\_Q1}\\</span>
+<span class="sd">            \text{S\_irr2}=\dot{m} \cdot \left(s_\mathrm{out,2}-s_\mathrm{in,2}</span>
+<span class="sd">            \right) - \text{S\_Q2}\\</span>
+<span class="sd">            \text{S\_irr}=\sum \dot{S}_\mathrm{irr}\\</span>
+<span class="sd">            \text{T\_mQ1}=\frac{\dot{Q}}{\text{S\_Q1}}\\</span>
+<span class="sd">            \text{T\_mQ2}=\frac{\dot{Q}}{\text{S\_Q2}}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">S_irr</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+            <span class="n">inl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">p_star</span> <span class="o">=</span> <span class="n">inl</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_attr</span><span class="p">(</span><span class="s1">&#39;pr&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">val</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
+            <span class="n">s_i_star</span> <span class="o">=</span> <span class="n">s_mix_ph</span><span class="p">(</span>
+                <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">p_star</span><span class="p">,</span> <span class="n">inl</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span><span class="p">,</span> <span class="n">inl</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">],</span> <span class="n">T0</span><span class="o">=</span><span class="n">inl</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span>
+            <span class="n">s_o_star</span> <span class="o">=</span> <span class="n">s_mix_ph</span><span class="p">(</span>
+                <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">p_star</span><span class="p">,</span> <span class="n">out</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span><span class="p">,</span> <span class="n">out</span><span class="o">.</span><span class="n">fluid</span><span class="o">.</span><span class="n">val</span><span class="p">],</span> <span class="n">T0</span><span class="o">=</span><span class="n">out</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span>
+
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;S_Q&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+                    <span class="n">inl</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="p">(</span><span class="n">s_o_star</span> <span class="o">-</span> <span class="n">s_i_star</span><span class="p">))</span>
+            <span class="n">S_Q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_attr</span><span class="p">(</span><span class="s1">&#39;S_Q&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;S_irr&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+                    <span class="n">inl</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="n">inl</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span> <span class="o">-</span> <span class="n">S_Q</span><span class="p">)</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;T_mQ&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+                    <span class="n">inl</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">*</span> <span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">-</span> <span class="n">inl</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">val_SI</span><span class="p">)</span> <span class="o">/</span> <span class="n">S_Q</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">S_irr</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_attr</span><span class="p">(</span><span class="s1">&#39;S_irr&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">S_irr</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">S_Q1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">S_Q2</span></div>
+
+<div class="viewcode-block" id="HeatExchanger.exergy_balance"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.base.HeatExchanger.exergy_balance">[docs]</a>    <span class="k">def</span> <span class="nf">exergy_balance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">T0</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate exergy balance of a heat exchanger.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        T0 : float</span>
+<span class="sd">            Ambient temperature T0 / K.</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        .. math::</span>
+
+<span class="sd">            \dot{E}_\mathrm{P} =</span>
+<span class="sd">            \begin{cases}</span>
+<span class="sd">            \dot{E}_\mathrm{out,2}^\mathrm{T} -</span>
+<span class="sd">            \dot{E}_\mathrm{in,2}^\mathrm{T}</span>
+<span class="sd">            &amp; T_\mathrm{in,1}, T_\mathrm{in,2}, T_\mathrm{out,1},</span>
+<span class="sd">            T_\mathrm{out,2} &gt; T_0\\</span>
+<span class="sd">            \dot{E}_\mathrm{out,1}^\mathrm{T} -</span>
+<span class="sd">            \dot{E}_\mathrm{in,1}^\mathrm{T}</span>
+<span class="sd">            &amp; T_0 \geq  T_\mathrm{in,1}, T_\mathrm{in,2}, T_\mathrm{out,1},</span>
+<span class="sd">            T_\mathrm{out,2}\\</span>
+<span class="sd">            \dot{E}_\mathrm{out,1}^\mathrm{T} +</span>
+<span class="sd">            \dot{E}_\mathrm{out,2}^\mathrm{T}</span>
+<span class="sd">            &amp; T_\mathrm{in,1}, T_\mathrm{out,2} &gt; T_0 \geq</span>
+<span class="sd">            T_\mathrm{in,2}, T_\mathrm{out,1}\\</span>
+<span class="sd">            \dot{E}_\mathrm{out,1}^\mathrm{T}</span>
+<span class="sd">            &amp; T_\mathrm{in,1} &gt; T_0 \geq</span>
+<span class="sd">            T_\mathrm{in,2}, T_\mathrm{out,1}, T_\mathrm{out,2}\\</span>
+<span class="sd">            \text{not defined (nan)}</span>
+<span class="sd">            &amp; T_\mathrm{in,1}, T_\mathrm{out,1} &gt; T_0 \geq</span>
+<span class="sd">            T_\mathrm{in,2}, T_\mathrm{out,2}\\</span>
+<span class="sd">            \dot{E}_\mathrm{out,2}^\mathrm{T}</span>
+<span class="sd">            &amp; T_\mathrm{in,1}, T_\mathrm{out,1},</span>
+<span class="sd">            T_\mathrm{out,2} \geq T_0 &gt; T_\mathrm{in,2}\\</span>
+<span class="sd">            \end{cases}</span>
+
+<span class="sd">            \dot{E}_\mathrm{F} =</span>
+<span class="sd">            \begin{cases}</span>
+<span class="sd">            \dot{E}_\mathrm{in,1}^\mathrm{PH} -</span>
+<span class="sd">            \dot{E}_\mathrm{out,1}^\mathrm{PH} +</span>
+<span class="sd">            \dot{E}_\mathrm{in,2}^\mathrm{M} -</span>
+<span class="sd">            \dot{E}_\mathrm{out,2}^\mathrm{M}</span>
+<span class="sd">            &amp; T_\mathrm{in,1}, T_\mathrm{in,2}, T_\mathrm{out,1},</span>
+<span class="sd">            T_\mathrm{out,2} &gt; T_0\\</span>
+<span class="sd">            \dot{E}_\mathrm{in,2}^\mathrm{PH} -</span>
+<span class="sd">            \dot{E}_\mathrm{out,2}^\mathrm{PH} +</span>
+<span class="sd">            \dot{E}_\mathrm{in,1}^\mathrm{M} -</span>
+<span class="sd">            \dot{E}_\mathrm{out,1}^\mathrm{M}</span>
+<span class="sd">            &amp; T_0 \geq T_\mathrm{in,1}, T_\mathrm{in,2}, T_\mathrm{out,1},</span>
+<span class="sd">            T_\mathrm{out,2}\\</span>
+<span class="sd">            \dot{E}_\mathrm{in,1}^\mathrm{PH} +</span>
+<span class="sd">            \dot{E}_\mathrm{in,2}^\mathrm{PH} -</span>
+<span class="sd">            \dot{E}_\mathrm{out,1}^\mathrm{M} -</span>
+<span class="sd">            \dot{E}_\mathrm{out,2}^\mathrm{M}</span>
+<span class="sd">            &amp; T_\mathrm{in,1}, T_\mathrm{out,2} &gt; T_0 \geq</span>
+<span class="sd">            T_\mathrm{in,2}, T_\mathrm{out,1}\\</span>
+<span class="sd">            \dot{E}_\mathrm{in,1}^\mathrm{PH} +</span>
+<span class="sd">            \dot{E}_\mathrm{in,2}^\mathrm{PH} -</span>
+<span class="sd">            \dot{E}_\mathrm{out,2}^\mathrm{PH} -</span>
+<span class="sd">            \dot{E}_\mathrm{out,1}^\mathrm{M}</span>
+<span class="sd">            &amp; T_\mathrm{in,1} &gt; T_0 \geq</span>
+<span class="sd">            T_\mathrm{in,2}, T_\mathrm{out,1}, T_\mathrm{out,2}\\</span>
+<span class="sd">            \dot{E}_\mathrm{in,1}^\mathrm{PH} -</span>
+<span class="sd">            \dot{E}_\mathrm{out,1}^\mathrm{PH} +</span>
+<span class="sd">            \dot{E}_\mathrm{in,2}^\mathrm{PH} -</span>
+<span class="sd">            \dot{E}_\mathrm{out,2}^\mathrm{PH}</span>
+<span class="sd">            &amp; T_\mathrm{in,1}, T_\mathrm{out,1} &gt; T_0 \geq</span>
+<span class="sd">            T_\mathrm{in,2}, T_\mathrm{out,2}\\</span>
+<span class="sd">            \dot{E}_\mathrm{in,1}^\mathrm{PH} -</span>
+<span class="sd">            \dot{E}_\mathrm{out,1}^\mathrm{PH} +</span>
+<span class="sd">            \dot{E}_\mathrm{in,2}^\mathrm{PH} -</span>
+<span class="sd">            \dot{E}_\mathrm{out,2}^\mathrm{M}</span>
+<span class="sd">            &amp; T_\mathrm{in,1}, T_\mathrm{out,1},</span>
+<span class="sd">            T_\mathrm{out,2} \geq T_0 &gt; T_\mathrm{in,2}\\</span>
+<span class="sd">            \end{cases}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">([</span><span class="n">c</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">&gt;</span> <span class="n">T0</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">]):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">E_P</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_therm</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_therm</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">E_F</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_physical</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_physical</span> <span class="o">+</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_mech</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_mech</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">all</span><span class="p">([</span><span class="n">c</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">&lt;=</span> <span class="n">T0</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">]):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">E_P</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_therm</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_therm</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">E_F</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_physical</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_physical</span> <span class="o">+</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_mech</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_mech</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">&gt;</span> <span class="n">T0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">&gt;</span> <span class="n">T0</span> <span class="ow">and</span>
+              <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">&lt;=</span> <span class="n">T0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">&lt;=</span> <span class="n">T0</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">E_P</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_therm</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_therm</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">E_F</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_physical</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_physical</span> <span class="o">-</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_mech</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_mech</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">&gt;</span> <span class="n">T0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">&lt;=</span> <span class="n">T0</span> <span class="ow">and</span>
+              <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">&lt;=</span> <span class="n">T0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">&lt;=</span> <span class="n">T0</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">E_P</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_therm</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">E_F</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_physical</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_physical</span> <span class="o">-</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_physical</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_mech</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">&gt;</span> <span class="n">T0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">&gt;</span> <span class="n">T0</span> <span class="ow">and</span>
+              <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">&lt;=</span> <span class="n">T0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">val_SI</span> <span class="o">&lt;=</span> <span class="n">T0</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">E_P</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">E_F</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_physical</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_physical</span> <span class="o">+</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_physical</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_physical</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">E_P</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_therm</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">E_F</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_physical</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_physical</span> <span class="o">+</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_physical</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">Ex_mech</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">E_bus</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">E_P</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">E_D</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">E_F</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">E_D</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">E_F</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">E_P</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">E_P</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">E_F</span></div>
+
+<div class="viewcode-block" id="HeatExchanger.get_plotting_data"><a class="viewcode-back" href="../../../../api/tespy.components.html#tespy.components.heat_exchangers.base.HeatExchanger.get_plotting_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_plotting_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generate a dictionary containing FluProDia plotting information.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        data : dict</span>
+<span class="sd">            A nested dictionary containing the keywords required by the</span>
+<span class="sd">            :code:`calc_individual_isoline` method of the</span>
+<span class="sd">            :code:`FluidPropertyDiagram` class. First level keys are the</span>
+<span class="sd">            connection index (&#39;in1&#39; -&gt; &#39;out1&#39;, therefore :code:`1` etc.).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;isoline_property&#39;</span><span class="p">:</span> <span class="s1">&#39;p&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;isoline_value&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">val</span><span class="p">,</span>
+                <span class="s1">&#39;isoline_value_end&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">val</span><span class="p">,</span>
+                <span class="s1">&#39;starting_point_property&#39;</span><span class="p">:</span> <span class="s1">&#39;v&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;starting_point_value&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">inl</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">vol</span><span class="o">.</span><span class="n">val</span><span class="p">,</span>
+                <span class="s1">&#39;ending_point_property&#39;</span><span class="p">:</span> <span class="s1">&#39;v&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;ending_point_value&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">outl</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">vol</span><span class="o">.</span><span class="n">val</span>
+            <span class="p">}</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)}</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2020, Francesco Witte.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

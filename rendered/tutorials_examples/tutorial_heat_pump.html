@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Heat pump tutorial &mdash; tespy 0.6.0 - Colored Chemicals documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> tespy
+            <img src="../_static/logo_tespy_mid.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                0.6.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Thermal Engineering Systems in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../first_steps.html">First steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials_examples.html">Examples and Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tespy_modules.html">TESPy modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tespy_analyses.html">Thermodynamic analyses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developing_tespy.html">Developing TESPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zliterature.html">Literature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">tespy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Heat pump tutorial</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tutorials_examples/tutorial_heat_pump.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="heat-pump-tutorial">
+<h1>Heat pump tutorial<a class="headerlink" href="#heat-pump-tutorial" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#task" id="id10">Task</a></p></li>
+<li><p><a class="reference internal" href="#set-up-a-network" id="id11">Set up a Network</a></p></li>
+<li><p><a class="reference internal" href="#modeling-the-heat-pump-consumer-system" id="id12">Modeling the heat pump: Consumer system</a></p></li>
+<li><p><a class="reference internal" href="#valve-and-evaporator-system" id="id13">Valve and evaporator system</a></p></li>
+<li><p><a class="reference internal" href="#compressor-system" id="id14">Compressor system</a></p></li>
+<li><p><a class="reference internal" href="#further-tasks" id="id15">Further tasks</a></p></li>
+</ul>
+</div>
+<section id="task">
+<h2><a class="toc-backref" href="#contents">Task</a><a class="headerlink" href="#task" title="Permalink to this headline">¶</a></h2>
+<p>This tutorial introduces you in how to model a heat pump in TESPy. You can see
+the plants topology in the figure. Also, you will find a fully working model in
+the last chapter of this tutorial.</p>
+<figure class="align-center" id="id9">
+<img alt="tutorials_examples/api/_images/tutorial_heat_pump.svg" src="tutorials_examples/api/_images/tutorial_heat_pump.svg" /><figcaption>
+<p><span class="caption-text">Figure: Topology of the heat pump.</span><a class="headerlink" href="#id9" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>The main purpose of the heat pump is to deliver heat e.g. for the consumers of
+a heating system. Thus, the heat pump’s parameters will be set in a way, which
+supports this target.
+Generally, if systems are getting more complex, it is highly recommended to set
+up your plant in incremental steps. This tutorial divides the plant in three
+sections: The consumer part, the valve and the evaporator and the compressor as
+last element. Each new section will be appended to the existing ones.</p>
+</section>
+<section id="set-up-a-network">
+<h2><a class="toc-backref" href="#contents">Set up a Network</a><a class="headerlink" href="#set-up-a-network" title="Permalink to this headline">¶</a></h2>
+<p>In order to simulate our heat pump we have to create an instance of the
+<a class="reference internal" href="../api/tespy.networks.html#tespy.networks.network.Network" title="tespy.networks.network.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">tespy.networks.network.Network</span></code></a> class. The network is the main
+container of the model and will be required in all following sections. First,
+it is necessary to specify a list of the fluids used in the plant. In this
+example we will work with water (H<sub>2</sub>O) and ammonia (NH<sub>3</sub>).
+Water is used for the cold side of the heat exchanger, for the consumer and for
+the hot side of the environmental temperature. Ammonia is used as coolant
+within the heat pump circuit. If you don’t specify the unit system, the
+variables are set to SI-Units.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tespy.networks</span> <span class="kn">import</span> <span class="n">Network</span>
+
+<span class="n">nw</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span><span class="n">fluids</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;water&#39;</span><span class="p">,</span> <span class="s1">&#39;NH3&#39;</span><span class="p">],</span>
+             <span class="n">T_unit</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="n">p_unit</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="n">h_unit</span><span class="o">=</span><span class="s1">&#39;kJ / kg&#39;</span><span class="p">,</span> <span class="n">m_unit</span><span class="o">=</span><span class="s1">&#39;kg / s&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We will use °C, bar and kJ/kg as units for temperature and enthalpy.</p>
+</section>
+<section id="modeling-the-heat-pump-consumer-system">
+<h2><a class="toc-backref" href="#contents">Modeling the heat pump: Consumer system</a><a class="headerlink" href="#modeling-the-heat-pump-consumer-system" title="Permalink to this headline">¶</a></h2>
+<section id="components">
+<h3>Components<a class="headerlink" href="#components" title="Permalink to this headline">¶</a></h3>
+<p>We will start with the consumer as the plant will be designed to deliver a
+specific heat flow. From figure 1 you can determine the components of the
+consumer system: condenser, pump and the consumer (
+<a class="reference internal" href="../api/tespy.components.html#tespy.components.heat_exchangers.simple.HeatExchangerSimple" title="tespy.components.heat_exchangers.simple.HeatExchangerSimple"><code class="xref py py-class docutils literal notranslate"><span class="pre">tespy.components.heat_exchangers.simple.HeatExchangerSimple</span></code></a>
+). Additionally we need a source and a sink for the consumer and the heat pump
+circuit respectively. We will import all necessary components already in the
+first step, so the imports will not need further adjustment.</p>
+<p>We label the sink for the coolant “valve”, as for our next calculation the
+valve (labeled “valve”) will be attached there. In this way, the fluid
+properties can be initialized by .csv at the interface-connection, too.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tespy.components</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Source</span><span class="p">,</span> <span class="n">Sink</span><span class="p">,</span> <span class="n">CycleCloser</span><span class="p">,</span> <span class="n">Valve</span><span class="p">,</span> <span class="n">Drum</span><span class="p">,</span> <span class="n">Pump</span><span class="p">,</span> <span class="n">Compressor</span><span class="p">,</span>
+    <span class="n">Condenser</span><span class="p">,</span> <span class="n">HeatExchangerSimple</span><span class="p">,</span> <span class="n">HeatExchanger</span><span class="p">)</span>
+
+<span class="c1"># sources &amp; sinks</span>
+
+<span class="n">c_in</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span><span class="s1">&#39;coolant in&#39;</span><span class="p">)</span>
+<span class="n">cons_closer</span> <span class="o">=</span> <span class="n">CycleCloser</span><span class="p">(</span><span class="s1">&#39;consumer cycle closer&#39;</span><span class="p">)</span>
+
+<span class="n">va</span> <span class="o">=</span> <span class="n">Sink</span><span class="p">(</span><span class="s1">&#39;valve&#39;</span><span class="p">)</span>
+
+<span class="c1"># consumer system</span>
+
+<span class="n">cd</span> <span class="o">=</span> <span class="n">Condenser</span><span class="p">(</span><span class="s1">&#39;condenser&#39;</span><span class="p">)</span>
+<span class="n">rp</span> <span class="o">=</span> <span class="n">Pump</span><span class="p">(</span><span class="s1">&#39;recirculation pump&#39;</span><span class="p">)</span>
+<span class="n">cons</span> <span class="o">=</span> <span class="n">HeatExchangerSimple</span><span class="p">(</span><span class="s1">&#39;consumer&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="connections">
+<h3>Connections<a class="headerlink" href="#connections" title="Permalink to this headline">¶</a></h3>
+<p>In the next steps we will connect the components in order to form a network.
+Every connection requires the source, the source id, the target and the target
+id as arguments: the source is the component from which the connection
+originates, the source id is the outlet id of that component. This applies
+analogously to the target. To find all inlet and outlet ids of a component look
+up the class documentation of the respective component. An overview of the
+components available and the class documentations is provided in the
+<a class="reference internal" href="../tespy_modules.html#using-tespy-components-label"><span class="std std-ref">TESPy modules overview</span></a>. The
+<a class="reference internal" href="../api/tespy.connections.html#tespy.connections.connection.Ref" title="tespy.connections.connection.Ref"><code class="xref py py-class docutils literal notranslate"><span class="pre">tespy.connections.connection.Ref</span></code></a> class is used specify fluid
+property values by referencing fluid properties of different connections. It is
+used in a later step.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tespy.connections</span> <span class="kn">import</span> <span class="n">Connection</span><span class="p">,</span> <span class="n">Ref</span>
+
+<span class="c1"># consumer system</span>
+
+<span class="n">c_in_cd</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">c_in</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">cd</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+
+<span class="n">close_rp</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">cons_closer</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">rp</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+<span class="n">rp_cd</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">rp</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">cd</span><span class="p">,</span> <span class="s1">&#39;in2&#39;</span><span class="p">)</span>
+<span class="n">cd_cons</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">cd</span><span class="p">,</span> <span class="s1">&#39;out2&#39;</span><span class="p">,</span> <span class="n">cons</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+<span class="n">cons_close</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">cons</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">cons_closer</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+
+<span class="n">nw</span><span class="o">.</span><span class="n">add_conns</span><span class="p">(</span><span class="n">c_in_cd</span><span class="p">,</span> <span class="n">close_rp</span><span class="p">,</span> <span class="n">rp_cd</span><span class="p">,</span> <span class="n">cd_cons</span><span class="p">,</span> <span class="n">cons_close</span><span class="p">)</span>
+
+<span class="c1"># connection condenser - evaporator system</span>
+
+<span class="n">cd_va</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">cd</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">va</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+
+<span class="n">nw</span><span class="o">.</span><span class="n">add_conns</span><span class="p">(</span><span class="n">cd_va</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Instead of just connecting the consumers outlet to the pumps inlet, we must
+make use of an auxiliary component: Closing a cycle without further
+adjustments will always result in a linear dependency in the fluid and the
+mass flow equations. We therefore need implement a CycleCloser. The
+<a class="reference internal" href="../api/tespy.components.html#tespy.components.basics.cycle_closer.CycleCloser" title="tespy.components.basics.cycle_closer.CycleCloser"><code class="xref py py-class docutils literal notranslate"><span class="pre">tespy.components.basics.cycle_closer.CycleCloser</span></code></a> component makes
+sure, the fluid properties pressure and enthalpy are identical at the inlet
+and the outlet. The component will prompt a warning, if the mass flow or
+the fluid composition at its outlet are different to those at its inlet. A
+different solution to this problem, is adding a merge and a splitter at
+some point of your network and connect the second inlet/outlet to a
+source/sink. This causes residual mass flow and residual fluids to
+emerge/drain there.</p>
+</div>
+</section>
+<section id="parametrization">
+<h3>Parametrization<a class="headerlink" href="#parametrization" title="Permalink to this headline">¶</a></h3>
+<p>For the condenser we set pressure ratios on hot and cold side and additionally
+we set a value for the upper terminal temperature difference as design
+parameter and the heat transfer coefficient as offdesign parameter. The
+consumer will have pressure losses, too. Further we set the isentropic
+efficiency for the pump, the offdesign efficiency is calculated with a
+characteristic function. Thus, we set the efficiency as design parameter and
+the characteristic function as offdesign parameter. In offdesign calculation
+the consumer’s pressure ratio will be a function of the mass flow, thus as
+offdesign parameter we select zeta. The most important parameter is the
+consumers heat demand. We marked this setting as “key parameter”.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">pr1</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">pr2</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span> <span class="n">ttd_u</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">design</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;pr2&#39;</span><span class="p">,</span> <span class="s1">&#39;ttd_u&#39;</span><span class="p">],</span>
+            <span class="n">offdesign</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;zeta2&#39;</span><span class="p">,</span> <span class="s1">&#39;kA_char&#39;</span><span class="p">])</span>
+<span class="n">rp</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">eta_s</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">design</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;eta_s&#39;</span><span class="p">],</span> <span class="n">offdesign</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;eta_s_char&#39;</span><span class="p">])</span>
+<span class="n">cons</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">pr</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span> <span class="n">design</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;pr&#39;</span><span class="p">],</span> <span class="n">offdesign</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;zeta&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>In order to calculate this network further parametrization is necessary, as
+e.g. the fluids are not determined yet: At the hot inlet of the condenser we
+define the temperature and the fluid vector. In order to fully determine the
+fluid’s state at this point, an information on the pressure is required. This
+is achieved by setting the terminal temperature difference (see above). The
+same needs to be done for the consumer cycle. We suggest to set the parameters
+at the pump’s inlet. On top, we assume that the consumer requires a constant
+inlet temperature. The CycleCloser automatically makes sure, that the fluid’s
+state at the consumer’s outlet is the same as at the pump’s inlet.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">c_in_cd</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">T</span><span class="o">=</span><span class="mi">170</span><span class="p">,</span> <span class="n">fluid</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;water&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;NH3&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+<span class="n">close_rp</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">T</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">fluid</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;water&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;NH3&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
+<span class="n">cd_cons</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">T</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># %% key parameter</span>
+
+<span class="n">cons</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">Q</span><span class="o">=-</span><span class="mf">230e3</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In TESPy there are two different types of calculations: design point and
+offdesign calculation. All parameters specified in the design attribute of
+a component or connection, will be unset in a offdesign calculation, all
+parameters specified in the offdesign attribute of a component or
+connection will be set for the offdesign calculation. The value for these
+parameters is the value derived from the design-calculation.</p>
+<p>Generally, the design calculation is used for designing your system in the
+way you want it to look like. This means, that you might want to specify a
+design point isentropic efficiency, pressure loss or terminal temperature
+difference. After you have designed your system, you are able to make
+offdesign calculations with TESPy. The offdesign calculation is used to
+predict the system’s behavior at different points of operation. For this
+case, this might be different ambient temperature, different feed flow
+temperature, or partial load.</p>
+</div>
+</section>
+<section id="solve">
+<h3>Solve<a class="headerlink" href="#solve" title="Permalink to this headline">¶</a></h3>
+<p>After creating the system, we want to solve our network. First, we calculate
+the design case and directly after we can perform the offdesign calculation at
+a different value for our key parameter. For general information on the solving
+process in TESPy and available parameters check the corresponding section in
+the <a class="reference internal" href="../tespy_modules/networks.html#using-tespy-networks-label"><span class="std std-ref">TESPy modules introduction</span></a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nw</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="s1">&#39;design&#39;</span><span class="p">)</span>
+<span class="n">nw</span><span class="o">.</span><span class="n">print_results</span><span class="p">()</span>
+<span class="n">nw</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;condenser&#39;</span><span class="p">)</span>
+
+<span class="n">cons</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">Q</span><span class="o">=-</span><span class="mf">200e3</span><span class="p">)</span>
+
+<span class="n">nw</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="s1">&#39;offdesign&#39;</span><span class="p">,</span> <span class="n">design_path</span><span class="o">=</span><span class="s1">&#39;condenser&#39;</span><span class="p">)</span>
+<span class="n">nw</span><span class="o">.</span><span class="n">print_results</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="valve-and-evaporator-system">
+<h2><a class="toc-backref" href="#contents">Valve and evaporator system</a><a class="headerlink" href="#valve-and-evaporator-system" title="Permalink to this headline">¶</a></h2>
+<p>Next we will add the valve and the evaporator system to our existing network.</p>
+<section id="id1">
+<h3>Components<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>This part contains of a valve followed by a drum with evaporator in forced flow
+and a superheater. Do not forget to change the old sink labeled “valve” to an
+actual valve and the sink used in the previous calculation will represent the
+first compressor, labeled “compressor 1”. Add the following components to the
+script.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># sources &amp; sinks</span>
+
+<span class="n">amb_in</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span><span class="s1">&#39;source ambient&#39;</span><span class="p">)</span>
+<span class="n">amb_out</span> <span class="o">=</span> <span class="n">Sink</span><span class="p">(</span><span class="s1">&#39;sink ambient&#39;</span><span class="p">)</span>
+
+<span class="n">cp1</span> <span class="o">=</span> <span class="n">Sink</span><span class="p">(</span><span class="s1">&#39;compressor 1&#39;</span><span class="p">)</span>
+
+<span class="c1"># evaporator system</span>
+
+<span class="n">va</span> <span class="o">=</span> <span class="n">Valve</span><span class="p">(</span><span class="s1">&#39;valve&#39;</span><span class="p">)</span>
+<span class="n">dr</span> <span class="o">=</span> <span class="n">Drum</span><span class="p">(</span><span class="s1">&#39;drum&#39;</span><span class="p">)</span>
+<span class="n">ev</span> <span class="o">=</span> <span class="n">HeatExchanger</span><span class="p">(</span><span class="s1">&#39;evaporator&#39;</span><span class="p">)</span>
+<span class="n">su</span> <span class="o">=</span> <span class="n">HeatExchanger</span><span class="p">(</span><span class="s1">&#39;superheater&#39;</span><span class="p">)</span>
+<span class="n">pu</span> <span class="o">=</span> <span class="n">Pump</span><span class="p">(</span><span class="s1">&#39;pump evaporator&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="id2">
+<h3>Connections<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>As we already redefined our variable “va” to be a valve instead of a sink (see
+above), we do not need any adjustments to the connection between the condenser
+and the former sink “cd_va”. The valve connects to the drum at the inlet ‘in1’.
+The pump of the forced flow evaporation system connects to the drum’s outlet
+‘out1’, the evaporator’s cold side connects to the drum’s inlet ‘in2’ and the
+superheater’s cold side connects to the drum’s outlet ‘out2’. This will add the
+following connections to the model:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># evaporator system</span>
+
+<span class="n">va_dr</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">va</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">dr</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+<span class="n">dr_pu</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">dr</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">pu</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+<span class="n">pu_ev</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">pu</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">ev</span><span class="p">,</span> <span class="s1">&#39;in2&#39;</span><span class="p">)</span>
+<span class="n">ev_dr</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">ev</span><span class="p">,</span> <span class="s1">&#39;out2&#39;</span><span class="p">,</span> <span class="n">dr</span><span class="p">,</span> <span class="s1">&#39;in2&#39;</span><span class="p">)</span>
+<span class="n">dr_su</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">dr</span><span class="p">,</span> <span class="s1">&#39;out2&#39;</span><span class="p">,</span> <span class="n">su</span><span class="p">,</span> <span class="s1">&#39;in2&#39;</span><span class="p">)</span>
+
+<span class="n">nw</span><span class="o">.</span><span class="n">add_conns</span><span class="p">(</span><span class="n">va_dr</span><span class="p">,</span> <span class="n">dr_pu</span><span class="p">,</span> <span class="n">pu_ev</span><span class="p">,</span> <span class="n">ev_dr</span><span class="p">,</span> <span class="n">dr_su</span><span class="p">)</span>
+
+<span class="n">amb_in_su</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">amb_in</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">su</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+<span class="n">su_ev</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">su</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">ev</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+<span class="n">ev_amb_out</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">ev</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">amb_out</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+
+<span class="n">nw</span><span class="o">.</span><span class="n">add_conns</span><span class="p">(</span><span class="n">amb_in_su</span><span class="p">,</span> <span class="n">su_ev</span><span class="p">,</span> <span class="n">ev_amb_out</span><span class="p">)</span>
+
+<span class="c1"># connection evaporator system - compressor system</span>
+
+<span class="n">su_cp1</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">su</span><span class="p">,</span> <span class="s1">&#39;out2&#39;</span><span class="p">,</span> <span class="n">cp1</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+
+<span class="n">nw</span><span class="o">.</span><span class="n">add_conns</span><span class="p">(</span><span class="n">su_cp1</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="id3">
+<h3>Parametrization<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>Previous parametrization stays untouched. Regarding the evaporator, we specify
+pressure ratios on hot and cold side as well as the lower terminal temperature
+difference. We use the hot side pressure ratio and the lower terminal
+temperature (similar to pinch point layout for waste heat steam generators)
+difference as design parameters and choose zeta as well as the area independent
+heat transfer coefficient as its offdesign parameters.</p>
+<p>On top of that, the characteristic function of the evaporator should follow the
+default characteristic line of ‘EVAPORATING FLUID’ on the cold side and the
+default line ‘DEFAULT’ on the hot side. These lines are defined in the
+<a class="reference internal" href="../api/tespy.data.html#module-tespy.data" title="tespy.data"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tespy.data</span></code></a> module. If you want to learn more about handling
+characteristic functions you should have a glance at the
+<a class="reference internal" href="../tespy_modules.html#using-tespy-components-label"><span class="std std-ref">TESPy components section</span></a>. The superheater
+will also use the pressure ratios on hot and cold side. Further we set a value
+for the upper terminal temperature difference. For the pump we set the
+isentropic efficiency. For offdesign and design parameter specification of
+these components the same logic as for the evaporator and the already existing
+part of the network is applied. The system designer has to answer the question:
+Which parameters are design point parameters and how does the component perform
+at a different operation point.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tespy.tools.characteristics</span> <span class="kn">import</span> <span class="n">CharLine</span>
+<span class="kn">from</span> <span class="nn">tespy.tools.characteristics</span> <span class="kn">import</span> <span class="n">load_default_char</span> <span class="k">as</span> <span class="n">ldc</span>
+<span class="c1"># evaporator system</span>
+
+<span class="n">kA_char1</span> <span class="o">=</span> <span class="n">ldc</span><span class="p">(</span><span class="s1">&#39;heat exchanger&#39;</span><span class="p">,</span> <span class="s1">&#39;kA_char1&#39;</span><span class="p">,</span> <span class="s1">&#39;DEFAULT&#39;</span><span class="p">,</span> <span class="n">CharLine</span><span class="p">)</span>
+<span class="n">kA_char2</span> <span class="o">=</span> <span class="n">ldc</span><span class="p">(</span><span class="s1">&#39;heat exchanger&#39;</span><span class="p">,</span> <span class="s1">&#39;kA_char2&#39;</span><span class="p">,</span> <span class="s1">&#39;EVAPORATING FLUID&#39;</span><span class="p">,</span> <span class="n">CharLine</span><span class="p">)</span>
+
+<span class="n">ev</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">pr1</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span> <span class="n">pr2</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span> <span class="n">ttd_l</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+            <span class="n">kA_char1</span><span class="o">=</span><span class="n">kA_char1</span><span class="p">,</span> <span class="n">kA_char2</span><span class="o">=</span><span class="n">kA_char2</span><span class="p">,</span>
+            <span class="n">design</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;pr1&#39;</span><span class="p">,</span> <span class="s1">&#39;ttd_l&#39;</span><span class="p">],</span> <span class="n">offdesign</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;zeta1&#39;</span><span class="p">,</span> <span class="s1">&#39;kA_char&#39;</span><span class="p">])</span>
+<span class="n">su</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">pr1</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span> <span class="n">pr2</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span> <span class="n">ttd_u</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">design</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;pr1&#39;</span><span class="p">,</span> <span class="s1">&#39;pr2&#39;</span><span class="p">,</span> <span class="s1">&#39;ttd_u&#39;</span><span class="p">],</span>
+            <span class="n">offdesign</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;zeta1&#39;</span><span class="p">,</span> <span class="s1">&#39;zeta2&#39;</span><span class="p">,</span> <span class="s1">&#39;kA_char&#39;</span><span class="p">])</span>
+<span class="n">pu</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">eta_s</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">design</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;eta_s&#39;</span><span class="p">],</span> <span class="n">offdesign</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;eta_s_char&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Next step is the connection parametrization: The pressure in the drum and the
+enthalpy of the wet steam reentering the drum need to be determined. For the
+enthalpy we can specify a reference of the circulating mass flow to the main
+cycle mass flow. The pressure is achieved through the given lower terminal
+temperature difference of the evaporator and its hot side outlet temperature.
+As we have specified a terminal temperature difference at the evaporator’s cold
+side inlet (<code class="code docutils literal notranslate"><span class="pre">ttd_l</span></code>), it might be necessary to state a starting value for
+the pressure or the state of the fluid (gaseous), as we are near to the
+wo-phase region. On the hot side inlet of the superheater we define the
+temperature, pressure and the fluid. Since the pressure between superheater and
+first compressor will be a result of the pressure losses in the superheater and
+we set the terminal temperature difference there, bad starting values will lead
+to a linear dependency, as a temperature and a pressure are set while the
+fluid’s state could be within the two phase region. Thus, we choose to specify
+<code class="code docutils literal notranslate"><span class="pre">state='g'</span></code>, so the solver will keep the fluid in gaseous state at all
+times. At last we have to fully determine the state of the incoming fluid at
+the superheater’s hot side.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Do only use the <code class="code docutils literal notranslate"><span class="pre">state</span></code> keyword if you know the fluid’s state prior
+to the simulation. If you specify the fluid to be gaseous but the correct
+result of the simulation would be within the two-phase region, your
+calculation most likely will not converge.</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># evaporator system cold side</span>
+
+<span class="n">pu_ev</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">m</span><span class="o">=</span><span class="n">Ref</span><span class="p">(</span><span class="n">va_dr</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="n">su_cp1</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s1">&#39;g&#39;</span><span class="p">)</span>
+
+<span class="c1"># evaporator system hot side</span>
+
+<span class="n">amb_in_su</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">T</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">fluid</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;water&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;NH3&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
+<span class="n">ev_amb_out</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">T</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="id4">
+<h3>Solve<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p>Again, you should calculate your network after you added these parts. As we
+have already calculated one part of our network, this time we can use the
+<code class="code docutils literal notranslate"><span class="pre">init_path</span></code> for the design calculation and load the results from the
+previous network. This step is not required, but in larger, more complex
+networks, it might help, to achieve better convergence.</p>
+</section>
+</section>
+<section id="compressor-system">
+<h2><a class="toc-backref" href="#contents">Compressor system</a><a class="headerlink" href="#compressor-system" title="Permalink to this headline">¶</a></h2>
+<p>To complete the heat pump, we will add the compressor system to our existing
+network.</p>
+<section id="id5">
+<h3>Components<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<p>This part contains two compressors with an intercooler between them. The cold
+side of the intercooler requires a source and a sink. Again, remember
+redefining the former sink <code class="code docutils literal notranslate"><span class="pre">&quot;cp1&quot;</span></code> to a compressor. We will now replace
+the source for the coolant <code class="code docutils literal notranslate"><span class="pre">c_in</span></code> at the condenser with another cycle
+closer (<code class="code docutils literal notranslate"><span class="pre">cool_closer</span></code>), to make sure the fluid properties after the
+second compressor are identical to the fluid properties at the condenser inlet.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The intercooling leads to a lower COP but may be necessary depending on
+your temperature level requirement on the consumer’s side. In a single
+stage compression, the outlet temperature of the coolant might violated
+technical boundary conditions of the real-world component.</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># sources &amp; sinks</span>
+
+<span class="n">ic_in</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span><span class="s1">&#39;source intercool&#39;</span><span class="p">)</span>
+<span class="n">ic_out</span> <span class="o">=</span> <span class="n">Sink</span><span class="p">(</span><span class="s1">&#39;sink intercool&#39;</span><span class="p">)</span>
+
+<span class="n">cool_closer</span> <span class="o">=</span> <span class="n">CycleCloser</span><span class="p">(</span><span class="s1">&#39;coolant cycle closer&#39;</span><span class="p">)</span>
+
+<span class="c1"># compressor-system</span>
+
+<span class="n">cp1</span> <span class="o">=</span> <span class="n">Compressor</span><span class="p">(</span><span class="s1">&#39;compressor 1&#39;</span><span class="p">)</span>
+<span class="n">cp2</span> <span class="o">=</span> <span class="n">Compressor</span><span class="p">(</span><span class="s1">&#39;compressor 2&#39;</span><span class="p">)</span>
+<span class="n">he</span> <span class="o">=</span> <span class="n">HeatExchanger</span><span class="p">(</span><span class="s1">&#39;intercooler&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="id6">
+<h3>Connections<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<p>Consequently to the addition of the cycle closer we have to adjust the
+connection definition touching the new cycle closer. Replace</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">c_in_cd</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">c_in</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">cd</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>with</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">c_in_cd</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">cool_closer</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">cd</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Of course, do not forget to add the new connections to the script.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># compressor-system</span>
+
+<span class="n">cp1_he</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">cp1</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">he</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+<span class="n">he_cp2</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">he</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">cp2</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+<span class="n">cp2_close</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">cp2</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">cool_closer</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+
+<span class="n">ic_in_he</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">ic_in</span><span class="p">,</span> <span class="s1">&#39;out1&#39;</span><span class="p">,</span> <span class="n">he</span><span class="p">,</span> <span class="s1">&#39;in2&#39;</span><span class="p">)</span>
+<span class="n">he_ic_out</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">he</span><span class="p">,</span> <span class="s1">&#39;out2&#39;</span><span class="p">,</span> <span class="n">ic_out</span><span class="p">,</span> <span class="s1">&#39;in1&#39;</span><span class="p">)</span>
+
+<span class="n">nw</span><span class="o">.</span><span class="n">add_conns</span><span class="p">(</span><span class="n">cp1_he</span><span class="p">,</span> <span class="n">he_cp2</span><span class="p">,</span> <span class="n">ic_in_he</span><span class="p">,</span> <span class="n">he_ic_out</span><span class="p">,</span> <span class="n">cp2_close</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="id7">
+<h3>Parametrization<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<p>For the two compressor we defined an isentropic efficiency and for the
+offdesign calculation a generic characteristic line for the isentropic
+efficiency will be applied. The first compressor has a fixed pressure ratio,
+the seconds compressor pressure ratio will result from the required pressure
+at the condenser. The heat exchanger comes with pressure ratios on both sides.
+The parametrization of all other components remains identical.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cp1</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">eta_s</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">design</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;eta_s&#39;</span><span class="p">],</span> <span class="n">offdesign</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;eta_s_char&#39;</span><span class="p">])</span>
+<span class="n">cp2</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">eta_s</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">pr</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">design</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;eta_s&#39;</span><span class="p">],</span> <span class="n">offdesign</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;eta_s_char&#39;</span><span class="p">])</span>
+<span class="n">he</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">pr1</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span> <span class="n">pr2</span><span class="o">=</span><span class="mf">0.98</span><span class="p">,</span> <span class="n">design</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;pr1&#39;</span><span class="p">,</span> <span class="s1">&#39;pr2&#39;</span><span class="p">],</span>
+            <span class="n">offdesign</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;zeta1&#39;</span><span class="p">,</span> <span class="s1">&#39;zeta2&#39;</span><span class="p">,</span> <span class="s1">&#39;kA_char&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Regarding the connections, on the hot side after the intercooler we set the
+temperature. For the cold side of the heat exchanger we set the temperature,
+the pressure and the fluid on the inlet flow, at the outlet we specify the
+temperature as a design parameter. In offdesign calculation, this will be a
+result from the given heat transfer coefficient (see parametrisation of
+intercooler, kA_char is an offdesign parameter). Last, make sure the fluid
+properties after the compressor outlet are identical to those at the condenser
+inlet using the references.</p>
+<p>The last step leads to a necessary redefinition of the parametrization of the
+existing model: As the enthalpy at the outlet of the second compressor is a
+result of the given pressure ratio and the isentropic efficiency, it is not
+allowed to set the temperature at the condenser’s hot inlet anymore.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># condenser system</span>
+
+<span class="n">c_in_cd</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">fluid</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;water&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;NH3&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+
+<span class="c1"># compressor-system</span>
+
+<span class="n">he_cp2</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">T</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">p0</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">ic_in_he</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">fluid</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;water&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;NH3&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
+<span class="n">he_ic_out</span><span class="o">.</span><span class="n">set_attr</span><span class="p">(</span><span class="n">T</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">design</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;T&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</section>
+<section id="id8">
+<h3>Solve<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<p>Here again, using the saved results from previous calculations is always
+favorable, but with manually adjusted starting values and the <code class="code docutils literal notranslate"><span class="pre">state</span></code>
+specifier, the calculation should still converge. If you want to use the
+previous part to initialise start the solver with</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nw</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="s1">&#39;design&#39;</span><span class="p">,</span> <span class="n">init_path</span><span class="o">=</span><span class="s1">&#39;condenser&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="further-tasks">
+<h2><a class="toc-backref" href="#contents">Further tasks</a><a class="headerlink" href="#further-tasks" title="Permalink to this headline">¶</a></h2>
+<p>After successfully modeling the heat pump in design and offdesign cases, you
+can now start using your model for further calculations. For example, if you
+have a time series of required heat flow of your consumer, you can loop over
+the series and perform offdesign calculation adjusting the heat flow every
+time. Of course, this is possible with every offdesign parameter. We provide
+the scripts after each of the three steps of the tutorial:
+<code class="xref download docutils literal notranslate"><span class="pre">Step</span> <span class="pre">1</span></code>,
+<code class="xref download docutils literal notranslate"><span class="pre">Step</span> <span class="pre">2</span></code>,
+<code class="xref download docutils literal notranslate"><span class="pre">Step</span> <span class="pre">3</span></code>.</p>
+<p>Have fun working with TESPy!</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2020, Francesco Witte.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
